@@ -1,18 +1,15 @@
-import { Link, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import { getRandomBgClass } from "../../shared/utils/helpers";
+
+
 
 
 export default function AuthLayout() {
 
     return (
-        <div>
-            <header>
-                <h1>login Taquilla</h1>
-                <nav>
-                    <Link to="login">Iniciar sesión</Link>
-                    <Link to="register">Registrarme</Link>
-                    
-                </nav>
-            </header>
+        <div className={`w-full h-screen flex items-center justify-center ${getRandomBgClass()}`}>
+
+        
 
             <main>
                 <Outlet /> 
