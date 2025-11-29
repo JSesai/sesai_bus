@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld("electron", {
     addUser: (user: User) => ipcRenderer.invoke("addUser", user),
     updateUser: (user: User) => ipcRenderer.invoke("updateUser", user),
     deleteUser: (id: User['id']) => ipcRenderer.invoke("deleteUser", id),
+    authUser:(credentials: Credential) => ipcRenderer.invoke("authUser", credentials)
   },
 
   agencies: {
@@ -23,6 +24,7 @@ contextBridge.exposeInMainWorld("electron", {
     addBus: (bus: Bus) => ipcRenderer.invoke("addBus", bus),
     deleteBus: (id: Bus['id']) => ipcRenderer.invoke("deleteBus", id),
     updateBus: (bus: Bus) => ipcRenderer.invoke("deleteBus", bus),
+    
   },
 
   drivers: {

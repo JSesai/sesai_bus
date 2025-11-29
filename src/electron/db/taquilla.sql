@@ -1,5 +1,3 @@
--- Activar llaves foráneas
---PRAGMA foreign_keys = ON;
 
 
 -- 1. AGENCIES (Sucursales)
@@ -30,7 +28,7 @@ CREATE TABLE IF NOT EXISTS drivers (
 );
 
 
--- 4. ROUTES (Ruta base: Ciudad A → Ciudad B)
+-- 4. ROUTES (Ruta base Ciudad A → Ciudad B)
 
 CREATE TABLE IF NOT EXISTS routes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -100,8 +98,8 @@ CREATE TABLE IF NOT EXISTS payments (
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
+    user TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
-    status: TEXT NOT NULL,
+    status TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'clerk'   -- clerk, admin, supervisor
 );

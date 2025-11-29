@@ -17,7 +17,7 @@ export const userRepo = {
   add: (user: User) =>
 
     new Promise((resolve, reject) => {
-      db.run("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?, ?)", [user.name, user.email, user.password, user.status, user.role], function (err) {
+      db.run("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?, ?)", [user.name, user.user, user.password, user.status, user.role], function (err) {
         if (err) reject(err);
         else resolve({ id: this.lastID, ...user });
       });
@@ -37,5 +37,16 @@ export const userRepo = {
         if (err) reject(err);
         else resolve({ changes: this.changes });
       });
-    })
+    }),
+  authUser: ({ user, password }: UserCredentials) =>
+    new Promise<User>((resolve, reject) => {
+      db.get(
+        "SELECT id, name, user, role FROM users WHERE user = ? AND password = ?",
+        [user, password],
+        (err, row) => {
+          if (err) return reject(err);
+          resolve(row as User);
+        }
+      );
+    }),
 };

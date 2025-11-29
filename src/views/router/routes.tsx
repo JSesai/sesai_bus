@@ -22,16 +22,20 @@ export function AppRouter() {
                     </Route>
 
 
+
+                    <Route path="*" element={<Navigate to={"/auth"} />} />
+                </Routes>
+
+                <Routes>
                     <Route path="dashboard" element={<DashBoardLayout />}>
                         <Route index element={<h1>este es el home del dash</h1>} />
                         <Route path="buses/register" element={<RegisterBus />} />09
                     </Route>
-
-                    {/* <Route path="dashboard" element={<RouterDashBoard />} /> */}
-                    {/* <Route path="/drivers" element={<DriverForm />} /> */}
-                    {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-                    <Route path="*" element={<Navigate to={"/auth"} />} />
                 </Routes>
+
+                {/* <Route path="dashboard" element={<RouterDashBoard />} /> */}
+                {/* <Route path="/drivers" element={<DriverForm />} /> */}
+                {/* <Route path="/dashboard" element={<Dashboard />} /> */}
             </AuthProvider>
         </BrowserRouter>
     );

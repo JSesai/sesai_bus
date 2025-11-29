@@ -8,29 +8,31 @@ import { Label } from "../../components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { Alert, AlertDescription } from "../../components/ui/alert"
 import { Bus, Lock, User, AlertCircle, Eye, EyeOff } from "lucide-react"
+import { useAuth } from "../context/AuthContext"
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("")
+  const { login, loading, setLoading } = useAuth()
+  const [user, setUser] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setIsLoading(true)
+    try {
+      e.preventDefault()
+      setError("");
+      setLoading(true);
+      if (!user && !password) return setError("Por favor completa todos los campos");
 
-    // Simulación de autenticación - Aquí integrarías tu API
-    setTimeout(() => {
-      if (email && password) {
-        // Lógica de autenticación exitosa
-        console.log("Login exitoso")
-      } else {
-        setError("Por favor completa todos los campos")
-      }
-      setIsLoading(false)
-    }, 1000)
+      await login({ user, password })
+
+    } catch (error) {
+      setError("No fue posible realizar la autenticacion. Intenta mas tarde");
+    } finally {
+      setLoading(false);
+    }
+
+
   }
 
   return (
@@ -61,14 +63,14 @@ export default function LoginForm() {
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                id="email"
-                type="email"
+                id="user"
+                type="user"
                 placeholder="Ingresa tu usuario"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={user}
+                onChange={(e) => setUser(e.target.value)}
                 className="pl-10"
                 required
-                disabled={isLoading}
+                disabled={loading}
               />
             </div>
           </div>
@@ -98,7 +100,7 @@ export default function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="pl-10 pr-10"
                 required
-                disabled={isLoading}
+                disabled={loading}
               />
               <button
                 type="button"
@@ -111,8 +113,8 @@ export default function LoginForm() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full h-11 text-base font-medium" disabled={isLoading}>
-            {isLoading ? (
+          <Button type="submit" className="w-full h-11 text-base font-medium" disabled={loading}>
+            {loading ? (
               <span className="flex items-center gap-2">
                 <span className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                 Iniciando sesión...

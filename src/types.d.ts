@@ -3,10 +3,21 @@
 interface User {
   id?: number
   name: string;
-  email: string;
+  user: string;
   password: string,
   status: string
   role: string
+}
+
+interface UserCredentials {
+  user: string;
+  password: string;
+}
+
+interface ResponseHandler {
+  ok: boolean;
+  data: any;
+  error: any
 }
 
 interface UsersAPI {
@@ -15,7 +26,7 @@ interface UsersAPI {
   addUser: (user: User) => Promise<User>;
   updateUser: (user: User) => Promise<void>;
   delete: (id: number) => Promise<void>;
-
+  authUser: (UserCredentials) => Promise<User>
 }
 
 interface Agency {

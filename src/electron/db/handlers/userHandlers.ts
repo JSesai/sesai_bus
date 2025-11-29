@@ -8,4 +8,21 @@ export function registerUserHandlers() {
     ipcMain.handle("addUser", (_event, user) => userRepo.add(user));
     ipcMain.handle("updateUser", (_event, user) => userRepo.update(user));
     ipcMain.handle("deleteUser", (_event, id) => userRepo.delete(id));
+    ipcMain.handle("authUser", async (_event, credentials) => {
+        try {
+            console.log('inicia process auth');
+
+            const result = await userRepo.authUser(credentials)
+
+            if (!result) {
+                return { ok: false, error: "Credenciales incorrectas" };
+            }
+
+            return { ok: true, user: result };
+        } catch (error) {
+            console.log(error);
+
+            return { ok: false, error: "Error interno" };
+        }
+    })
 }

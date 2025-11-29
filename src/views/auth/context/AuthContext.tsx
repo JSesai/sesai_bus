@@ -1,24 +1,20 @@
-import { createContext, use, useContext, useEffect, useState } from "react";
+import { createContext, use, useContext, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 
-export type AuthUser = {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-};
+
 
 type AuthContextType = {
-    user: AuthUser | null;
+    user: User | null;
     loading: boolean;
-    login: (user: AuthUser) => void;
+    setLoading: Dispatch<SetStateAction<boolean>>
+    login: (user: UserCredentials) => void;
     logout: () => void;
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<AuthUser | null>({ name: 'juan', email: '', id: 2, role: 'admin' });
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(false);
 
     // Cargar usuario desde localStorage al iniciar
     useEffect(() => {
@@ -28,9 +24,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     // Login
-    const login = (userData: AuthUser) => {
-        setUser(userData);
-        localStorage.setItem("auth_user", JSON.stringify(userData));
+    const login = async (userData: UserCredentials) => {
+        try {
+            console.log('haciendo login', userData);
+            const validateUser = await window.electron.users.authUser(userData);
+            console.log(validateUser);
+
+        } catch (error) {
+            console.log('el error', error);
+
+        }
+
+
+        // localStorage.setItem("auth_user", JSON.stringify(userData));
     }
 
     // Logout
@@ -43,6 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         <AuthContext.Provider value={{
             user,
             loading,
+            setLoading,
             login,
             logout
         }}>
