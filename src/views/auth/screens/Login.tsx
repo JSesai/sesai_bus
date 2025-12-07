@@ -9,13 +9,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Alert, AlertDescription } from "../../components/ui/alert"
 import { Bus, Lock, User, AlertCircle, Eye, EyeOff } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
+import { useNavigate } from "react-router-dom"
 
 export default function LoginForm() {
-  const { login, loading, setLoading } = useAuth()
-  const [user, setUser] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState("")
+  const { login, loading, setLoading } = useAuth();
+  const navigation = useNavigate();
+  const [user, setUser] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     try {
@@ -23,8 +25,9 @@ export default function LoginForm() {
       setError("");
       setLoading(true);
       if (!user && !password) return setError("Por favor completa todos los campos");
+      console.log('this is data', { user, password });
 
-      await login({ user, password })
+      await login({ user, password });
 
     } catch (error) {
       setError("No fue posible realizar la autenticacion. Intenta mas tarde");
@@ -67,7 +70,7 @@ export default function LoginForm() {
                 type="user"
                 placeholder="Ingresa tu usuario"
                 value={user}
-                onChange={(e) => setUser(e.target.value)}
+                onChange={(e) => setUser(e.target.value.trim())}
                 className="pl-10"
                 required
                 disabled={loading}
@@ -80,15 +83,7 @@ export default function LoginForm() {
               <Label htmlFor="password" className="text-sm font-medium">
                 Contraseña
               </Label>
-              <button
-                type="button"
-                className="text-xs text-primary hover:underline"
-                onClick={() => {
-                  /* Lógica para recuperar contraseña */
-                }}
-              >
-                ¿Olvidaste tu contraseña?
-              </button>
+
             </div>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -97,7 +92,7 @@ export default function LoginForm() {
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value.trim())}
                 className="pl-10 pr-10"
                 required
                 disabled={loading}
@@ -123,6 +118,17 @@ export default function LoginForm() {
               "Iniciar sesión"
             )}
           </Button>
+
+          <div className="text-center">
+            <button
+              type="button"
+              className="cursor-pointer text-xs text-primary hover:underline"
+              onClick={() => navigation('forgot-password')}
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+
+          </div>
 
           <div className="pt-4 border-t border-border">
             <p className="text-xs text-center text-muted-foreground leading-relaxed">

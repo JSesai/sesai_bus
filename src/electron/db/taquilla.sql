@@ -101,5 +101,6 @@ CREATE TABLE IF NOT EXISTS users (
     user TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     status TEXT NOT NULL,
+    phone TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'clerk'   -- clerk, admin, supervisor
 );

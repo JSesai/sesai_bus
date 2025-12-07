@@ -11,7 +11,7 @@ function App() {
   const handlerOnclick = async () => {
     const user: User = {
       name: 'julio',
-      email: `elbonsai87`,
+      user: `elbonsai87`,
       password: '123',
       role: 'developer',
       status: 'register'
