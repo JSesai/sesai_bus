@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom"
 export default function LoginForm() {
   const { login, loading, setLoading } = useAuth();
   const navigation = useNavigate();
-  const [user, setUser] = useState("");
+  const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -24,10 +24,10 @@ export default function LoginForm() {
       e.preventDefault()
       setError("");
       setLoading(true);
-      if (!user && !password) return setError("Por favor completa todos los campos");
-      console.log('this is data', { user, password });
+      if (!userName && !password) return setError("Por favor completa todos los campos");
+      console.log('this is data', { userName, password });
 
-      await login({ user, password });
+      await login({ userName, password });
 
     } catch (error) {
       setError("No fue posible realizar la autenticacion. Intenta mas tarde");
@@ -69,8 +69,8 @@ export default function LoginForm() {
                 id="user"
                 type="user"
                 placeholder="Ingresa tu usuario"
-                value={user}
-                onChange={(e) => setUser(e.target.value.trim())}
+                value={userName}
+                onChange={(e) => setUserName(e.target.value.trim())}
                 className="pl-10"
                 required
                 disabled={loading}

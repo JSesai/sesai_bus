@@ -14,12 +14,12 @@ export const userRepo = {
       });
     }),
 
-  add: (user: User) =>
+  add: (user: User): Promise<User> =>
 
     new Promise((resolve, reject) => {
-      db.run("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?, ?)", [user.name, user.user, user.password, user.status, user.role], function (err) {
+      db.run("INSERT INTO users (name, userName, password, status, phone, role) VALUES (?, ?, ?, ?, ?, ?)", [user.name, user.userName, user.password, user.status, user.phone, user.role], function (err) {
         if (err) reject(err);
-        else resolve({ id: this.lastID, ...user });
+        else resolve({ id: this.lastID, ...user } as User);
       });
     }),
   update: (user: { id: number; name?: string; email?: string }) =>
@@ -38,11 +38,11 @@ export const userRepo = {
         else resolve({ changes: this.changes });
       });
     }),
-  authUser: ({ user, password }: UserCredentials) =>
+  authUser: ({ userName }: UserCredentials) =>
     new Promise<User>((resolve, reject) => {
       db.get(
-        "SELECT id, name, user, role FROM users WHERE user = ? AND password = ?",
-        [user, password],
+        "SELECT * FROM users WHERE userName = ? ",
+        [userName],
         (err, row) => {
           if (err) return reject(err);
           resolve(row as User);

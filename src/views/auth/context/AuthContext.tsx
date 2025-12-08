@@ -1,7 +1,7 @@
 import { createContext, use, useContext, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { redirect, useNavigate } from "react-router-dom";
-
-
+import confetti from 'canvas-confetti';
+import { toast } from 'sonner';
 
 type AuthContextType = {
     user: User | null;
@@ -9,6 +9,7 @@ type AuthContextType = {
     setLoading: Dispatch<SetStateAction<boolean>>
     login: (user: UserCredentials) => Promise<void>;
     logout: () => void;
+    handleRegisterUser: (user: User) => Promise<void>
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,11 +21,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Cargar usuario desde localStorage al iniciar
     useEffect(() => {
         console.log('ejecuta usefecgt');
-        
+
         const saved = localStorage.getItem("auth_user");
         if (saved) {
             setUser(JSON.parse(saved));
             navigate("dashboard");
+        } else {
+            navigate("/auth/register");
+
         };
         setLoading(false);
     }, []);
@@ -51,13 +55,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem("auth_user");
     }
 
+    const handleRegisterUser = async (user: User) => {
+        const { name, password, phone, role, userName, status } = user
+        const resp = await window.electron.users.addUser({
+            role,
+            userName,
+            name,
+            password,
+            phone,
+            status
+        })
+
+        console.log(resp);
+        if (resp.ok) {
+            confetti({
+                particleCount: 100,
+                spread: 120,
+                origin: { y: 0.6 }
+            });
+            toast.success('Registro exitoso. La cuenta ha sido creada correctamente.')
+
+
+        }
+
+        if (resp.error) {
+            // setError(`${resp.error.message} ${resp.error.detail}`)
+            toast.warning(resp.error.message, {
+                description: resp.error.detail,
+
+                duration: 10_000,
+                position: 'top-center'
+            })
+        }
+
+    }
+
     return (
         <AuthContext.Provider value={{
             user,
             loading,
             setLoading,
             login,
-            logout
+            logout,
+            handleRegisterUser
         }}>
             {children}
         </AuthContext.Provider>

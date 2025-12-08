@@ -1,16 +1,17 @@
 
 
 interface User {
-  id?: number
+  id?: number;
   name: string;
-  user: string;
-  password: string,
-  status: string
-  role: string
+  userName: string;
+  password: string;
+  status: StatusType;
+  role: Rol;
+  phone: string;
 }
 
 interface UserCredentials {
-  user: string;
+  userName: string;
   password: string;
 }
 
@@ -23,7 +24,7 @@ interface ResponseHandler {
 interface UsersAPI {
   getById: (id: number) => Promise<User>;
   getUsers: () => Promise<User[]>;
-  addUser: (user: User) => Promise<User>;
+  addUser: (user: User) => Promise<ResponseElectronUser>;
   updateUser: (user: User) => Promise<void>;
   delete: (id: number) => Promise<void>;
   authUser: (UserCredentials) => Promise<User>
@@ -149,10 +150,10 @@ interface Payment {
 
 interface PaymentsAPI {
   getPayments: () => Promise<Payment[]>
-  getPaymentById: (id: Payment['id'])=> Promise<Payment>
-  addPayment: (payment: Payment)=> Promise<Payment>
-  updatePayment: (payment: Payment)=> Promise<void>
-  deletePayment: (id: Payment['id'])=> Promise<void>
+  getPaymentById: (id: Payment['id']) => Promise<Payment>
+  addPayment: (payment: Payment) => Promise<Payment>
+  updatePayment: (payment: Payment) => Promise<void>
+  deletePayment: (id: Payment['id']) => Promise<void>
 }
 
 
@@ -169,4 +170,21 @@ interface Window {
 
 
   };
+}
+
+
+type StatusType = 'registered' | 'acitive' | 'disabled' | 'deleted' | 'developer'
+type Rol = 'developer'| 'manager' | 'driver' | 'ticketSeller' | 'checkIn' | null
+
+interface ErrorApp {
+  message: string;
+  detail: string;
+}
+
+// type UserResp = Omit<User, "pas">
+
+interface ResponseElectronUser {
+  ok: boolean;
+  data: null | Omit<User, "password">;
+  error: null | ErrorApp
 }
