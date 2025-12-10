@@ -8,7 +8,7 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "main": "dist-electron/main.js",
+  "main": "dist-electron/electron/main.js",
   "build": {
     "extraResources": [
       {

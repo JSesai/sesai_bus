@@ -6,8 +6,7 @@ import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
-import { Alert, AlertDescription } from "../../components/ui/alert"
-import { Bus, Lock, User as UserIcon, AlertCircle, Eye, EyeOff, Phone, UserCircle } from "lucide-react"
+import { Bus, Lock, User as UserIcon, Eye, EyeOff, Phone, UserCircle } from "lucide-react"
 
 interface UserRegister extends User {
     confirmPassword: string;
@@ -29,6 +28,8 @@ export default function RegisterUser() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [error, setError] = useState("")
     const [success, setSuccess] = useState(false)
+    console.log(success, error);
+    
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -65,7 +66,7 @@ export default function RegisterUser() {
 
 
 
-        const resp = await handleRegisterUser(formData)
+       await handleRegisterUser(formData)
 
     }
 

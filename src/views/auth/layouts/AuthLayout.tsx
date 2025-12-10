@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { getRandomBgClass } from "../../shared/utils/helpers";
-import { useContext } from "react";
-import { AuthContext, useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 
 

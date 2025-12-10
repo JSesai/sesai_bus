@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route } from "react-router-dom";
 import DashBoardLayout from "../shared/layouts/DashboardLayout";
 import RegisterBus from "../Buses/screens/RegisterBus";
 

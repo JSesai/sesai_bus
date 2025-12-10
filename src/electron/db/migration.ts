@@ -1,6 +1,5 @@
 
 
-import { getDB } from "./connection.js";
 import path from "path";
 import fs from "fs";
 import isDev from "electron-is-dev";

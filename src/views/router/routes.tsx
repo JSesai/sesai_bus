@@ -1,7 +1,5 @@
 // src/react/AppRouter.tsx
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import RouterBuses from "../Buses/routes/RoutesBuses";
-import RouterDashBoard from "../DashBoard/RouterDashBoard";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import DashBoardLayout from "../shared/layouts/DashboardLayout";
 import RegisterBus from "../Buses/screens/RegisterBus";
 import AuthLayout from "../auth/layouts/AuthLayout";

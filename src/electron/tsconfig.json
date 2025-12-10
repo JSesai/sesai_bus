@@ -8,5 +8,6 @@
         "module": "nodenext",
         "outDir": "../../dist-electron",
         "skipLibCheck": true,
+        // "noEmitOnError": true
     },
 }

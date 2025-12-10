@@ -17,12 +17,12 @@ export function registerUserHandlers() {
 
             user.password = await hashPassword(user.password);
             const result: User = await userRepo.add(user);
-            console.log('this is the result', result);
+            console.log(result);
 
             if (!result) throw new Error("Error al crear usuario");
 
             const { password, ...rest } = result
-            console.log('llega hasta aqui y devuelve esto', { ok: true, data: rest, error: null });
+            console.log("ESTE ES EL HANDLER CORRECTO")
             return { ok: true, data: rest, error: null };
 
         } catch (error) {
