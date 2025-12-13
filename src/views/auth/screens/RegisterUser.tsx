@@ -8,28 +8,30 @@ import { Label } from "../../components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { Bus, Lock, User as UserIcon, Eye, EyeOff, Phone, UserCircle } from "lucide-react"
 
-interface UserRegister extends User {
+export interface UserRegister extends User {
     confirmPassword: string;
+}
+
+const dataInicialForm: UserRegister = {
+    name: "",
+    userName: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
+    role: null,
+    status: "registered"
 }
 
 export default function RegisterUser() {
     const { handleRegisterUser, loading, setLoading } = useAuth();
 
-    const [formData, setFormData] = useState<UserRegister>({
-        name: "",
-        userName: "",
-        password: "",
-        confirmPassword: "",
-        phone: "",
-        role: null,
-        status: "registered"
-    })
+    const [formData, setFormData] = useState<UserRegister>(dataInicialForm)
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [error, setError] = useState("")
     const [success, setSuccess] = useState(false)
     console.log(success, error);
-    
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -37,36 +39,8 @@ export default function RegisterUser() {
         setSuccess(false)
         setLoading(true)
 
-        const { userName, name, password, confirmPassword, phone, role } = formData;
-
-        // Validaciones
-        if (!name || !userName || !password || !confirmPassword || !phone || !role) {
-            setError("Por favor completa todos los campos")
-            setLoading(false)
-            return
-        }
-
-        if (password !== confirmPassword) {
-            setError("Las contraseñas no coinciden")
-            setLoading(false)
-            return
-        }
-
-        if (password.length < 6) {
-            setError("La contraseña debe tener al menos 6 caracteres")
-            setLoading(false)
-            return
-        }
-
-        if (phone.length < 10) {
-            setError("El número de teléfono debe tener al menos 10 dígitos")
-            setLoading(false)
-            return
-        }
-
-
-
-       await handleRegisterUser(formData)
+        await handleRegisterUser(formData);
+        setFormData(dataInicialForm);
 
     }
 
@@ -77,7 +51,7 @@ export default function RegisterUser() {
     }
 
     return (
-        <Card className="w-full max-w-md shadow-lg">
+        <Card className="w-92 max-w-md shadow-lg">
             <CardHeader className="space-y-3 text-center pb-6">
                 <div className="mx-auto w-16 h-16 bg-primary rounded-xl flex items-center justify-center">
                     <Bus className="w-10 h-10 text-primary-foreground" />

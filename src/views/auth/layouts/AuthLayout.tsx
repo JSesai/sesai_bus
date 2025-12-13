@@ -13,7 +13,7 @@ export default function AuthLayout() {
     return (
         <div className={`w-full h-screen flex items-center justify-center ${getRandomBgClass()}`}>
 
-            <main>
+            <main >
                 <Outlet />
             </main>
         </div>
