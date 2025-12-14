@@ -1,7 +1,7 @@
 import type React from "react"
 import { useAuth } from "../context/AuthContext"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
@@ -15,40 +15,61 @@ export interface UserRegister extends User {
 const dataInicialForm: UserRegister = {
     name: "",
     userName: "",
-    password: "",
-    confirmPassword: "",
+    password: "temporal123",
+    confirmPassword: "temporal123",
     phone: "",
     role: null,
     status: "registered"
 }
 
 export default function RegisterUser() {
-    const { handleRegisterUser, loading, setLoading } = useAuth();
+    const { handleRegisterUser, loading, setLoading, getUniqueUserName } = useAuth();
 
     const [formData, setFormData] = useState<UserRegister>(dataInicialForm)
-    const [showPassword, setShowPassword] = useState(false)
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    const [error, setError] = useState("")
-    const [success, setSuccess] = useState(false)
-    console.log(success, error);
+    // const [showPassword, setShowPassword] = useState(false)
+    // const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setError("")
-        setSuccess(false)
+
+
         setLoading(true)
 
-        await handleRegisterUser(formData);
+        const resp = await handleRegisterUser(formData);
+        if (!resp) return;
         setFormData(dataInicialForm);
 
     }
 
     const handleChange = (field: string, value: string) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
-        setError("");
-        setSuccess(false);
+
+
     }
+
+    const handleKeyDown = () => {
+
+    }
+
+    //debounce para busqueda de nombre valido
+    useEffect(() => {
+
+        const idTimeout = setTimeout(async () => {
+            //busqueda
+            const userName = await getUniqueUserName(formData.name);
+            console.log(userName);
+
+            setFormData(prev => ({ ...prev, userName }));
+
+        }, 800);
+
+        return () => {
+            clearTimeout(idTimeout)
+        }
+
+
+    }, [formData.name])
 
     return (
         <Card className="w-92 max-w-md shadow-lg">
@@ -77,6 +98,8 @@ export default function RegisterUser() {
                                 placeholder="Ingresa nombre completo"
                                 value={formData.name}
                                 onChange={(e) => handleChange("name", e.target.value)}
+                                onKeyDown={handleKeyDown}
+                                minLength={10}
                                 className="pl-10"
                                 required
                                 disabled={loading}
@@ -93,17 +116,17 @@ export default function RegisterUser() {
                             <Input
                                 id="usuario"
                                 type="text"
-                                placeholder="jperez123"
+                                placeholder="usuario"
                                 value={formData.userName}
                                 onChange={(e) => handleChange("userName", e.target.value)}
                                 className="pl-10"
                                 required
-                                disabled={loading}
+                                disabled={true}
                             />
                         </div>
                     </div>
 
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                         <Label htmlFor="password" className="text-sm font-medium">
                             Contraseña
                         </Label>
@@ -129,9 +152,9 @@ export default function RegisterUser() {
                                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                         </div>
-                    </div>
+                    </div> */}
 
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                         <Label htmlFor="confirmPassword" className="text-sm font-medium">
                             Confirmar contraseña
                         </Label>
@@ -157,7 +180,7 @@ export default function RegisterUser() {
                                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="space-y-2">
                         <Label htmlFor="telefono" className="text-sm font-medium">
@@ -199,7 +222,7 @@ export default function RegisterUser() {
                         </Select>
                     </div>
 
-                    <Button type="submit" className="w-full h-11 text-base font-medium" disabled={loading}>
+                    <Button type="submit" className="w-full h-11 text-base font-medium" disabled={loading || !formData.userName}>
                         {loading ? (
                             <span className="flex items-center gap-2">
                                 <span className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />

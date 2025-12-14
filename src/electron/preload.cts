@@ -7,7 +7,8 @@ contextBridge.exposeInMainWorld("electron", {
     addUser: (user: User) => ipcRenderer.invoke("addUser", user),
     updateUser: (user: User) => ipcRenderer.invoke("updateUser", user),
     deleteUser: (id: User['id']) => ipcRenderer.invoke("deleteUser", id),
-    authUser:(credentials: Credential) => ipcRenderer.invoke("authUser", credentials)
+    authUser:(credentials: Credential) => ipcRenderer.invoke("authUser", credentials),
+    generateUniqueUserName:(userName: User['userName']) => ipcRenderer.invoke("generateUniqueUserName", userName)
   },
 
   agencies: {

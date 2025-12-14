@@ -2,6 +2,7 @@ import { ipcMain } from "electron";
 import { userRepo } from "../repositories/userRepo.js";
 import { comparePassword, hashPassword } from "../../security/pass.js";
 import { AppError, AuthError, RegisterUserError } from '../../../shared/errors/customError.js'
+import { generateUniqueUserName } from "../../utils/helpers.js";
 
 export function registerUserHandlers() {
     ipcMain.handle("getById", async (_event, id: User['id']) => userRepo.getById(id));
@@ -19,18 +20,31 @@ export function registerUserHandlers() {
             const result: User = await userRepo.add(user);
             console.log(result);
 
-            if (!result) throw new Error("Error al crear usuario");
+            if (!result) throw new RegisterUserError("Error al crear usuario", "jsjs");
 
             const { password, ...rest } = result
-            console.log("ESTE ES EL HANDLER CORRECTO")
+        
             return { ok: true, data: rest, error: null };
 
-        } catch (error) {
+        } catch (error: any) {
             //logger
             console.log(error);
             if (error instanceof AppError) {
                 return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
             }
+
+            if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('users.phone')) {
+                return {
+                    ok: false,
+                    data: null,
+                    error: {
+                        message: 'Teléfono ya registrado',
+                        detail: 'El número de teléfono ya está asociado a otro usuario'
+                    }
+                };
+            }
+
+
 
             return { ok: false, data: null, error: { message: "Error interno", detail: "error no esperado" } };
 
@@ -55,6 +69,29 @@ export function registerUserHandlers() {
 
             const { password, ...rest } = result;
             return { data: rest, error: null, ok: true }
+
+
+        } catch (error) {
+            //logger
+            console.log(error);
+            if (error instanceof AppError) {
+                return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
+            }
+
+            return { ok: false, data: null, error: { message: "Error interno", detail: "error no esperado" } };
+        }
+
+
+    })
+    ipcMain.handle("generateUniqueUserName", async (_event, userName: User['userName']): Promise<ResponseElectronGeneric> => {
+
+        try {
+            console.log('start process validacion nombre user');
+            const userNameAllow =await generateUniqueUserName(userName);
+         
+
+            if (!userNameAllow) throw new RegisterUserError("Usuario no disponible.", "Ocurrio un error al validar si el nombre del usuario esta disponible.");
+            return { data: userNameAllow, error: null, ok: true }
 
 
         } catch (error) {

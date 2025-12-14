@@ -27,7 +27,8 @@ interface UsersAPI {
   addUser: (user: User) => Promise<ResponseElectronUser>;
   updateUser: (user: User) => Promise<void>;
   delete: (id: number) => Promise<void>;
-  authUser: (UserCredentials) => Promise<User>
+  authUser: (UserCredentials) => Promise<User>;
+  generateUniqueUserName: (UserCredentials) => Promise<ResponseElectronGeneric>;
 }
 
 interface Agency {
@@ -186,5 +187,11 @@ interface ErrorApp {
 interface ResponseElectronUser {
   ok: boolean;
   data: null | Omit<User, "password">;
+  error: null | ErrorApp
+}
+
+interface ResponseElectronGeneric {
+  ok: boolean,
+  data: any;
   error: null | ErrorApp
 }

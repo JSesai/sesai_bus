@@ -41,7 +41,7 @@ export const userRepo = {
   authUser: ({ userName }: UserCredentials) =>
     new Promise<User>((resolve, reject) => {
       db.get(
-        "SELECT * FROM users WHERE userName = ? ",
+        "SELECT * FROM users WHERE userName = ? LIMIT 1",
         [userName],
         (err, row) => {
           if (err) return reject(err);
@@ -49,4 +49,19 @@ export const userRepo = {
         }
       );
     }),
+
+    getByName: (userName: string) =>
+      new Promise<User | null>((resolve, reject) => {
+
+        db.get(
+          `SELECT * FROM users WHERE userName = ? LIMIT 1`,
+          [userName],
+          (err, row) => {
+            if (err) return reject(err);
+            resolve(row ? row as User : null);
+          }
+        )
+      })
+
+
 };
