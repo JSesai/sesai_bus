@@ -25,8 +25,6 @@ export default function LoginForm() {
       setError("");
       setLoading(true);
       if (!userName && !password) return setError("Por favor completa todos los campos");
-      console.log('this is data', { userName, password });
-
       await login({ userName, password });
 
     } catch (error) {
@@ -123,7 +121,7 @@ export default function LoginForm() {
             <button
               type="button"
               className="cursor-pointer text-xs text-primary hover:underline"
-              onClick={() => navigation('forgot-password')}
+              onClick={() => navigation('/auth/forgot-password')}
             >
               ¿Olvidaste tu contraseña?
             </button>

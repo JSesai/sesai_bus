@@ -13,6 +13,7 @@ import { registerSchedulesHandlers } from "./db/handlers/schedulesHandlers.js";
 import { registerCustomersHandlers } from "./db/handlers/customersHandlers.js";
 import { registerTicketsHandlers } from "./db/handlers/ticketsHandlers.js";
 import { registerPaymentsHandlers } from "./db/handlers/paymentsHandlers.js";
+import { registerBiometricHandlers } from "./db/handlers/biometricHandlers.js";
 
 
 
@@ -49,6 +50,7 @@ app.whenReady().then(async () => {
     registerCustomersHandlers();
     registerTicketsHandlers();
     registerPaymentsHandlers();
+    registerBiometricHandlers();
 
 
 });

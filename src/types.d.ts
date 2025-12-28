@@ -21,13 +21,15 @@ interface ResponseHandler {
   error: any
 }
 
+
 interface UsersAPI {
   getById: (id: number) => Promise<User>;
   getUsers: () => Promise<User[]>;
   addUser: (user: User) => Promise<ResponseElectronUser>;
-  updateUser: (user: User) => Promise<void>;
+  updateUser: (user: User) => Promise<ResponseElectronGeneric>;
   delete: (id: number) => Promise<void>;
-  authUser: (UserCredentials) => Promise<User>;
+  authUser: (UserCredentials) => Promise<ResponseElectronUser>;
+  checkSession: () => Promise<ResponseElectronUser>;
   generateUniqueUserName: (UserCredentials) => Promise<ResponseElectronGeneric>;
 }
 
@@ -158,6 +160,36 @@ interface PaymentsAPI {
 }
 
 
+
+
+type StatusType = 'registered' | 'active' | 'disabled' | 'deleted' | 'developer'
+type Rol = 'developer' | 'manager' | 'driver' | 'ticketSeller' | 'checkIn' | null
+
+interface ErrorApp {
+  message: string;
+  detail: string;
+}
+
+type UserResponseAuth = Omit<User, "password"> 
+
+interface ResponseElectronUser {
+  ok: boolean;
+  data: UserResponseAuth | null;
+  error: null | ErrorApp
+}
+
+interface ResponseElectronGeneric {
+  ok: boolean,
+  data: any;
+  error: null | ErrorApp
+}
+
+
+interface BiometricService {
+  enroll(userId: number): Promise<string>;
+  authenticate(): Promise<string | null>;
+}
+
 interface Window {
   electron: {
     users: UsersAPI;
@@ -166,32 +198,9 @@ interface Window {
     routeTravel: RouteTravelAPI;
     schedules: ScheduleAPI;
     customers: CustomersAPI
-    tickets: TicketAPI
-    payments: PaymentsAPI
-
+    tickets: TicketAPI;
+    payments: PaymentsAPI;
+    biometric: BiometricService;
 
   };
-}
-
-
-type StatusType = 'registered' | 'acitive' | 'disabled' | 'deleted' | 'developer'
-type Rol = 'developer'| 'manager' | 'driver' | 'ticketSeller' | 'checkIn' | null
-
-interface ErrorApp {
-  message: string;
-  detail: string;
-}
-
-// type UserResp = Omit<User, "pas">
-
-interface ResponseElectronUser {
-  ok: boolean;
-  data: null | Omit<User, "password">;
-  error: null | ErrorApp
-}
-
-interface ResponseElectronGeneric {
-  ok: boolean,
-  data: any;
-  error: null | ErrorApp
 }

@@ -7,8 +7,10 @@ contextBridge.exposeInMainWorld("electron", {
     addUser: (user: User) => ipcRenderer.invoke("addUser", user),
     updateUser: (user: User) => ipcRenderer.invoke("updateUser", user),
     deleteUser: (id: User['id']) => ipcRenderer.invoke("deleteUser", id),
-    authUser:(credentials: Credential) => ipcRenderer.invoke("authUser", credentials),
-    generateUniqueUserName:(userName: User['userName']) => ipcRenderer.invoke("generateUniqueUserName", userName)
+    authUser: (credentials: Credential) => ipcRenderer.invoke("authUser", credentials),
+    checkSession: () => ipcRenderer.invoke("checkSession"),
+    generateUniqueUserName: (userName: User['userName']) => ipcRenderer.invoke("generateUniqueUserName", userName),
+    
   },
 
   agencies: {
@@ -25,7 +27,7 @@ contextBridge.exposeInMainWorld("electron", {
     addBus: (bus: Bus) => ipcRenderer.invoke("addBus", bus),
     deleteBus: (id: Bus['id']) => ipcRenderer.invoke("deleteBus", id),
     updateBus: (bus: Bus) => ipcRenderer.invoke("deleteBus", bus),
-    
+
   },
 
   drivers: {
@@ -74,6 +76,11 @@ contextBridge.exposeInMainWorld("electron", {
     addPayment: (payment: Payment) => ipcRenderer.invoke("addPayment", payment),
     updatePayment: (payment: Payment) => ipcRenderer.invoke("updatePayment", payment),
     deletePayment: (id: Payment['id']) => ipcRenderer.invoke("deletePayment", id),
+  },
+
+  biometric: {
+    enroll: (userId: number) => ipcRenderer.invoke("biometric:enroll", userId),
+    authenticate: () => ipcRenderer.invoke("biometric:auth"),
   }
 
 

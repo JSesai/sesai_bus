@@ -15,7 +15,13 @@
         "from": "src/electron/db/taquilla.sql",
         "to": "db/taquilla.sql"
       }
-    ]
+    ],
+    "extraMetadata": {
+      "env": {
+        "JWT_SECRET": "super-secret-key-123",
+        "JWT_EXPIRES_IN": "1m"
+      }
+    }
   },
   "scripts": {
     "dev": "npm-run-all --parallel dev:react dev:electron",
@@ -39,6 +45,8 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "electron-is-dev": "^3.0.1",
+    "electron-store": "^11.0.2",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.554.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -52,6 +60,7 @@
     "@eslint/js": "^9.39.1",
     "@types/bcrypt": "^6.0.0",
     "@types/canvas-confetti": "^1.9.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.10.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",

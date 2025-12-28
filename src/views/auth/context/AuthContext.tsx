@@ -3,36 +3,65 @@ import { useNavigate } from "react-router-dom";
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
 import type { UserRegister } from "../screens/RegisterUser";
+import { AppError, ValidationError } from "../../../shared/errors/customError";
 
 type AuthContextType = {
-  user: User | null;
+  userLogged: UserResponseAuth | null;
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>
   login: (user: UserCredentials) => Promise<void>;
   logout: () => void;
   handleRegisterUser: (user: UserRegister) => Promise<boolean>;
   getUniqueUserName: (name: User['name']) => Promise<User['userName']>;
+  updatePassword: ({ password, comfirmPassword }: { password: string, comfirmPassword: string }) => Promise<boolean>
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [userLogged, setUserLogged] = useState<UserResponseAuth | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const validaSesionActiva = async () => {
+    try {
+      const responseSession = await window.electron.users.checkSession();
+      console.log(responseSession);
+
+      if (responseSession.data && responseSession.data.status === 'registered') {
+        toast.warning('Acción requerida', {
+          description: 'Debes de actualizar tu contraseña',
+          richColors: true,
+          duration: 10_000,
+          position: 'top-center'
+        })
+        setUserLogged(responseSession.data)
+        navigate('/auth/new-password');
+        return;
+      }
+
+      if (responseSession.ok) {
+        setUserLogged(responseSession.data);
+        navigate("dashboard");
+        return;
+      }
+
+
+
+      navigate("/auth/login");
+
+    } catch (error) {
+      console.log('errorssss', error);
+    } finally {
+
+      setLoading(false);
+    }
+  }
+
   // Cargar usuario desde localStorage al iniciar
   useEffect(() => {
-    console.log('ejecuta usefecgt');
-
-    const saved = localStorage.getItem("auth_user");
-    if (saved) {
-      setUser(JSON.parse(saved));
-      navigate("dashboard");
-    } else {
-      navigate("/auth/register");
-
-    };
-    setLoading(false);
+    console.log('valida session activa...');
+    validaSesionActiva();
   }, []);
 
   // Login
@@ -40,8 +69,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('haciendo login', userData);
       const validateUser = await window.electron.users.authUser(userData);
-      console.log(validateUser);
-      localStorage.setItem("auth_user", JSON.stringify(validateUser));
+      const { ok, error, data } = validateUser;
+      if (validateUser.data && validateUser.data.status === 'registered') {
+        toast.warning('Acción requerida', {
+          description: 'Debes de actualizar tu contraseña',
+          richColors: true,
+          duration: 10_000,
+          position: 'top-center'
+        })
+        setUserLogged(validateUser.data)
+        navigate('/auth/new-password');
+        return;
+      }
+
+      if (!ok) {
+        toast.error(error?.message || 'error', {
+          description: error?.detail,
+          richColors: true,
+          duration: 10_000,
+          position: 'top-center'
+        })
+        return;
+      }
+
+      setUserLogged(data);
       navigate("dashboard");
     } catch (error) {
       console.log('el error', error);
@@ -51,9 +102,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   }
 
+  const loginBiometric = async () => {
+
+  }
+
   // Logout
   const logout = () => {
-    setUser(null);
+    setUserLogged(null);
+    //todo llamar metodo para expirar la sesion
     localStorage.removeItem("auth_user");
   }
   //Registro de usuario
@@ -151,17 +207,78 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   }
 
-  //funcion para hacer la creacion de nombre usuario basado en nombre ingresado
+  //actualizacion de contraseña
+  const updatePassword = async ({ password, comfirmPassword }: { password: string, comfirmPassword: string }) => {
+    try {
+      setLoading(true);
+      if (password.length < 6) throw new ValidationError("La longitud minima es de 6 caracteres");
+      if (!password || !comfirmPassword) throw new ValidationError("Por favor completa todos los campos");
+      if (password !== comfirmPassword) throw new ValidationError("Revisa la información", "La contraseña y la comfirmación no son iguales");
+
+      if (!userLogged?.name || !userLogged?.userName || !userLogged?.phone || !userLogged?.role) return false;
+
+      const updateUser = await window.electron.users.updateUser({
+        id: userLogged.id,
+        name: userLogged?.name,
+        password,
+        phone: userLogged?.phone,
+        role: userLogged?.role,
+        status: userLogged?.status,
+        userName: userLogged?.userName,
+      });
+
+
+
+      console.log('updatePassword', updateUser);
+      if (!updateUser.ok) throw new ValidationError("Error iesperado", "La contraseña no fue actualizada");
+
+      toast.success("Contraseña actualizada correctamete", {
+        richColors: true,
+        duration: 10_000,
+        position: 'top-center'
+      });
+
+      confetti({
+        particleCount: 100,
+        spread: 120,
+        origin: { y: 0.6 }
+      });
+      navigate("/auth/login");
+      return true;
+
+    } catch (error) {
+      if (error instanceof AppError) {
+        toast.error(error.message, {
+          richColors: true,
+          description: error.details ?? '',
+          duration: 10_000,
+          position: 'top-center'
+        })
+
+        return false;
+      }
+
+      console.log(error);
+      return false;
+
+    } finally {
+      setLoading(false);
+    }
+
+
+  }
 
   return (
     <AuthContext.Provider value={{
-      user,
+      // user,
+      userLogged,
       loading,
       setLoading,
       login,
       logout,
       handleRegisterUser,
-      getUniqueUserName
+      getUniqueUserName,
+      updatePassword
     }}>
       {children}
     </AuthContext.Provider>

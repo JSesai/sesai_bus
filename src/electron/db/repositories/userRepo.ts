@@ -22,15 +22,34 @@ export const userRepo = {
         else resolve({ id: this.lastID, ...user } as User);
       });
     }),
-  update: (user: { id: number; name?: string; email?: string }) =>
-    new Promise((resolve, reject) => {
-      db.run("UPDATE users SET name = COALESCE(?, name), email = COALESCE(?, email) WHERE id = ?",
-        [user.name, user.email, user.id], function (err) {
-          if (err) reject(err);
-          else resolve({ changes: this.changes });
-        }
-      );
-    }),
+    update: (user: User) =>
+      new Promise((resolve, reject) => {
+        db.run(
+          `
+          UPDATE users SET
+            name     = COALESCE(?, name),
+            userName = COALESCE(?, userName),
+            phone    = COALESCE(?, phone),
+            status   = COALESCE(?, status),
+            role     = COALESCE(?, role),
+            password = COALESCE(?, password)
+          WHERE id = ?
+          `,
+          [
+            user.name,
+            user.userName,
+            user.phone,
+            user.status,
+            user.role,
+            user.password,
+            user.id
+          ],
+          function (err) {
+            if (err) reject(err);
+            else resolve({ changes: this.changes });
+          }
+        );
+      }),    
   delete: (id: number) =>
     new Promise((resolve, reject) => {
       db.run("DELETE FROM users WHERE id = ?", [id], function (err) {

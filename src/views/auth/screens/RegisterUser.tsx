@@ -6,7 +6,7 @@ import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
-import { Bus, Lock, User as UserIcon, Eye, EyeOff, Phone, UserCircle } from "lucide-react"
+import { Bus, User as UserIcon, Phone, UserCircle } from "lucide-react"
 
 export interface UserRegister extends User {
     confirmPassword: string;
@@ -48,9 +48,7 @@ export default function RegisterUser() {
 
     }
 
-    const handleKeyDown = () => {
 
-    }
 
     //debounce para busqueda de nombre valido
     useEffect(() => {
@@ -98,7 +96,6 @@ export default function RegisterUser() {
                                 placeholder="Ingresa nombre completo"
                                 value={formData.name}
                                 onChange={(e) => handleChange("name", e.target.value)}
-                                onKeyDown={handleKeyDown}
                                 minLength={10}
                                 className="pl-10"
                                 required

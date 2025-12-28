@@ -7,8 +7,8 @@ import { useAuth } from "../context/AuthContext";
 
 export default function AuthLayout() {
 
-    const { user } = useAuth()
-    console.log(user);
+    const { userLogged } = useAuth()
+    console.log(userLogged);
 
     return (
         <div className={`w-full h-screen flex items-center justify-center ${getRandomBgClass()}`}>

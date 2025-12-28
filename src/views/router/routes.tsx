@@ -7,6 +7,7 @@ import Login from "../auth/screens/Login";
 import RegisterUser from "../auth/screens/RegisterUser";
 import { AuthProvider } from "../auth/context/AuthContext";
 import ForgotPassword from "../auth/screens/ForgotPassword";
+import NewPassword from "../auth/screens/NewPassword";
 
 export function AppRouter() {
     return (
@@ -19,6 +20,7 @@ export function AppRouter() {
                         <Route path="login" element={<Login />} />
                         <Route path="register" element={<RegisterUser />} />
                         <Route path="forgot-password" element={<ForgotPassword />} />
+                        <Route path="new-password" element={<NewPassword />} />
                     </Route>
 
 

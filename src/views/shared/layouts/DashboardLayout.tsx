@@ -7,7 +7,7 @@ export default function DashBoardLayout() {
         <div >
 
             <main>
-                <Outlet /> {/* Aquí se renderizan las rutas hijas */}
+                <Outlet /> 
             </main>
         </div>
 

@@ -1,3 +1,6 @@
+import { app } from "electron";
+import fs from "fs";
+import path from "path";
 import { userRepo } from "../db/repositories/userRepo.js";
 
 export function normalizeUserName(name: string) {
@@ -20,4 +23,13 @@ export async function generateUniqueUserName(name: User['userName']) {
     }
 
     return userName;
+}
+
+
+export function getAppMetadata() {
+  const appPath = app.getAppPath();
+  const packageJsonPath = path.join(appPath, "package.json");
+
+  const raw = fs.readFileSync(packageJsonPath, "utf-8");
+  return JSON.parse(raw);
 }

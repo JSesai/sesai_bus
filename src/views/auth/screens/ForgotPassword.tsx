@@ -1,5 +1,4 @@
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
@@ -102,7 +101,7 @@ export default function ForgotPassword() {
                                     <Input
                                         id="phone"
                                         type="tel"
-                                        placeholder="+1 (555) 000-0000"
+                                        placeholder="+52 00-00-00-00"
                                         value={phone}
                                         onChange={(e) => setPhone(e.target.value)}
                                         minLength={10}
@@ -163,7 +162,7 @@ export default function ForgotPassword() {
                         <div className="mt-6 pt-6 border-t border-border text-center">
                             <p className="text-sm text-muted-foreground">
                                 ¿Recordaste tu contraseña?{" "}
-                                <NavLink to="auth/login" className="text-primary font-semibold hover:underline">
+                                <NavLink to="/auth/login" className="text-primary font-semibold hover:underline">
                                     Iniciar sesión
                                 </NavLink>
                             </p>
