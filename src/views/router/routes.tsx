@@ -1,4 +1,3 @@
-// src/react/AppRouter.tsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import DashBoardLayout from "../shared/layouts/DashboardLayout";
 import RegisterBus from "../Buses/screens/RegisterBus";
@@ -8,6 +7,8 @@ import RegisterUser from "../auth/screens/RegisterUser";
 import { AuthProvider } from "../auth/context/AuthContext";
 import ForgotPassword from "../auth/screens/ForgotPassword";
 import NewPassword from "../auth/screens/NewPassword";
+import Summary from "../Buses/screens/Summary";
+import MainDashboard from "../Buses/components/MainDashboard";
 
 export function AppRouter() {
     return (
@@ -29,8 +30,11 @@ export function AppRouter() {
 
                 <Routes>
                     <Route path="dashboard/" element={<DashBoardLayout />}>
-                        <Route index element={<h1>este es el home del dash</h1>} />
-                        <Route path="buses/register" element={<RegisterBus />} />09
+                        <Route index element={<MainDashboard />} />
+                        <Route path="summary" element={<Summary />} />
+                        <Route path="ticket-sale" element={<h1>venta de boleto</h1>} />
+                        <Route path="setting" element={<h1>setting</h1>} />
+                        <Route path="buses" element={<RegisterBus />} />
                     </Route>
                 </Routes>
 

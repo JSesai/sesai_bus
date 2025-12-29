@@ -13,6 +13,32 @@ const { JsonWebTokenError, TokenExpiredError } = jwt;
 
 export function registerUserHandlers() {
     ipcMain.handle("getById", async (_event, id: User['id']) => userRepo.getById(id));
+    ipcMain.handle("getByUserName", async (_event, userName: User['userName']): Promise<ResponseElectronUser> => {
+
+        try {
+            console.log('inicia process auth');
+            if (!userName) throw new ValidationError("Falta de datos.", "Ingresa el userName")
+
+            const user = await userRepo.getByName(userName)
+            console.log('this is user', user);
+            if (!user) throw new AuthError("Usuario no encontrado.", "valida tu información ingresada.")
+
+            const { password, ...rest } = user;
+            return { ok: true, data: rest, error: null };
+
+
+        } catch (error) {
+            //logger
+            console.log(error);
+            if (error instanceof AppError) {
+                return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
+            }
+
+            return { ok: false, data: null, error: { message: "Error interno", detail: "error no esperado" } };
+        }
+
+
+    });
     ipcMain.handle("getUsers", () => userRepo.getAll());
 
     ipcMain.handle("addUser", async (_event, user: User): Promise<ResponseElectronUser> => {
@@ -102,6 +128,25 @@ export function registerUserHandlers() {
             sessionStore.setToken(token);
             return { ok: true, data: rest, error: null };
 
+
+        } catch (error) {
+            //logger
+            console.log(error);
+            if (error instanceof AppError) {
+                return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
+            }
+
+            return { ok: false, data: null, error: { message: "Error interno", detail: "error no esperado" } };
+        }
+
+
+    });
+    ipcMain.handle("logout", async (_event, credentials: UserCredentials): Promise<ResponseElectronGeneric> => {
+
+        try {
+            console.log('inicia process logout');
+            sessionStore.clear();
+            return { ok: true, data: "logut exitoso", error: null };
 
         } catch (error) {
             //logger

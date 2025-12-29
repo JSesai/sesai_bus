@@ -24,9 +24,11 @@ interface ResponseHandler {
 
 interface UsersAPI {
   getById: (id: number) => Promise<User>;
+  getByUserName: (userName: User['userName']) => Promise<ResponseElectronUser>;
   getUsers: () => Promise<User[]>;
   addUser: (user: User) => Promise<ResponseElectronUser>;
   updateUser: (user: User) => Promise<ResponseElectronGeneric>;
+  logout: () => Promise<ResponseElectronGeneric>;
   delete: (id: number) => Promise<void>;
   authUser: (UserCredentials) => Promise<ResponseElectronUser>;
   checkSession: () => Promise<ResponseElectronUser>;
@@ -170,7 +172,7 @@ interface ErrorApp {
   detail: string;
 }
 
-type UserResponseAuth = Omit<User, "password"> 
+type UserResponseAuth = Omit<User, "password">
 
 interface ResponseElectronUser {
   ok: boolean;

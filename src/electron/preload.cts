@@ -3,11 +3,13 @@ const { ipcRenderer, contextBridge } = require("electron");
 contextBridge.exposeInMainWorld("electron", {
   users: {
     getById: (id: User['id']) => ipcRenderer.invoke("getById", id),
+    getByUserName: (userName: User['userName']) => ipcRenderer.invoke("getByUserName", userName),
     getUsers: () => ipcRenderer.invoke("getUsers"),
     addUser: (user: User) => ipcRenderer.invoke("addUser", user),
     updateUser: (user: User) => ipcRenderer.invoke("updateUser", user),
     deleteUser: (id: User['id']) => ipcRenderer.invoke("deleteUser", id),
     authUser: (credentials: Credential) => ipcRenderer.invoke("authUser", credentials),
+    logout: () => ipcRenderer.invoke("logout"),
     checkSession: () => ipcRenderer.invoke("checkSession"),
     generateUniqueUserName: (userName: User['userName']) => ipcRenderer.invoke("generateUniqueUserName", userName),
     

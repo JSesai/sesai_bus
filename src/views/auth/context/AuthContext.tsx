@@ -13,7 +13,8 @@ type AuthContextType = {
   logout: () => void;
   handleRegisterUser: (user: UserRegister) => Promise<boolean>;
   getUniqueUserName: (name: User['name']) => Promise<User['userName']>;
-  updatePassword: ({ password, comfirmPassword }: { password: string, comfirmPassword: string }) => Promise<boolean>
+  updatePassword: ({ password, comfirmPassword }: { password: string, comfirmPassword: string }) => Promise<boolean>;
+  forgotPassword: (userName: User['userName']) => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -107,11 +108,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   // Logout
-  const logout = () => {
-    setUserLogged(null);
-    //todo llamar metodo para expirar la sesion
-    localStorage.removeItem("auth_user");
+  const logout = async () => {
+    try {
+      const resposeLogout = await window.electron.users.logout();
+      console.log(resposeLogout);
+      if (!resposeLogout.ok) {
+        toast.error("Error inesperado", {
+          richColors: true,
+          description: "No fue posible cerrar sesión",
+          duration: 10_000,
+          position: 'top-center'
+        })
+        return;
+      }
+
+      setUserLogged(null);
+      navigate('/auth/login');
+
+    } catch (error) {
+      console.log(error);
+
+    } finally {
+      setLoading(false);
+    }
+
   }
+
   //Registro de usuario
   const handleRegisterUser = async (user: UserRegister): Promise<boolean> => {
     const { name, password, phone, role, userName, status, confirmPassword } = user
@@ -268,6 +290,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   }
 
+  //recupera password
+  const forgotPassword = async (userName: User['userName']) => {
+    try {
+      setLoading(true)
+      const getUser = await window.electron.users.getByUserName(userName);
+      if (!getUser.ok) {
+        toast.error(getUser.error?.message || 'error', {
+          description: getUser.error?.detail,
+          richColors: true,
+          duration: 10_000,
+          position: 'top-center'
+        })
+        return;
+      }
+      setUserLogged(getUser.data);
+
+      console.log('este es el user por name', getUser);
+
+      navigate('/auth/new-password');
+
+    } catch (error) {
+      console.log(error);
+
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <AuthContext.Provider value={{
       // user,
@@ -278,7 +328,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logout,
       handleRegisterUser,
       getUniqueUserName,
-      updatePassword
+      updatePassword,
+      forgotPassword
     }}>
       {children}
     </AuthContext.Provider>
