@@ -15,20 +15,9 @@ import { Outlet } from "react-router-dom";
 import DashboardHeader from "../../Buses/components/DashboardHeader"
 import DashBoardLoader from "../../Buses/components/DashboardLoader"
 import DashboardSidebar from "../../Buses/components/DashboardSidebar"
+import ActionButton from "../../Buses/components/AcctionButton"
 
 
-// Action button component
-function ActionButton({ icon: Icon, label }: { icon: LucideIcon; label: string }) {
-    return (
-        <Button
-            variant="outline"
-            className="h-auto py-3 px-3 border-slate-700 bg-slate-800/50 hover:bg-slate-700/50 flex flex-col items-center justify-center space-y-1 w-full"
-        >
-            <Icon className="h-5 w-5 text-cyan-500" />
-            <span className="text-xs">{label}</span>
-        </Button>
-    )
-}
 
 
 
@@ -60,7 +49,7 @@ function DashBoardLayout() {
 
     // Particle effect
     useEffect(() => {
-        const canvas = canvasRef.current
+        const canvas = canvasRef.current!
         if (!canvas) return
 
         const ctx = canvas.getContext("2d")
@@ -159,7 +148,6 @@ function DashBoardLayout() {
 
                     <div className="col-span-12 md:col-span-9 lg:col-span-8">
                         <Outlet />
-
                     </div>
 
 

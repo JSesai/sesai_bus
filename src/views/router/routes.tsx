@@ -9,6 +9,8 @@ import ForgotPassword from "../auth/screens/ForgotPassword";
 import NewPassword from "../auth/screens/NewPassword";
 import Summary from "../Buses/screens/Summary";
 import MainDashboard from "../Buses/components/MainDashboard";
+import { TicketSale } from "../Buses/screens/TicketSale";
+import Setting from "../Buses/screens/Setting";
 
 export function AppRouter() {
     return (
@@ -32,9 +34,9 @@ export function AppRouter() {
                     <Route path="dashboard/" element={<DashBoardLayout />}>
                         <Route index element={<MainDashboard />} />
                         <Route path="summary" element={<Summary />} />
-                        <Route path="ticket-sale" element={<h1>venta de boleto</h1>} />
-                        <Route path="setting" element={<h1>setting</h1>} />
+                        <Route path="ticket-sale" element={<TicketSale />} />
                         <Route path="buses" element={<RegisterBus />} />
+                        <Route path="setting" element={<Setting />} />
                     </Route>
                 </Routes>
 

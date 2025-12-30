@@ -21,6 +21,7 @@ interface ResponseHandler {
   error: any
 }
 
+type BookingType = "reserve" | "purchase"
 
 interface UsersAPI {
   getById: (id: number) => Promise<User>;
