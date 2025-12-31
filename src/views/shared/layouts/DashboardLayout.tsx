@@ -190,6 +190,7 @@ function DashBoardLayout() {
                                         <ActionButton icon={RefreshCw} label="Sync Data" />
                                         <ActionButton icon={Download} label="Backup" />
                                         <ActionButton icon={Terminal} label="Console" />
+                                       
                                     </div>
                                 </CardContent>
                             </Card>

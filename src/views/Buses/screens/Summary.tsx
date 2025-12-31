@@ -60,52 +60,243 @@ function Summary() {
                         <div className="flex items-center justify-between mb-4">
                             <TabsList className="bg-slate-800/50 p-1">
                                 <TabsTrigger
-                                    value="performance"
+                                    value="Todos"
                                     className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
                                 >
-                                    Performance
+                                    Todos
                                 </TabsTrigger>
+
                                 <TabsTrigger
-                                    value="processes"
+                                    value="Vendidos"
                                     className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
                                 >
-                                    Processes
+                                    Vendidos
                                 </TabsTrigger>
+
                                 <TabsTrigger
-                                    value="storage"
+                                    value="Apartados"
                                     className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
                                 >
-                                    Storage
+                                    Apartados
                                 </TabsTrigger>
+
+                                <TabsTrigger
+                                    value="Disponibles"
+                                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                                >
+                                    Disponibles
+                                </TabsTrigger>
+                               
                             </TabsList>
 
                             <div className="flex items-center space-x-2 text-xs text-slate-400">
                                 <div className="flex items-center">
                                     <div className="h-2 w-2 rounded-full bg-cyan-500 mr-1"></div>
-                                    CPU
+                                    Vendidos
                                 </div>
                                 <div className="flex items-center">
                                     <div className="h-2 w-2 rounded-full bg-purple-500 mr-1"></div>
-                                    Memory
+                                    Apartados
                                 </div>
                                 <div className="flex items-center">
                                     <div className="h-2 w-2 rounded-full bg-blue-500 mr-1"></div>
-                                    Network
+                                    Disponibles
                                 </div>
                             </div>
                         </div>
 
-                        <TabsContent value="performance" className="mt-0">
-                            <div className="h-64 w-full relative bg-slate-800/30 rounded-lg border border-slate-700/50 overflow-hidden">
-                                <PerformanceChart />
-                                <div className="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur-sm rounded-md px-3 py-2 border border-slate-700/50">
-                                    <div className="text-xs text-slate-400">System Load</div>
-                                    <div className="text-lg font-mono text-cyan-400">{22}%</div>
+                     
+
+                        <TabsContent value="Todos" className="mt-0">
+                            <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 overflow-hidden">
+                                <div className="grid grid-cols-12 text-xs text-slate-400 p-3 border-b border-slate-700/50 bg-slate-800/50">
+                                    <div className="col-span-1">PID</div>
+                                    <div className="col-span-4">Process</div>
+                                    <div className="col-span-2">User</div>
+                                    <div className="col-span-2">CPU</div>
+                                    <div className="col-span-2">Memory</div>
+                                    <div className="col-span-1">Status</div>
+                                </div>
+
+                                <div className="divide-y divide-slate-700/30">
+                                    <ProcessRow
+                                        pid="1024"
+                                        name="system_core.exe"
+                                        user="SYSTEM"
+                                        cpu={12.4}
+                                        memory={345}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="1842"
+                                        name="nexus_service.exe"
+                                        user="SYSTEM"
+                                        cpu={8.7}
+                                        memory={128}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="2156"
+                                        name="security_monitor.exe"
+                                        user="ADMIN"
+                                        cpu={5.2}
+                                        memory={96}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="3012"
+                                        name="network_manager.exe"
+                                        user="SYSTEM"
+                                        cpu={3.8}
+                                        memory={84}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="4268"
+                                        name="user_interface.exe"
+                                        user="USER"
+                                        cpu={15.3}
+                                        memory={256}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="5124"
+                                        name="data_analyzer.exe"
+                                        user="ADMIN"
+                                        cpu={22.1}
+                                        memory={512}
+                                        status="running"
+                                    />
                                 </div>
                             </div>
                         </TabsContent>
+                        <TabsContent value="Vendidos" className="mt-0">
+                            <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 overflow-hidden">
+                                <div className="grid grid-cols-12 text-xs text-slate-400 p-3 border-b border-slate-700/50 bg-slate-800/50">
+                                    <div className="col-span-1">PID</div>
+                                    <div className="col-span-4">Process</div>
+                                    <div className="col-span-2">User</div>
+                                    <div className="col-span-2">CPU</div>
+                                    <div className="col-span-2">Memory</div>
+                                    <div className="col-span-1">Status</div>
+                                </div>
 
-                        <TabsContent value="processes" className="mt-0">
+                                <div className="divide-y divide-slate-700/30">
+                                    <ProcessRow
+                                        pid="1024"
+                                        name="system_core.exe"
+                                        user="SYSTEM"
+                                        cpu={12.4}
+                                        memory={345}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="1842"
+                                        name="nexus_service.exe"
+                                        user="SYSTEM"
+                                        cpu={8.7}
+                                        memory={128}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="2156"
+                                        name="security_monitor.exe"
+                                        user="ADMIN"
+                                        cpu={5.2}
+                                        memory={96}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="3012"
+                                        name="network_manager.exe"
+                                        user="SYSTEM"
+                                        cpu={3.8}
+                                        memory={84}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="4268"
+                                        name="user_interface.exe"
+                                        user="USER"
+                                        cpu={15.3}
+                                        memory={256}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="5124"
+                                        name="data_analyzer.exe"
+                                        user="ADMIN"
+                                        cpu={22.1}
+                                        memory={512}
+                                        status="running"
+                                    />
+                                </div>
+                            </div>
+                        </TabsContent>
+                        <TabsContent value="Apartados" className="mt-0">
+                            <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 overflow-hidden">
+                                <div className="grid grid-cols-12 text-xs text-slate-400 p-3 border-b border-slate-700/50 bg-slate-800/50">
+                                    <div className="col-span-1">PID</div>
+                                    <div className="col-span-4">Process</div>
+                                    <div className="col-span-2">User</div>
+                                    <div className="col-span-2">CPU</div>
+                                    <div className="col-span-2">Memory</div>
+                                    <div className="col-span-1">Status</div>
+                                </div>
+
+                                <div className="divide-y divide-slate-700/30">
+                                    <ProcessRow
+                                        pid="1024"
+                                        name="system_core.exe"
+                                        user="SYSTEM"
+                                        cpu={12.4}
+                                        memory={345}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="1842"
+                                        name="nexus_service.exe"
+                                        user="SYSTEM"
+                                        cpu={8.7}
+                                        memory={128}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="2156"
+                                        name="security_monitor.exe"
+                                        user="ADMIN"
+                                        cpu={5.2}
+                                        memory={96}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="3012"
+                                        name="network_manager.exe"
+                                        user="SYSTEM"
+                                        cpu={3.8}
+                                        memory={84}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="4268"
+                                        name="user_interface.exe"
+                                        user="USER"
+                                        cpu={15.3}
+                                        memory={256}
+                                        status="running"
+                                    />
+                                    <ProcessRow
+                                        pid="5124"
+                                        name="data_analyzer.exe"
+                                        user="ADMIN"
+                                        cpu={22.1}
+                                        memory={512}
+                                        status="running"
+                                    />
+                                </div>
+                            </div>
+                        </TabsContent>
+                        <TabsContent value="Disponibles" className="mt-0">
                             <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 overflow-hidden">
                                 <div className="grid grid-cols-12 text-xs text-slate-400 p-3 border-b border-slate-700/50 bg-slate-800/50">
                                     <div className="col-span-1">PID</div>
@@ -169,16 +360,7 @@ function Summary() {
                             </div>
                         </TabsContent>
 
-                        <TabsContent value="storage" className="mt-0">
-                            <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 p-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <StorageItem name="System Drive (C:)" total={512} used={324} type="SSD" />
-                                    <StorageItem name="Data Drive (D:)" total={2048} used={1285} type="HDD" />
-                                    <StorageItem name="Backup Drive (E:)" total={4096} used={1865} type="HDD" />
-                                    <StorageItem name="External Drive (F:)" total={1024} used={210} type="SSD" />
-                                </div>
-                            </div>
-                        </TabsContent>
+                       
                     </Tabs>
                 </div>
             </CardContent>

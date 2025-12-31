@@ -11,6 +11,11 @@ import Summary from "../Buses/screens/Summary";
 import MainDashboard from "../Buses/components/MainDashboard";
 import { TicketSale } from "../Buses/screens/TicketSale";
 import Setting from "../Buses/screens/Setting";
+import Destinations from "../Buses/screens/Destinations";
+import Schedules from "../Buses/screens/Schedules";
+import Employees from "../Buses/screens/Employees";
+import Customers from "../Buses/screens/Customers";
+
 
 export function AppRouter() {
     return (
@@ -35,8 +40,12 @@ export function AppRouter() {
                         <Route index element={<MainDashboard />} />
                         <Route path="summary" element={<Summary />} />
                         <Route path="ticket-sale" element={<TicketSale />} />
-                        <Route path="buses" element={<RegisterBus />} />
                         <Route path="setting" element={<Setting />} />
+                        <Route path="buses" element={<RegisterBus />} />
+                        <Route path="destinations" element={<Destinations />} />
+                        <Route path="schedules" element={<Schedules />} />
+                        <Route path="employees" element={<Employees />} />
+                        <Route path="customers" element={<Customers />} />
                     </Route>
                 </Routes>
 

@@ -39,12 +39,6 @@ export const menuDashboard: MeuDash[] = [
         roles: ["ticketSeller", "manager", "developer"],
     },
     {
-        label: "Autobúses",
-        path: "/dashboard/buses",
-        icon: Bus,
-        roles: ["manager", "developer"],
-    },
-    {
         label: "Configuración",
         path: "/dashboard/setting",
         icon: Settings,

@@ -1,14 +1,268 @@
-import { Link } from "react-router-dom";
+import type React from "react"
 
+import { useState } from "react"
+
+import { Button } from "../../components/ui/button"
+import { Input } from "../../components/ui/input"
+import { Label } from "../../components/ui/label"
+import { Textarea } from "../../components/ui/textarea"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
+import { Alert, AlertDescription } from "../../components/ui/alert"
+import { AlertCircle, CreditCard, Hash, Users, Calendar, Component } from "lucide-react"
 
 export default function RegisterBus() {
+    const [formData, setFormData] = useState({
+        numeroAutobus: "",
+        placas: "",
+        numeroSerie: "",
+        capacidadAsientos: "",
+        año: "",
+        modelo: "",
+        caracteristicas: "",
+    })
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState("")
+    const [success, setSuccess] = useState(false)
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setError("")
+        setSuccess(false)
+        setIsLoading(true)
+
+        // Validaciones
+        if (
+            !formData.numeroAutobus ||
+            !formData.placas ||
+            !formData.numeroSerie ||
+            !formData.capacidadAsientos ||
+            !formData.año ||
+            !formData.modelo
+        ) {
+            setError("Por favor completa todos los campos obligatorios")
+            setIsLoading(false)
+            return
+        }
+
+        const capacidad = Number.parseInt(formData.capacidadAsientos)
+        if (isNaN(capacidad) || capacidad <= 0) {
+            setError("La capacidad de asientos debe ser un número vΓ'lido mayor a 0")
+            setIsLoading(false)
+            return
+        }
+
+        const año = Number.parseInt(formData.año)
+        const currentYear = new Date().getFullYear()
+        if (isNaN(año) || año < 1990 || año > currentYear + 1) {
+            setError(`El aΓ±o debe estar entre 1990 y ${currentYear + 1}`)
+            setIsLoading(false)
+            return
+        }
+
+        // SimulaciΓ³n de registro - AquΓ­ integrarΓ­as tu API
+        setTimeout(() => {
+            setSuccess(true)
+            setIsLoading(false)
+            // Reiniciar formulario
+            setFormData({
+                numeroAutobus: "",
+                placas: "",
+                numeroSerie: "",
+                capacidadAsientos: "",
+                año: "",
+                modelo: "",
+                caracteristicas: "",
+            })
+        }, 1500)
+    }
+
+    const handleChange = (field: string, value: string) => {
+        setFormData((prev) => ({ ...prev, [field]: value }))
+        setError("")
+        setSuccess(false)
+    }
+
+    // 1 agregar component form register bus Component
+    // 2 crear contexto para que consuma todos los componentes ese origen
 
     return (
-        <>
-            <h1>Registrar autobus</h1>
+        <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm overflow-hidden">
+            <CardHeader className="space-y-3 text-center pb-6">
 
-            <Link to={'buses/update'}>ir a actualizar</Link>
+                <div className="space-y-1">
+                    <CardTitle className="text-2xl font-semibold text-balance">Registro de Autobús</CardTitle>
+                    <CardDescription className="text-base text-balance">Agrega un nuevo autobús a la flota</CardDescription>
+                </div>
+            </CardHeader>
 
-        </>
+            <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    {error && (
+                        <Alert variant="destructive">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertDescription>{error}</AlertDescription>
+                        </Alert>
+                    )}
+
+                    {/* todo remover alert */}
+                    {success && (
+                        <Alert className="border-green-600 bg-green-50 dark:bg-green-950/20">
+                            <AlertCircle className="h-4 w-4 text-green-600" />
+                            <AlertDescription className="text-green-800 dark:text-green-400">
+                                Autobús registrado exitosamente en el sistema.
+                            </AlertDescription>
+                        </Alert>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="numeroAutobus" className="text-sm font-medium">
+                                Número de autobus <span className="text-destructive">*</span>
+                            </Label>
+                            <div className="relative">
+                                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    id="numeroAutobus"
+                                    type="text"
+                                    placeholder="001"
+                                    value={formData.numeroAutobus}
+                                    onChange={(e) => handleChange("numeroAutobus", e.target.value)}
+                                    className="pl-10"
+                                    required
+                                    disabled={isLoading}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="placas" className="text-sm font-medium">
+                                Número de placas <span className="text-destructive">*</span>
+                            </Label>
+                            <div className="relative">
+                                <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    id="placas"
+                                    type="text"
+                                    placeholder="ABC-123-XYZ"
+                                    value={formData.placas}
+                                    onChange={(e) => handleChange("placas", e.target.value.toUpperCase())}
+                                    className="pl-10 uppercase"
+                                    required
+                                    disabled={isLoading}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="numeroSerie" className="text-sm font-medium">
+                            Número de serie <span className="text-destructive">*</span>
+                        </Label>
+                        <div className="relative">
+                            <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                id="numeroSerie"
+                                type="text"
+                                placeholder="3VWDX7AJ9CM123456"
+                                value={formData.numeroSerie}
+                                onChange={(e) => handleChange("numeroSerie", e.target.value.toUpperCase())}
+                                className="pl-10 uppercase"
+                                required
+                                disabled={isLoading}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="capacidadAsientos" className="text-sm font-medium">
+                                Capacidad de asientos <span className="text-destructive">*</span>
+                            </Label>
+                            <div className="relative">
+                                <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    id="capacidadAsientos"
+                                    type="number"
+                                    placeholder="42"
+                                    value={formData.capacidadAsientos}
+                                    onChange={(e) => handleChange("capacidadAsientos", e.target.value)}
+                                    className="pl-10"
+                                    required
+                                    disabled={isLoading}
+                                    min="1"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="año" className="text-sm font-medium">
+                                Año <span className="text-destructive">*</span>
+                            </Label>
+                            <div className="relative">
+                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    id="año"
+                                    type="number"
+                                    placeholder="2024"
+                                    value={formData.año}
+                                    onChange={(e) => handleChange("año", e.target.value)}
+                                    className="pl-10"
+                                    required
+                                    disabled={isLoading}
+                                    min="1990"
+                                    max={new Date().getFullYear() + 1}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="modelo" className="text-sm font-medium">
+                                Modelo <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                                id="modelo"
+                                type="text"
+                                placeholder="ej: Volvo 9700"
+                                value={formData.modelo}
+                                onChange={(e) => handleChange("modelo", e.target.value)}
+                                required
+                                disabled={isLoading}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="caracteristicas" className="text-sm font-medium">
+                            Características
+                        </Label>
+                        <Textarea
+                            id="caracteristicas"
+                            placeholder="Ej: WiFi, Aire acondicionado, Pantallas individuales, Asientos reclinables, Baño, Tomas de corriente USB..."
+                            value={formData.caracteristicas}
+                            onChange={(e) => handleChange("caracteristicas", e.target.value)}
+                            disabled={isLoading}
+                            rows={4}
+                            className="resize-none"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Describe las comodidades y características especiales del autobús
+                        </p>
+                    </div>
+
+                    <Button type="submit" className="w-full h-11 text-base font-medium" disabled={isLoading}>
+                        {isLoading ? (
+                            <span className="flex items-center gap-2">
+                                <span className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                                Registrando autobús...
+                            </span>
+                        ) : (
+                            "Registrar autobús"
+                        )}
+                    </Button>
+
+
+                </form>
+            </CardContent>
+        </Card>
     )
 }
