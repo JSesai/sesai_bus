@@ -11,12 +11,19 @@ CREATE TABLE IF NOT EXISTS agencies (
 
 
 -- 2. BUSES (Unidades)
-
 CREATE TABLE IF NOT EXISTS buses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     number TEXT NOT NULL UNIQUE,
-    capacity INTEGER NOT NULL
+    seatingCapacity INTEGER NOT NULL,
+    plate TEXT NOT NULL UNIQUE,
+    serialNumber TEXT NOT NULL UNIQUE,
+    year TEXT NOT NULL,
+    model TEXT NOT NULL,
+    characteristics TEXT,
+    status TEXT NOT NULL DEFAULT 'active',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
+
 
 
 -- 3. DRIVERS (Choferes)

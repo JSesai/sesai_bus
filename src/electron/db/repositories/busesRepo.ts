@@ -15,17 +15,36 @@ export const busesRepo = {
       );
     }),
 
-  add: (bus: { number: string; capacity: number }) =>
+  add: (bus: Bus) =>
     new Promise((resolve, reject) => {
       db.run(
-        "INSERT INTO buses (number, capacity) VALUES (?, ?)",
-        [bus.number, bus.capacity],
+        `
+          INSERT INTO buses (
+            number,
+            seatingCapacity,
+            plate,
+            serialNumber,
+            year,
+            model,
+            characteristics
+          ) VALUES (?, ?, ?, ?, ?, ?, ?)
+          `,
+        [
+          bus.number,
+          bus.seatingCapacity,
+          bus.plate,
+          bus.serialNumber,
+          bus.year,
+          bus.model,
+          bus.characteristics ?? null
+        ],
         function (err) {
           if (err) reject(err);
           else resolve({ id: this.lastID, ...bus });
         }
       );
     }),
+
 
   update: (bus: { id: number; number?: string; capacity?: number }) =>
     new Promise((resolve, reject) => {

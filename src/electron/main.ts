@@ -7,13 +7,14 @@ import { getDB } from "./db/connection.js";
 import { registerUserHandlers } from "./db/handlers/userHandlers.js";
 import { registerAgenciesHandlers } from "./db/handlers/agenciesHandlers.js";
 import { registerDriversHandlers } from "./db/handlers/driversHandlers.js";
-import { registerBusesHandlers } from "./db/handlers/busesHandlers.js";
+import { busesHandlers } from "./db/handlers/busesHandlers.js";
 import { registerRoutesHandlersTravel } from "./db/handlers/routesHandlersTravel.js";
 import { registerSchedulesHandlers } from "./db/handlers/schedulesHandlers.js";
 import { registerCustomersHandlers } from "./db/handlers/customersHandlers.js";
 import { registerTicketsHandlers } from "./db/handlers/ticketsHandlers.js";
 import { registerPaymentsHandlers } from "./db/handlers/paymentsHandlers.js";
 import { registerBiometricHandlers } from "./db/handlers/biometricHandlers.js";
+import { seedInitialUser } from "./db/seed.js";
 
 
 
@@ -43,7 +44,7 @@ app.whenReady().then(async () => {
     createWindow();
     registerUserHandlers();
     registerAgenciesHandlers();
-    registerBusesHandlers();
+    busesHandlers();
     registerDriversHandlers();
     registerRoutesHandlersTravel();
     registerSchedulesHandlers();
@@ -51,6 +52,9 @@ app.whenReady().then(async () => {
     registerTicketsHandlers();
     registerPaymentsHandlers();
     registerBiometricHandlers();
+
+    //seed
+    await seedInitialUser();
 
 
 });

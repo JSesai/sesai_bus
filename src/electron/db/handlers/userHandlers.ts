@@ -39,7 +39,23 @@ export function registerUserHandlers() {
 
 
     });
-    ipcMain.handle("getUsers", () => userRepo.getAll());
+    ipcMain.handle("getUsers", async (): Promise<ResponseElectronGeneric> => {
+
+        try {
+            const users = await userRepo.getAll();
+            if (!users) return { ok: false, data: [], error: { message: "No se obtuvieron usuarios", detail: "No data" } }
+            return { ok: true, error: null, data: users }
+        } catch (error) {
+            console.log(error);
+            if (error instanceof AppError) {
+                return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
+            }
+
+            return { ok: false, data: null, error: { message: "Error interno", detail: "error no esperado" } };
+        }
+
+
+    });
 
     ipcMain.handle("addUser", async (_event, user: User): Promise<ResponseElectronUser> => {
 
@@ -50,7 +66,7 @@ export function registerUserHandlers() {
 
             user.password = await hashPassword(user.password);
             const result: User = await userRepo.add(user);
-            if (!result) throw new RegisterUserError("Error al crear usuario", "jsjs");
+            if (!result) throw new RegisterUserError("Error al crear usuario", "Intentalo mas tarde");
             const { password, ...rest } = result;
             return { ok: true, data: rest, error: null };
 
@@ -203,5 +219,7 @@ export function registerUserHandlers() {
         }
 
 
-    })
+    });
+
+
 }

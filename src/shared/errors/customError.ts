@@ -45,3 +45,9 @@ export class DatabaseError extends AppError {
         super(message, 500, details);
     }
 }
+
+export class BusError extends AppError {
+    constructor(message:string, details:string) {
+        super(message, 401, details);
+    }
+}

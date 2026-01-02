@@ -1,9 +1,9 @@
-import { Activity, Armchair, Cpu, HardDrive, RefreshCw, Ticket, TicketCheck, Wifi } from "lucide-react";
-import { Button } from "../../components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
-import { Badge } from "../../components/ui/badge"
-import { MetricCard, PerformanceChart, ProcessRow, StorageItem } from "../components/SystemOverview";
+import { Armchair, ChartLine, RefreshCw, Ticket, TicketCheck } from "lucide-react";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import { Badge } from "../../components/ui/badge";
+import { MetricCard, ProcessRow } from "../components/SystemOverview";
 
 
 function Summary() {
@@ -12,8 +12,8 @@ function Summary() {
         <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm overflow-hidden">
             <CardHeader className="border-b border-slate-700/50 pb-3">
                 <div className="flex items-center justify-between">
-                    <CardTitle className="text-slate-100 flex items-center">
-                        <Activity className="mr-2 h-5 w-5 text-cyan-500" />
+                    <CardTitle className="text-slate-100 flex items-center text-2xl">
+                        <ChartLine className="mr-2 h-5 w-5 text-cyan-500" />
                         Resumen de Taquilla
                     </CardTitle>
                     <div className="flex items-center space-x-2">
@@ -56,7 +56,7 @@ function Summary() {
                 </div>
 
                 <div className="mt-8">
-                    <Tabs defaultValue="performance" className="w-full">
+                    <Tabs defaultValue="Todos" className="w-full">
                         <div className="flex items-center justify-between mb-4">
                             <TabsList className="bg-slate-800/50 p-1">
                                 <TabsTrigger

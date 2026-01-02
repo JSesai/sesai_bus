@@ -1,89 +1,42 @@
-import type React from "react"
-
-import { useState } from "react"
-
+import type React from "react";
+import { useEffect, useState } from "react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Textarea } from "../../components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
-import { Alert, AlertDescription } from "../../components/ui/alert"
-import { AlertCircle, CreditCard, Hash, Users, Calendar, Component } from "lucide-react"
+import { CreditCard, Hash, Users, Calendar } from "lucide-react"
+import { useDashboard } from "../../auth/context/DashBoardContext"
+
+
+const initialStateBus: Bus = {
+    model: "",
+    number: "",
+    plate: "",
+    seatingCapacity: 0,
+    serialNumber: "",
+    year: "",
+    characteristics: "",
+    status: "active",
+}
 
 export default function RegisterBus() {
-    const [formData, setFormData] = useState({
-        numeroAutobus: "",
-        placas: "",
-        numeroSerie: "",
-        capacidadAsientos: "",
-        año: "",
-        modelo: "",
-        caracteristicas: "",
-    })
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState("")
-    const [success, setSuccess] = useState(false)
+
+    const { handleRegisterBus, isLoading } = useDashboard();
+    const [formData, setFormData] = useState<Bus>(initialStateBus);
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setError("")
-        setSuccess(false)
-        setIsLoading(true)
-
-        // Validaciones
-        if (
-            !formData.numeroAutobus ||
-            !formData.placas ||
-            !formData.numeroSerie ||
-            !formData.capacidadAsientos ||
-            !formData.año ||
-            !formData.modelo
-        ) {
-            setError("Por favor completa todos los campos obligatorios")
-            setIsLoading(false)
-            return
-        }
-
-        const capacidad = Number.parseInt(formData.capacidadAsientos)
-        if (isNaN(capacidad) || capacidad <= 0) {
-            setError("La capacidad de asientos debe ser un número vΓ'lido mayor a 0")
-            setIsLoading(false)
-            return
-        }
-
-        const año = Number.parseInt(formData.año)
-        const currentYear = new Date().getFullYear()
-        if (isNaN(año) || año < 1990 || año > currentYear + 1) {
-            setError(`El aΓ±o debe estar entre 1990 y ${currentYear + 1}`)
-            setIsLoading(false)
-            return
-        }
-
-        // SimulaciΓ³n de registro - AquΓ­ integrarΓ­as tu API
-        setTimeout(() => {
-            setSuccess(true)
-            setIsLoading(false)
-            // Reiniciar formulario
-            setFormData({
-                numeroAutobus: "",
-                placas: "",
-                numeroSerie: "",
-                capacidadAsientos: "",
-                año: "",
-                modelo: "",
-                caracteristicas: "",
-            })
-        }, 1500)
+        e.preventDefault();
+        const registerSucces = await handleRegisterBus(formData);
+        if (registerSucces) setFormData(initialStateBus);
     }
 
     const handleChange = (field: string, value: string) => {
-        setFormData((prev) => ({ ...prev, [field]: value }))
-        setError("")
-        setSuccess(false)
+        setFormData((prev) => ({ ...prev, [field]: value }));
     }
 
-    // 1 agregar component form register bus Component
-    // 2 crear contexto para que consuma todos los componentes ese origen
+   
+
 
     return (
         <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm overflow-hidden">
@@ -97,22 +50,6 @@ export default function RegisterBus() {
 
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-5">
-                    {error && (
-                        <Alert variant="destructive">
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertDescription>{error}</AlertDescription>
-                        </Alert>
-                    )}
-
-                    {/* todo remover alert */}
-                    {success && (
-                        <Alert className="border-green-600 bg-green-50 dark:bg-green-950/20">
-                            <AlertCircle className="h-4 w-4 text-green-600" />
-                            <AlertDescription className="text-green-800 dark:text-green-400">
-                                Autobús registrado exitosamente en el sistema.
-                            </AlertDescription>
-                        </Alert>
-                    )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
@@ -122,11 +59,11 @@ export default function RegisterBus() {
                             <div className="relative">
                                 <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
-                                    id="numeroAutobus"
+                                    id="number"
                                     type="text"
                                     placeholder="001"
-                                    value={formData.numeroAutobus}
-                                    onChange={(e) => handleChange("numeroAutobus", e.target.value)}
+                                    value={formData.number}
+                                    onChange={(e) => handleChange("number", e.target.value)}
                                     className="pl-10"
                                     required
                                     disabled={isLoading}
@@ -141,11 +78,11 @@ export default function RegisterBus() {
                             <div className="relative">
                                 <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
-                                    id="placas"
+                                    id="plate"
                                     type="text"
                                     placeholder="ABC-123-XYZ"
-                                    value={formData.placas}
-                                    onChange={(e) => handleChange("placas", e.target.value.toUpperCase())}
+                                    value={formData.plate}
+                                    onChange={(e) => handleChange("plate", e.target.value.toUpperCase())}
                                     className="pl-10 uppercase"
                                     required
                                     disabled={isLoading}
@@ -161,11 +98,11 @@ export default function RegisterBus() {
                         <div className="relative">
                             <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
-                                id="numeroSerie"
+                                id="serialNumber"
                                 type="text"
                                 placeholder="3VWDX7AJ9CM123456"
-                                value={formData.numeroSerie}
-                                onChange={(e) => handleChange("numeroSerie", e.target.value.toUpperCase())}
+                                value={formData.serialNumber}
+                                onChange={(e) => handleChange("serialNumber", e.target.value.toUpperCase())}
                                 className="pl-10 uppercase"
                                 required
                                 disabled={isLoading}
@@ -175,17 +112,17 @@ export default function RegisterBus() {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="capacidadAsientos" className="text-sm font-medium">
+                            <Label htmlFor="seatingCapacity" className="text-sm font-medium">
                                 Capacidad de asientos <span className="text-destructive">*</span>
                             </Label>
                             <div className="relative">
                                 <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
-                                    id="capacidadAsientos"
+                                    id="seatingCapacity"
                                     type="number"
                                     placeholder="42"
-                                    value={formData.capacidadAsientos}
-                                    onChange={(e) => handleChange("capacidadAsientos", e.target.value)}
+                                    value={formData.seatingCapacity}
+                                    onChange={(e) => handleChange("seatingCapacity", e.target.value)}
                                     className="pl-10"
                                     required
                                     disabled={isLoading}
@@ -201,30 +138,30 @@ export default function RegisterBus() {
                             <div className="relative">
                                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
-                                    id="año"
+                                    id="year"
                                     type="number"
                                     placeholder="2024"
-                                    value={formData.año}
-                                    onChange={(e) => handleChange("año", e.target.value)}
+                                    value={formData.year}
+                                    onChange={(e) => handleChange("year", e.target.value)}
                                     className="pl-10"
                                     required
                                     disabled={isLoading}
-                                    min="1990"
+                                    min="1980"
                                     max={new Date().getFullYear() + 1}
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="modelo" className="text-sm font-medium">
+                            <Label htmlFor="model" className="text-sm font-medium">
                                 Modelo <span className="text-destructive">*</span>
                             </Label>
                             <Input
-                                id="modelo"
+                                id="model"
                                 type="text"
                                 placeholder="ej: Volvo 9700"
-                                value={formData.modelo}
-                                onChange={(e) => handleChange("modelo", e.target.value)}
+                                value={formData.model}
+                                onChange={(e) => handleChange("model", e.target.value)}
                                 required
                                 disabled={isLoading}
                             />
@@ -232,14 +169,14 @@ export default function RegisterBus() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="caracteristicas" className="text-sm font-medium">
+                        <Label htmlFor="characteristics" className="text-sm font-medium">
                             Características
                         </Label>
                         <Textarea
-                            id="caracteristicas"
+                            id="characteristics"
                             placeholder="Ej: WiFi, Aire acondicionado, Pantallas individuales, Asientos reclinables, Baño, Tomas de corriente USB..."
-                            value={formData.caracteristicas}
-                            onChange={(e) => handleChange("caracteristicas", e.target.value)}
+                            value={formData.characteristics}
+                            onChange={(e) => handleChange("characteristics", e.target.value)}
                             disabled={isLoading}
                             rows={4}
                             className="resize-none"

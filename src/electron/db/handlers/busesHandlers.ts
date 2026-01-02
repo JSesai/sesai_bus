@@ -1,10 +1,59 @@
 import { ipcMain } from "electron";
 import { busesRepo } from "../repositories/busesRepo.js";
+import { AppError, BusError } from "../../../shared/errors/customError.js";
 
-export function registerBusesHandlers() {
-  ipcMain.handle("getBuses", () => busesRepo.getAll());
-  ipcMain.handle("getBusById", (_, id: number) => busesRepo.getById(id));
-  ipcMain.handle("addBus", (_, bus) => busesRepo.add(bus));
-  ipcMain.handle("updateBus", (_, bus) => busesRepo.update(bus));
-  ipcMain.handle("deleteBus", (_, id: number) => busesRepo.delete(id));
+export function busesHandlers() {
+  ipcMain.handle("getBuses", async (): Promise<ResponseElectronGeneric> => {
+    try {
+      const buses = await busesRepo.getAll();
+      console.log('estos son los buses', buses);
+      return { ok: true, data: buses, error: null }
+
+    } catch (error) {
+      console.log('error al obtener autobus ->', error);
+
+      if (error instanceof AppError) {
+        return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
+      }
+
+      return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible obtener los automobiles" } };
+
+
+    }
+
+  });
+  ipcMain.handle("getBusById", (_e, id: number) => busesRepo.getById(id));
+  ipcMain.handle("addBus", async (_e, bus: Bus): Promise<ResponseElectronGeneric> => {
+
+    try {
+
+      const registerBus = await busesRepo.add(bus);
+      console.log({ registerBus });
+
+      if (!registerBus) throw new BusError("Error al crear registro", "No se ha registrado autobus");
+      return { ok: true, error: null, data: "Registro creado correctamente" }
+    } catch (error: any) {
+      console.log('error al registrar autobus ->', error);
+
+      if (error instanceof AppError) {
+        return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
+      }
+
+      if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('buses.plate')) {
+        return { ok: false, data: null, error: { message: 'Placas ya registradas', detail: 'El número de placas ya está asociada a otro autobus' } };
+      }
+      if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('buses.serialNumber')) {
+        return { ok: false, data: null, error: { message: 'Número de serie ya registrado', detail: 'El número de serie ya está asociada a otro autobus' } };
+      }
+      if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('buses.number')) {
+        return { ok: false, data: null, error: { message: 'Numero ya esta registrado', detail: 'El número de autobus ya está asociada a otro autobus' } };
+      }
+
+
+      return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible agregar el bus" } };
+    }
+
+  });
+  ipcMain.handle("updateBus", (_e, bus) => busesRepo.update(bus));
+  ipcMain.handle("deleteBus", (_e, id: number) => busesRepo.delete(id));
 }

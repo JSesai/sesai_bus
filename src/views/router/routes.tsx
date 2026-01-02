@@ -15,6 +15,8 @@ import Destinations from "../Buses/screens/Destinations";
 import Schedules from "../Buses/screens/Schedules";
 import Employees from "../Buses/screens/Employees";
 import Customers from "../Buses/screens/Customers";
+import { DashboardProvider } from "../auth/context/DashBoardContext";
+import Buses from "../Buses/screens/Buses";
 
 
 export function AppRouter() {
@@ -35,19 +37,23 @@ export function AppRouter() {
 
                 </Routes>
 
-                <Routes>
-                    <Route path="dashboard/" element={<DashBoardLayout />}>
-                        <Route index element={<MainDashboard />} />
-                        <Route path="summary" element={<Summary />} />
-                        <Route path="ticket-sale" element={<TicketSale />} />
-                        <Route path="setting" element={<Setting />} />
-                        <Route path="buses" element={<RegisterBus />} />
-                        <Route path="destinations" element={<Destinations />} />
-                        <Route path="schedules" element={<Schedules />} />
-                        <Route path="employees" element={<Employees />} />
-                        <Route path="customers" element={<Customers />} />
-                    </Route>
-                </Routes>
+                <DashboardProvider>
+                    <Routes>
+
+                        <Route path="dashboard/" element={<DashBoardLayout />}>
+                            <Route index element={<MainDashboard />} />
+                            <Route path="summary" element={<Summary />} />
+                            <Route path="ticket-sale" element={<TicketSale />} />
+                            <Route path="setting" element={<Setting />} />
+                            <Route path="buses" element={<Buses />} />
+                            <Route path="add-bus" element={<RegisterBus />} />
+                            <Route path="destinations" element={<Destinations />} />
+                            <Route path="schedules" element={<Schedules />} />
+                            <Route path="employees" element={<Employees />} />
+                            <Route path="customers" element={<Customers />} />
+                        </Route>
+                    </Routes>
+                </DashboardProvider>
 
                 {/* <Route path="dashboard" element={<RouterDashBoard />} /> */}
                 {/* <Route path="/drivers" element={<DriverForm />} /> */}

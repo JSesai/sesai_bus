@@ -22,10 +22,10 @@ export const userRepo = {
         else resolve({ id: this.lastID, ...user } as User);
       });
     }),
-    update: (user: User) =>
-      new Promise((resolve, reject) => {
-        db.run(
-          `
+  update: (user: User) =>
+    new Promise((resolve, reject) => {
+      db.run(
+        `
           UPDATE users SET
             name     = COALESCE(?, name),
             userName = COALESCE(?, userName),
@@ -35,21 +35,21 @@ export const userRepo = {
             password = COALESCE(?, password)
           WHERE id = ?
           `,
-          [
-            user.name,
-            user.userName,
-            user.phone,
-            user.status,
-            user.role,
-            user.password,
-            user.id
-          ],
-          function (err) {
-            if (err) reject(err);
-            else resolve({ changes: this.changes });
-          }
-        );
-      }),    
+        [
+          user.name,
+          user.userName,
+          user.phone,
+          user.status,
+          user.role,
+          user.password,
+          user.id
+        ],
+        function (err) {
+          if (err) reject(err);
+          else resolve({ changes: this.changes });
+        }
+      );
+    }),
   delete: (id: number) =>
     new Promise((resolve, reject) => {
       db.run("DELETE FROM users WHERE id = ?", [id], function (err) {
@@ -69,18 +69,33 @@ export const userRepo = {
       );
     }),
 
-    getByName: (userName: string) =>
-      new Promise<User | null>((resolve, reject) => {
+  getByName: (userName: string) =>
+    new Promise<User | null>((resolve, reject) => {
 
-        db.get(
-          `SELECT * FROM users WHERE userName = ? LIMIT 1`,
-          [userName],
-          (err, row) => {
-            if (err) return reject(err);
-            resolve(row ? row as User : null);
-          }
-        )
-      })
+      db.get(
+        `SELECT * FROM users WHERE userName = ? LIMIT 1`,
+        [userName],
+        (err, row) => {
+          if (err) return reject(err);
+          resolve(row ? row as User : null);
+        }
+      )
+    }),
+
+  countUsers: (): Promise<number> =>
+    new Promise((resolve, reject) => {
+      db.get(
+        "SELECT COUNT(*) as count FROM users",
+        (err, row: { count: number }) => {
+          if (err) return reject(err);
+          resolve(row.count);
+        }
+      );
+    }),
+
+
+
+
 
 
 };

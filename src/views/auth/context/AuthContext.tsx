@@ -24,6 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  //valida sesion
   const validaSesionActiva = async () => {
     try {
       const responseSession = await window.electron.users.checkSession();
@@ -50,6 +51,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 
       navigate("/auth/login");
+      // navigate('/auth/register');
+
 
     } catch (error) {
       console.log('errorssss', error);
@@ -59,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  // Cargar usuario desde localStorage al iniciar
+  // Cargar sesion de usuario
   useEffect(() => {
     console.log('valida session activa...');
     validaSesionActiva();
@@ -100,10 +103,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     }
 
-
-  }
-
-  const loginBiometric = async () => {
 
   }
 

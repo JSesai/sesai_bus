@@ -51,16 +51,23 @@ interface AgencieAPI {
   deleteAgency: (id: Agency['id']) => Promise<void>;
 }
 
+type TstatusBus = 'active' | 'disabled';
 interface Bus {
-  id: number;
-  number: number;
-  capacity: number;
+  id?: number;
+  number: string;
+  seatingCapacity: number;
+  plate: string;
+  serialNumber: string;
+  year:string;
+  model: string;
+  characteristics?: string;
+  status: TstatusBus;
 }
 
 interface BusesAPI {
-  getBuses: () => Promise<Bus[]>;
+  getBuses: () => Promise<ResponseElectronGeneric>;
   getBusById: (id: Bus['id']) => Promise<Bus>;
-  addBus: (bus: Bus) => Promise<Bus>;
+  addBus: (bus: Bus) => Promise<ResponseElectronGeneric>;
   deleteBus: (id: Bus['id']) => Promise<void>;
   updateBus: (id: Bus['id']) => Promise<void>;
 }
