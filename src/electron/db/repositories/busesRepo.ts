@@ -44,19 +44,42 @@ export const busesRepo = {
         }
       );
     }),
-
-
-  update: (bus: { id: number; number?: string; capacity?: number }) =>
+  update: (bus: Partial<Bus> & { id: number }) =>
     new Promise((resolve, reject) => {
       db.run(
-        "UPDATE buses SET number = COALESCE(?, number), capacity = COALESCE(?, capacity) WHERE id = ?",
-        [bus.number, bus.capacity, bus.id],
+        `
+          UPDATE buses SET
+            number           = COALESCE(?, number),
+            seatingCapacity  = COALESCE(?, seatingCapacity),
+            plate            = COALESCE(?, plate),
+            serialNumber     = COALESCE(?, serialNumber),
+            year             = COALESCE(?, year),
+            model            = COALESCE(?, model),
+            characteristics  = COALESCE(?, characteristics),
+            status           = COALESCE(?, status)
+          WHERE id = ?
+          `,
+        [
+          bus.number,
+          bus.seatingCapacity,
+          bus.plate,
+          bus.serialNumber,
+          bus.year,
+          bus.model,
+          bus.characteristics ?? null,
+          bus.status,
+          bus.id
+        ],
         function (err) {
           if (err) reject(err);
           else resolve({ changes: this.changes });
         }
       );
     }),
+
+
+
+
 
   delete: (id: number) =>
     new Promise((resolve, reject) => {

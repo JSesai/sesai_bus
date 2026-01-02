@@ -60,11 +60,16 @@ export default function Buses() {
     if (view === "add") {
         return (
             <div className="space-y-6">
-                <Button variant="ghost" onClick={() => setView("list")} className="gap-2">
+                <Button variant="ghost" className="gap-2" onClick={() => {
+                    setEditingBus(null);
+                    setView("list");
+
+                }}
+                >
                     <ArrowLeft className="h-4 w-4" />
                     Volver a la lista
                 </Button>
-                <RegisterBus />
+                <RegisterBus editingBus={null} />
             </div>
         )
     }
@@ -76,21 +81,13 @@ export default function Buses() {
                     <ArrowLeft className="h-4 w-4" />
                     Volver a la lista
                 </Button>
-                <RegisterBus
-                // initialData={editingDestino}
-                // onSubmit={handleEditDestino}
-                // onCancel={() => {
-                //     setEditingDestino(null)
-                //     setView("list")
-                // }}
-                // isEditing
-                />
+                <RegisterBus editingBus={editingBus} />
             </div>
         )
     }
 
     console.log(buses);
-    
+
 
     return (
         <div className="space-y-6">
@@ -151,7 +148,7 @@ export default function Buses() {
                                     <p className="text-xs text-muted-foreground">Asientos</p>
                                     <p className="font-semibold text-sm">{buses.seatingCapacity}</p>
                                 </div>
-                               
+
                                 <div className="text-center">
                                     <p className="text-xs text-muted-foreground">Año</p>
                                     <p className="font-semibold text-sm">{buses.year}</p>

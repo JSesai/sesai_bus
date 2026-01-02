@@ -28,7 +28,7 @@ contextBridge.exposeInMainWorld("electron", {
     getBusById: (id: Bus['id']) => ipcRenderer.invoke("getBusById", id),
     addBus: (bus: Bus) => ipcRenderer.invoke("addBus", bus),
     deleteBus: (id: Bus['id']) => ipcRenderer.invoke("deleteBus", id),
-    updateBus: (bus: Bus) => ipcRenderer.invoke("deleteBus", bus),
+    updateBus: (bus: Bus) => ipcRenderer.invoke("updateBus", bus),
 
   },
 

@@ -6,7 +6,7 @@ import { AppError, BusError, ValidationError } from "../../../shared/errors/cust
 
 type DashboardContextType = {
 
-    handleRegisterBus: (dataBus: Bus) => Promise<boolean>;
+    handleRegisterBus: (dataBus: Bus, editingBus?: boolean) => Promise<boolean>;
     isLoading: boolean;
 };
 
@@ -19,7 +19,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(false)
 
     //manejador para registro de autobus 
-    const handleRegisterBus = async (bus: Bus): Promise<boolean> => {
+    const handleRegisterBus = async (bus: Bus, editingBus: boolean = false): Promise<boolean> => {
 
         try {
 
@@ -37,7 +37,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             bus.number = parsedNumber.toString();
 
             setLoading(true);
-            const resp = await window.electron.buses.addBus(bus);
+            const resp = editingBus ? await window.electron.buses.updateBus(bus) : await window.electron.buses.addBus(bus);
 
             console.log(resp);
             if (resp.ok) {
@@ -47,8 +47,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
                     origin: { y: 0.6 }
                 });
 
-                toast.success('Registro exitoso.', {
-                    description: 'Autobús agregado al sistema.',
+                toast.success(editingBus ? 'Cambios guardados' : 'Registro exitoso.', {
+                    description: editingBus ? 'Automobil editado correctamente': 'Autobús agregado al sistema.',
                     richColors: true,
                     duration: 10_000,
                     position: 'top-center'

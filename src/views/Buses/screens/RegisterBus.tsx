@@ -20,14 +20,15 @@ const initialStateBus: Bus = {
     status: "active",
 }
 
-export default function RegisterBus() {
+export default function RegisterBus({ editingBus }: { editingBus: Bus | null }) {
 
     const { handleRegisterBus, isLoading } = useDashboard();
-    const [formData, setFormData] = useState<Bus>(initialStateBus);
+    const [formData, setFormData] = useState<Bus>(editingBus ? editingBus : initialStateBus);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const registerSucces = await handleRegisterBus(formData);
+       
+        const registerSucces = await handleRegisterBus(formData, Boolean(editingBus));
         if (registerSucces) setFormData(initialStateBus);
     }
 
@@ -35,7 +36,7 @@ export default function RegisterBus() {
         setFormData((prev) => ({ ...prev, [field]: value }));
     }
 
-   
+
 
 
     return (
@@ -190,10 +191,10 @@ export default function RegisterBus() {
                         {isLoading ? (
                             <span className="flex items-center gap-2">
                                 <span className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                                Registrando autobús...
+                                {editingBus ? "Guardando cambios... " : "Registrando autobús..."}
                             </span>
                         ) : (
-                            "Registrar autobús"
+                            editingBus ? "Guardar cambios" : "Registrar autobús"
                         )}
                     </Button>
 

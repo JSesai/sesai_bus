@@ -6,7 +6,7 @@ export function busesHandlers() {
   ipcMain.handle("getBuses", async (): Promise<ResponseElectronGeneric> => {
     try {
       const buses = await busesRepo.getAll();
-      console.log('estos son los buses', buses);
+      console.log('buses registrados', buses);
       return { ok: true, data: buses, error: null }
 
     } catch (error) {
@@ -54,6 +54,21 @@ export function busesHandlers() {
     }
 
   });
-  ipcMain.handle("updateBus", (_e, bus) => busesRepo.update(bus));
+  ipcMain.handle("updateBus", async (_e, bus): Promise<ResponseElectronGeneric> => {
+    try {
+      console.log("init process update bus");
+
+      const response = await busesRepo.update(bus);
+
+      return { ok: true, error: null, data: response }
+
+    } catch (error) {
+      console.log('error al actualizar bus ->', error);
+
+      return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible actualizar el bus" } };
+
+    }
+
+  });
   ipcMain.handle("deleteBus", (_e, id: number) => busesRepo.delete(id));
 }

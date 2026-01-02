@@ -69,7 +69,7 @@ interface BusesAPI {
   getBusById: (id: Bus['id']) => Promise<Bus>;
   addBus: (bus: Bus) => Promise<ResponseElectronGeneric>;
   deleteBus: (id: Bus['id']) => Promise<void>;
-  updateBus: (id: Bus['id']) => Promise<void>;
+  updateBus: (bus: Bus) => Promise<ResponseElectronGeneric>;
 }
 
 interface Driver {
