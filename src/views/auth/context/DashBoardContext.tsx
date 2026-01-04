@@ -5,19 +5,93 @@ import { toast } from 'sonner';
 import { AppError, BusError, ValidationError } from "../../../shared/errors/customError";
 
 type DashboardContextType = {
-
-    handleRegisterBus: (dataBus: Bus, editingBus?: boolean) => Promise<boolean>;
+    //data
     isLoading: boolean;
+
+    //methods
+    handleRegisterBus: (dataBus: Bus, editingBus?: boolean) => Promise<boolean>;
+    handleUpdateStatus: (dataBus: Bus) => Promise<boolean>;
+    handleGetBuses: () => Promise<Bus[]>
 };
 
 export const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
 
     const [isLoading, setIsLoading] = useState(false)
 
+    //manejador para obtener buses
+    const handleGetBuses = async (): Promise<Bus[]> => {
+
+        try {
+            setIsLoading(true);
+            const buses = await window.electron.buses.getBuses();
+
+
+            console.log(buses);
+            if (buses.ok && buses.data.length > 0) return buses.data.filter(bus => bus.status !== "removed");
+
+            return [];
+
+        } catch (e) {
+            if (e instanceof AppError) {
+
+                toast.error(e.message, {
+                    richColors: true,
+                    description: e.details,
+                    duration: 10_000,
+                    position: 'top-center'
+                });
+                return [];
+            }
+
+        } finally {
+            setIsLoading(false)
+        }
+
+        return [];
+
+    }
+    //manejador para cambio de estatus de autobus 
+    const handleUpdateStatus = async (bus: Bus): Promise<boolean> => {
+
+        try {
+            setIsLoading(true);
+            const resp = await window.electron.buses.updateBus(bus);
+
+            console.log(resp);
+            if (resp.ok) {
+
+                toast.success('Acción exitosa!!', {
+                    richColors: true,
+                    duration: 5_000,
+                    position: 'top-center'
+                })
+
+                return true;
+            }
+
+            if (resp.error) throw new BusError(resp.error.message, resp.error.detail);
+
+        } catch (e) {
+            if (e instanceof AppError) {
+
+                toast.error(e.message, {
+                    richColors: true,
+                    description: e.details,
+                    duration: 10_000,
+                    position: 'top-center'
+                });
+                return false;
+            }
+
+        } finally {
+            setIsLoading(false)
+        }
+
+        return false;
+
+    }
     //manejador para registro de autobus 
     const handleRegisterBus = async (bus: Bus, editingBus: boolean = false): Promise<boolean> => {
 
@@ -36,7 +110,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             if (Number.isNaN(parsedNumber)) throw new BusError("Número inválido", "El número del autobús debe ser numérico");
             bus.number = parsedNumber.toString();
 
-            setLoading(true);
+            setIsLoading(true);
             const resp = editingBus ? await window.electron.buses.updateBus(bus) : await window.electron.buses.addBus(bus);
 
             console.log(resp);
@@ -48,7 +122,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
                 });
 
                 toast.success(editingBus ? 'Cambios guardados' : 'Registro exitoso.', {
-                    description: editingBus ? 'Automobil editado correctamente': 'Autobús agregado al sistema.',
+                    description: editingBus ? 'Automobil editado correctamente' : 'Autobús agregado al sistema.',
                     richColors: true,
                     duration: 10_000,
                     position: 'top-center'
@@ -72,7 +146,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             }
 
         } finally {
-            setLoading(false)
+            setIsLoading(false)
         }
 
         return false;
@@ -83,6 +157,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     return (
         <DashboardContext.Provider value={{
             handleRegisterBus,
+            handleUpdateStatus,
+            handleGetBuses,
             isLoading
         }}>
             {children}

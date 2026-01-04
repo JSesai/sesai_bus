@@ -6,6 +6,7 @@ import { Badge } from "../../components/ui/badge"
 import { Input } from "../../components/ui/input"
 import { MapPin, Plus, Search, Edit, Trash2, ArrowLeft, Phone, MapIcon, RectangleEllipsis, WholeWord, BusIcon } from "lucide-react"
 import RegisterBus from "./RegisterBus"
+import { useDashboard } from "../../auth/context/DashBoardContext"
 
 // Datos de ejemplo - reemplazar con datos de tu base de datos
 const automobiles: Bus[] = [
@@ -25,31 +26,40 @@ const automobiles: Bus[] = [
 
 
 export default function Buses() {
+    const { handleUpdateStatus, handleGetBuses } = useDashboard();
     const [buses, setBuses] = useState<Bus[]>(automobiles)
     const [searchTerm, setSearchTerm] = useState("")
     const [view, setView] = useState<"list" | "add" | "edit">("list")
     const [editingBus, setEditingBus] = useState<Bus | null>(null)
 
     useEffect(() => {
-        window.electron.buses.getBuses().then(buses => setBuses(buses.data)).catch(e => console.log(e));
+        const getDataBus = async () => {
+            const dataBuses = await handleGetBuses();
+            setBuses(dataBuses)
+        }
+        getDataBus()
     }, [view])
 
-    const handleEditDestino = (updatedDestino: Omit<Bus, "id">) => {
-        if (editingBus) {
-            setBuses(buses.map((d) => (d.id === editingBus?.id ? { ...updatedDestino, id: editingBus?.id } : d)))
-            setEditingBus(null)
-            setView("list")
+
+    const handleDeletebuses = async (bus: Bus) => {
+        if (confirm("Estas seguro de que deseas eliminar este automovil?")) {
+            const updateBus: Bus = {
+                ...bus,
+                status: "removed"
+            }
+            const busDeleted = await handleUpdateStatus(updateBus);
+            if (busDeleted) setBuses(buses.filter((b) => b.id !== bus.id))
         }
     }
 
-    const handleDeletebuses = (id: number) => {
-        if (confirm("ΒΏEstΓ's seguro de que deseas eliminar este destino?")) {
-            setBuses(buses.filter((d) => d.id !== id))
+    const handleToggleActivo = async (bus: Bus) => {
+        console.log('actualizar el estatus');
+        const updateBus: Bus = {
+            ...bus,
+            status: bus.status === "active" ? "disabled" : "active"
         }
-    }
-
-    const handleToggleActivo = (id: number) => {
-        // setDestinos(buses.map((d) => (d.id === id ? { ...d, activo: !d.activo } : d)))
+        const changeStatus = await handleUpdateStatus(updateBus)
+        if (changeStatus) setBuses(buses.map((b) => (b.id === bus.id ? updateBus : b)))
     }
 
     const startEdit = (bus: Bus) => {
@@ -85,8 +95,6 @@ export default function Buses() {
             </div>
         )
     }
-
-    console.log(buses);
 
 
     return (
@@ -166,13 +174,13 @@ export default function Buses() {
                                     <Edit className="h-4 w-4" />
                                     Editar
                                 </Button>
-                                <Button variant="outline" size="sm" onClick={() => handleToggleActivo(buses?.id ?? 0)} className="flex-1">
+                                <Button variant="outline" size="sm" onClick={() => handleToggleActivo(buses)} className="flex-1">
                                     {buses.status === "active" ? "Desactivar" : "Activar"}
                                 </Button>
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => handleDeletebuses(buses.id ?? 0)}
+                                    onClick={() => handleDeletebuses(buses)}
                                     className="text-destructive hover:text-destructive"
                                 >
                                     <Trash2 className="h-4 w-4" />

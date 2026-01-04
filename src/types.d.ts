@@ -51,7 +51,7 @@ interface AgencieAPI {
   deleteAgency: (id: Agency['id']) => Promise<void>;
 }
 
-type TstatusBus = 'active' | 'disabled';
+type TstatusBus = 'active' | 'disabled' | 'removed';
 interface Bus {
   id?: number;
   number: string;
@@ -65,10 +65,10 @@ interface Bus {
 }
 
 interface BusesAPI {
-  getBuses: () => Promise<ResponseElectronGeneric>;
+  getBuses: () => Promise<ResponseElectronBuses>;
   getBusById: (id: Bus['id']) => Promise<Bus>;
   addBus: (bus: Bus) => Promise<ResponseElectronGeneric>;
-  deleteBus: (id: Bus['id']) => Promise<void>;
+  deleteBus: (id: Bus['id']) => Promise<ResponseElectronGeneric>;
   updateBus: (bus: Bus) => Promise<ResponseElectronGeneric>;
 }
 
@@ -191,6 +191,11 @@ interface ResponseElectronUser {
 interface ResponseElectronGeneric {
   ok: boolean,
   data: any;
+  error: null | ErrorApp
+}
+interface ResponseElectronBuses {
+  ok: boolean,
+  data: Bus[];
   error: null | ErrorApp
 }
 
