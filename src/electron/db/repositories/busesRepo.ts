@@ -20,17 +20,15 @@ export const busesRepo = {
       db.run(
         `
           INSERT INTO buses (
-            number,
             seatingCapacity,
             plate,
             serialNumber,
             year,
             model,
             characteristics
-          ) VALUES (?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?)
           `,
         [
-          bus.number,
           bus.seatingCapacity,
           bus.plate,
           bus.serialNumber,
@@ -49,7 +47,6 @@ export const busesRepo = {
       db.run(
         `
           UPDATE buses SET
-            number           = COALESCE(?, number),
             seatingCapacity  = COALESCE(?, seatingCapacity),
             plate            = COALESCE(?, plate),
             serialNumber     = COALESCE(?, serialNumber),
@@ -60,7 +57,6 @@ export const busesRepo = {
           WHERE id = ?
           `,
         [
-          bus.number,
           bus.seatingCapacity,
           bus.plate,
           bus.serialNumber,

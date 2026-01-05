@@ -7,27 +7,13 @@ import { Input } from "../../components/ui/input"
 import { MapPin, Plus, Search, Edit, Trash2, ArrowLeft, Phone, MapIcon, RectangleEllipsis, WholeWord, BusIcon } from "lucide-react"
 import RegisterBus from "./RegisterBus"
 import { useDashboard } from "../../auth/context/DashBoardContext"
+import { CalendarCustom } from "../components/CalendarCustom"
 
-// Datos de ejemplo - reemplazar con datos de tu base de datos
-const automobiles: Bus[] = [
-    {
-        id: 1,
-        number: '',
-        model: '',
-        plate: '',
-        seatingCapacity: 99,
-        serialNumber: '',
-        year: '',
-        characteristics: '',
-        status: 'active'
-    },
-
-]
 
 
 export default function Buses() {
     const { handleUpdateStatus, handleGetBuses } = useDashboard();
-    const [buses, setBuses] = useState<Bus[]>(automobiles)
+    const [buses, setBuses] = useState<Bus[]>([])
     const [searchTerm, setSearchTerm] = useState("")
     const [view, setView] = useState<"list" | "add" | "edit">("list")
     const [editingBus, setEditingBus] = useState<Bus | null>(null)
@@ -104,9 +90,10 @@ export default function Buses() {
                     <h1 className="text-3xl font-bold text-balance mb-2">Gestión de Automobiles</h1>
                     <p className="text-muted-foreground text-pretty">Administra y gestiona la flotatilla de automobiles</p>
                 </div>
+                <CalendarCustom />
                 <Button onClick={() => setView("add")} size="lg" className="gap-2">
                     <Plus className="h-5 w-5" />
-                    Agregar automobil
+                    Agregar
                 </Button>
             </div>
 
@@ -131,7 +118,7 @@ export default function Buses() {
                                         <BusIcon className="h-6 w-6 text-green-600" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-lg text-balance">Autobus {buses.number}</h3>
+                                        <h3 className="font-semibold text-lg text-balance">{buses.model}</h3>
                                         <p className="text-sm text-muted-foreground">{buses.model}</p>
                                     </div>
                                 </div>
@@ -193,12 +180,12 @@ export default function Buses() {
 
             {buses.length === 0 && (
                 <div className="text-center py-12">
-                    <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-                    <h3 className="text-lg font-semibold mb-2">No se encontraron destinos</h3>
-                    <p className="text-muted-foreground mb-4">Intenta con otra búsqueda o agrega un nuevo destino</p>
+                    <BusIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                    <h3 className="text-lg font-semibold mb-2">No se encontraron transportes</h3>
+                    <p className="text-muted-foreground mb-4">Intenta con otra búsqueda o agrega un nuevo transporte</p>
                     <Button onClick={() => setView("add")} className="gap-2">
                         <Plus className="h-4 w-4" />
-                        Agregar Primer Destino
+                        Agregar Primer Transporte
                     </Button>
                 </div>
             )}

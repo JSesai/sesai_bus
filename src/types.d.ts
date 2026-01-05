@@ -54,7 +54,7 @@ interface AgencieAPI {
 type TstatusBus = 'active' | 'disabled' | 'removed';
 interface Bus {
   id?: number;
-  number: string;
+  // number: string;
   seatingCapacity: number;
   plate: string;
   serialNumber: string;

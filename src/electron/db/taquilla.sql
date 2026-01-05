@@ -6,14 +6,16 @@ CREATE TABLE IF NOT EXISTS agencies (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     location TEXT,
-    phone TEXT
+    phone TEXT,
+    dynamic_bus_numbering INTEGER NOT NULL DEFAULT 0 -- 0 = fijo, 1 = dinámico
+
 );
 
 
 -- 2. BUSES (Unidades)
 CREATE TABLE IF NOT EXISTS buses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    number TEXT NOT NULL UNIQUE,
+    -- number TEXT NOT NULL UNIQUE,
     seatingCapacity INTEGER NOT NULL,
     plate TEXT NOT NULL UNIQUE,
     serialNumber TEXT NOT NULL UNIQUE,
@@ -23,6 +25,22 @@ CREATE TABLE IF NOT EXISTS buses (
     status TEXT NOT NULL DEFAULT 'active',
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
+
+-- asignacion diaria de numero de autobus
+CREATE TABLE bus_number_assignments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bus_id INTEGER NOT NULL,
+    terminal_id INTEGER NOT NULL,
+    service_date TEXT NOT NULL, -- YYYY-MM-DD
+    bus_number INTEGER NOT NULL,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE (terminal_id, service_date, bus_number),
+    UNIQUE (bus_id, terminal_id, service_date),
+
+    FOREIGN KEY (bus_id) REFERENCES buses(id)
+);
+
 
 
 

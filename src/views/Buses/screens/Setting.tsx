@@ -1,8 +1,17 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "../../components/ui/card";
-import { Bus, MapPin, Clock, Users, IdCardLanyard } from "lucide-react";
+import { Bus, MapPin, Clock, Users, IdCardLanyard, HousePlug } from "lucide-react";
 
 const menuItems = [
+    {
+        title: "Agencia",
+        description: "Gestionar configuración de la agencia",
+        icon: HousePlug,
+        path: "/dashboard/agencie",
+        color: "text-pink-400",
+        bgColor: "bg-pink-500/10",
+        hoverColor: "hover:border-pink-500",
+    },
     {
         title: "Autobuses",
         description: "Gestionar unidades y flotas",

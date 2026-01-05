@@ -105,10 +105,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             const year = Number.parseInt(bus.year);
             const currentYear = new Date().getFullYear();
             if (isNaN(year) || year > currentYear + 1) throw new BusError("Año incorrecto", "El año no puede ser superior a 1 año de la fecha actual");
-            const parsedNumber = Number(bus.number);
-
-            if (Number.isNaN(parsedNumber)) throw new BusError("Número inválido", "El número del autobús debe ser numérico");
-            bus.number = parsedNumber.toString();
+           
 
             setIsLoading(true);
             const resp = editingBus ? await window.electron.buses.updateBus(bus) : await window.electron.buses.addBus(bus);

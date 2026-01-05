@@ -11,7 +11,7 @@ import { useDashboard } from "../../auth/context/DashBoardContext"
 
 const initialStateBus: Bus = {
     model: "",
-    number: "",
+    // number: "",
     plate: "",
     seatingCapacity: 0,
     serialNumber: "",
@@ -27,7 +27,7 @@ export default function RegisterBus({ editingBus }: { editingBus: Bus | null }) 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-       
+
         const registerSucces = await handleRegisterBus(formData, Boolean(editingBus));
         if (registerSucces) setFormData(initialStateBus);
     }
@@ -42,8 +42,8 @@ export default function RegisterBus({ editingBus }: { editingBus: Bus | null }) 
             <CardHeader className="space-y-3 text-center pb-6">
 
                 <div className="space-y-1">
-                    <CardTitle className="text-2xl font-semibold text-balance">Registro de Autobús</CardTitle>
-                    <CardDescription className="text-base text-balance">Agrega un nuevo autobús a la flota</CardDescription>
+                    <CardTitle className="text-2xl font-semibold text-balance">Registro de Vehículo</CardTitle>
+                    <CardDescription className="text-base text-balance">Agrega un nuevo registro a la flota</CardDescription>
                 </div>
             </CardHeader>
 
@@ -53,17 +53,17 @@ export default function RegisterBus({ editingBus }: { editingBus: Bus | null }) 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="numeroAutobus" className="text-sm font-medium">
-                                Número de autobus <span className="text-destructive">*</span>
+                                Número de serie <span className="text-destructive">*</span>
                             </Label>
                             <div className="relative">
                                 <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
-                                    id="number"
+                                    id="serialNumber"
                                     type="text"
-                                    placeholder="001"
-                                    value={formData.number}
-                                    onChange={(e) => handleChange("number", e.target.value)}
-                                    className="pl-10"
+                                    placeholder="ej: 3VWDX7AJ9CM123456"
+                                    value={formData.serialNumber}
+                                    onChange={(e) => handleChange("serialNumber", e.target.value.toUpperCase())}
+                                    className="pl-10 uppercase"
                                     required
                                     disabled={isLoading}
                                 />
@@ -79,7 +79,7 @@ export default function RegisterBus({ editingBus }: { editingBus: Bus | null }) 
                                 <Input
                                     id="plate"
                                     type="text"
-                                    placeholder="ABC-123-XYZ"
+                                    placeholder="ej: ABC-123-XYZ"
                                     value={formData.plate}
                                     onChange={(e) => handleChange("plate", e.target.value.toUpperCase())}
                                     className="pl-10 uppercase"
@@ -90,24 +90,7 @@ export default function RegisterBus({ editingBus }: { editingBus: Bus | null }) 
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="numeroSerie" className="text-sm font-medium">
-                            Número de serie <span className="text-destructive">*</span>
-                        </Label>
-                        <div className="relative">
-                            <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                id="serialNumber"
-                                type="text"
-                                placeholder="3VWDX7AJ9CM123456"
-                                value={formData.serialNumber}
-                                onChange={(e) => handleChange("serialNumber", e.target.value.toUpperCase())}
-                                className="pl-10 uppercase"
-                                required
-                                disabled={isLoading}
-                            />
-                        </div>
-                    </div>
+               
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
