@@ -17,6 +17,7 @@ import DashBoardLoader from "../../Buses/components/Loader"
 import DashboardSidebar from "../../Buses/components/DashboardSidebar"
 import ActionButton from "../../Buses/components/AcctionButton"
 import { useDashboard } from "../../auth/context/DashBoardContext"
+import { useAuth } from "../../auth/context/AuthContext"
 
 
 
@@ -28,6 +29,7 @@ function DashBoardLayout() {
 
     const [currentTime, setCurrentTime] = useState(new Date())
     const { isLoading } = useDashboard();
+    const { userLogged } = useAuth();
 
     const canvasRef = useRef<HTMLCanvasElement>(null)
 

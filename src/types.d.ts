@@ -46,8 +46,8 @@ interface Agency {
 interface AgencyAPI {
   getAgency: () => Promise<ResponseElectronGeneric>;
   getAgencyById: (id: Agency['id']) => Promise<Agency>;
-  addAgency: (agency: Agency) => Promise<void>;
-  updateAgency: (agency: Agency) => Promise<void>;
+  addAgency: (agency: Agency) => Promise<ResponseElectronAgencie>;
+  updateAgency: (agency: Agency) => Promise<ResponseElectronAgencie>;
   deleteAgency: (id: Agency['id']) => Promise<void>;
 }
 
@@ -196,7 +196,7 @@ interface ResponseElectronGeneric {
 }
 interface ResponseElectronAgencie {
   ok: boolean,
-  data: Agency;
+  data: Agency | null;
   error: null | ErrorApp
 }
 interface ResponseElectronBuses {

@@ -16,7 +16,7 @@ export async function seedInitialUser(): Promise<ResponseElectronGeneric> {
             userName: "admin",
             password: hashedPassword,
             phone: "5555555555",
-            role: "manager",
+            role: "developer",//todo cambia a manager el role
             status: "registered"
         }
 

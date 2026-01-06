@@ -2,7 +2,8 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
-import { AppError, BusError, ValidationError } from "../../../shared/errors/customError";
+import { AgencyError, AppError, BusError, ValidationError } from "../../../shared/errors/customError";
+import { useAuth } from "./AuthContext";
 
 type DashboardContextType = {
     //data
@@ -13,6 +14,7 @@ type DashboardContextType = {
     handleRegisterBus: (dataBus: Bus, editingBus?: boolean) => Promise<boolean>;
     handleUpdateStatus: (dataBus: Bus) => Promise<boolean>;
     handleGetBuses: () => Promise<Bus[]>
+    handleRegisterAgency: (agency: Agency, editingAgency?: boolean) => Promise<boolean>;
 };
 
 export const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -20,6 +22,7 @@ export const DashboardContext = createContext<DashboardContextType | undefined>(
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
     const navigate = useNavigate();
+    const { userLogged } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [agency, setAgency] = useState<Agency | null>(null);
 
@@ -154,26 +157,91 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     }
 
     const getAgency = async () => {
+        try {
+            const agencyData = await window.electron.agency.getAgency();
+            console.log(agencyData);
+            if (!userLogged || userLogged?.status === "registered") return;
 
-        const agencyData = await window.electron.agency.getAgency();
-        console.log(agencyData);
+            if (agencyData.ok) return navigate('/dashboard/agency');
 
-        if (agencyData.data.length > 0) setAgency(agencyData.data[0]);
-        navigate('/dashboard/agency')
+            setAgency(agencyData.data);
+            return navigate('/dashboard/summary');
+            //todo implementar restart
+
+
+
+        } catch (error) {
+            console.log('error al obtener agencia', error);
+
+        }
+
+    }
+
+
+    const handleRegisterAgency = async (agency: Agency, editingAgency: boolean = false): Promise<boolean> => {
+
+        try {
+
+            // Validaciones
+            if (Object.values(agency).includes('')) throw new ValidationError("Ingresa todos los datos", "Hay campos obligatorios vacíos");
+
+            if (agency.name.length <= 3) throw new AgencyError("Error", "El nombre es demasiado corto");
+
+            setIsLoading(true);
+            const resp = editingAgency ? await window.electron.agency.updateAgency(agency) : await window.electron.agency.addAgency(agency);
+
+            console.log(resp);
+            if (resp.ok) {
+                confetti({
+                    particleCount: 100,
+                    spread: 120,
+                    origin: { y: 0.6 }
+                });
+
+                toast.success(editingAgency ? 'Cambios guardados' : 'Registro exitoso.', {
+                    description: editingAgency ? 'Agencia editada correctamente' : 'Agencia agregada al sistema.',
+                    richColors: true,
+                    duration: 5_000,
+                    position: 'top-center',
+
+                })
+                navigate("/dashboard");
+                return true;
+            }
+
+            if (resp.error) throw new BusError(resp.error.message, resp.error.detail);
+
+        } catch (e) {
+            if (e instanceof AppError) {
+
+                toast.error(e.message, {
+                    richColors: true,
+                    description: e.details,
+                    duration: 10_000,
+                    position: 'top-center'
+                });
+                return false;
+            }
+
+        } finally {
+            setIsLoading(false)
+        }
+
+        return false;
 
     }
 
     // get agencia
     useEffect(() => {
-
         getAgency();
-    }, []);
+    }, [userLogged]);
 
     return (
         <DashboardContext.Provider value={{
             handleRegisterBus,
             handleUpdateStatus,
             handleGetBuses,
+            handleRegisterAgency,
             isLoading,
             agency
         }}>

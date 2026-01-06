@@ -59,13 +59,20 @@ interface NavItemProps {
 // Component for nav items
 export function NavItem({ icon: Icon, label, path, end }: NavItemProps) {
     const { agency } = useDashboard();
-    const isDisabled = !agency ? true : false;
+    console.log('agencyyy', agency);
+
+    if (!agency) {
+        return (
+            <Button disabled variant="ghost" className="w-full justify-start text-slate-400" >
+                <Icon className="mr-2 h-4 w-4" /> {label}
+            </Button>
+        );
+    }
 
     return (
-        <NavLink to={isDisabled ? '#' : path} end={end} className="w-full">
+        <NavLink to={path} end={end} className="w-full">
             {({ isActive }) => (
                 <Button
-                    disabled={isDisabled}
                     variant="ghost"
                     className={`w-full justify-start ${isActive
                         ? "bg-slate-800/70 text-cyan-400"

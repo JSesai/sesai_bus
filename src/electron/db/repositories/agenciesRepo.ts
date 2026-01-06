@@ -5,7 +5,7 @@ const db = getDB();
 export const agenciesRepo = {
   getAgency: () =>
     new Promise((resolve, reject) => {
-      db.all("SELECT * FROM agencies", (err, rows) => (err ? reject(err) : resolve(rows)));
+      db.get("SELECT * FROM agencies", (err, rows) => (err ? reject(err) : resolve(rows)));
     }),
 
   getById: (id: number) =>
@@ -15,11 +15,11 @@ export const agenciesRepo = {
       );
     }),
 
-  add: (agency: { name: string; address?: string; phone?: string }) =>
+  add: (agency: Agency) =>
     new Promise((resolve, reject) => {
       db.run(
-        "INSERT INTO agencies (name, address, phone) VALUES (?, ?, ?)",
-        [agency.name, agency.address, agency.phone],
+        "INSERT INTO agencies (name, location, phone) VALUES (?, ?, ?)",
+        [agency.name, agency.location, agency.phone],
         function (err) {
           if (err) reject(err);
           else resolve({ id: this.lastID, ...agency });
