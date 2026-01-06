@@ -12,11 +12,11 @@ contextBridge.exposeInMainWorld("electron", {
     logout: () => ipcRenderer.invoke("logout"),
     checkSession: () => ipcRenderer.invoke("checkSession"),
     generateUniqueUserName: (userName: User['userName']) => ipcRenderer.invoke("generateUniqueUserName", userName),
-    
+
   },
 
-  agencies: {
-    getAgencies: () => ipcRenderer.invoke('getAgencies'),
+  agency: {
+    getAgency: () => ipcRenderer.invoke('getAgency'),
     getAgencyById: (id: Agency['id']) => ipcRenderer.invoke("getAgencyById", id),
     addAgency: (agency: Agency) => ipcRenderer.invoke("addAgency", agency),
     updateAgency: (agency: Agency) => ipcRenderer.invoke("updateAgency", agency),
@@ -29,6 +29,7 @@ contextBridge.exposeInMainWorld("electron", {
     addBus: (bus: Bus) => ipcRenderer.invoke("addBus", bus),
     deleteBus: (id: Bus['id']) => ipcRenderer.invoke("deleteBus", id),
     updateBus: (bus: Bus) => ipcRenderer.invoke("updateBus", bus),
+    getDailyBusAssignments: (terminalId: number, date: string) => ipcRenderer.invoke("getDailyBusAssignments", { terminalId, date }),
 
   },
 

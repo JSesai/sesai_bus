@@ -9,6 +9,7 @@ import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Navigate, NavLink, useLocation, useParams } from "react-router-dom";
 import { AuthContext, useAuth } from "../../auth/context/AuthContext";
+import { useDashboard } from "../../auth/context/DashBoardContext";
 
 
 interface MeuDash {
@@ -57,10 +58,14 @@ interface NavItemProps {
 
 // Component for nav items
 export function NavItem({ icon: Icon, label, path, end }: NavItemProps) {
+    const { agency } = useDashboard();
+    const isDisabled = !agency ? true : false;
+
     return (
-        <NavLink to={path} end={end} className="w-full">
+        <NavLink to={isDisabled ? '#' : path} end={end} className="w-full">
             {({ isActive }) => (
                 <Button
+                    disabled={isDisabled}
                     variant="ghost"
                     className={`w-full justify-start ${isActive
                         ? "bg-slate-800/70 text-cyan-400"
@@ -130,7 +135,7 @@ function DashboardSidebar() {
 
                             ))
                         }
-                     
+
                     </nav>
 
                     <div className="mt-8 pt-6 border-t border-slate-700/50">

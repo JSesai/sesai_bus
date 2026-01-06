@@ -43,8 +43,8 @@ interface Agency {
   phone: string;
 }
 
-interface AgencieAPI {
-  getAgencies: () => Promise<Agency[]>;
+interface AgencyAPI {
+  getAgency: () => Promise<ResponseElectronGeneric>;
   getAgencyById: (id: Agency['id']) => Promise<Agency>;
   addAgency: (agency: Agency) => Promise<void>;
   updateAgency: (agency: Agency) => Promise<void>;
@@ -58,7 +58,7 @@ interface Bus {
   seatingCapacity: number;
   plate: string;
   serialNumber: string;
-  year:string;
+  year: string;
   model: string;
   characteristics?: string;
   status: TstatusBus;
@@ -66,6 +66,7 @@ interface Bus {
 
 interface BusesAPI {
   getBuses: () => Promise<ResponseElectronBuses>;
+  getDailyBusAssignments: (terminalId: number, date: string) => Promise<ResponseElectronBuses>;
   getBusById: (id: Bus['id']) => Promise<Bus>;
   addBus: (bus: Bus) => Promise<ResponseElectronGeneric>;
   deleteBus: (id: Bus['id']) => Promise<ResponseElectronGeneric>;
@@ -193,6 +194,11 @@ interface ResponseElectronGeneric {
   data: any;
   error: null | ErrorApp
 }
+interface ResponseElectronAgencie {
+  ok: boolean,
+  data: Agency;
+  error: null | ErrorApp
+}
 interface ResponseElectronBuses {
   ok: boolean,
   data: Bus[];
@@ -208,7 +214,7 @@ interface BiometricService {
 interface Window {
   electron: {
     users: UsersAPI;
-    agencie: AgencieAPI;
+    agency: AgencyAPI;
     buses: BusesAPI;
     routeTravel: RouteTravelAPI;
     schedules: ScheduleAPI;

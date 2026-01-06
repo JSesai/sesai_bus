@@ -1,5 +1,16 @@
 import { getDB } from "../connection.js";
 
+
+interface DailyBusAssignment {
+  busId: number
+  model: string
+  plate: string
+  seatingCapacity: number
+  busStatus: string
+  dailyNumber: number | null
+  assignmentStatus: string | null
+}
+
 const db = getDB();
 
 export const busesRepo = {
@@ -73,10 +84,6 @@ export const busesRepo = {
       );
     }),
 
-
-
-
-
   delete: (id: number) =>
     new Promise((resolve, reject) => {
       db.run("DELETE FROM buses WHERE id = ?", [id], function (err) {
@@ -84,4 +91,39 @@ export const busesRepo = {
         else resolve({ changes: this.changes });
       });
     }),
+
+  getDailyAssignments: (terminalId: number, date: string) =>
+    new Promise((resolve, reject) => {
+      db.all(
+        `
+          SELECT
+            b.id AS bus_id,
+            b.model,
+            b.plate,
+            b.seatingCapacity,
+            b.status AS busStatus,
+  
+            a.daily_number AS dailyNumber,
+            a.status AS assignmentStatus
+  
+          FROM buses b
+          LEFT JOIN bus_daily_assignments a
+            ON a.bus_id = b.id
+           AND a.terminal_id = ?
+           AND a.date = ?
+  
+          WHERE b.status != 'removed'
+          ORDER BY a.daily_number IS NULL, a.daily_number ASC
+          `,
+        [terminalId, date],
+        (err, rows) => {
+          if (err) reject(err)
+          else resolve(rows)
+        }
+      )
+    })
 };
+
+
+
+

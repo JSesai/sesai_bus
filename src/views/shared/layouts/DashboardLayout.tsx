@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react"
+import React, { useEffect, useState, useRef, useMemo } from "react"
 import {
     CircleOff, Download, Lock,
     type LucideIcon, Radio,
@@ -11,32 +11,25 @@ import { Slider } from "../../components/ui/slider"
 import { Switch } from "../../components/ui/switch"
 import { Label } from "../../components/ui/label"
 import { formatDate, formatTime } from "../../../shared/utils/helpers"
-import { Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import DashboardHeader from "../../Buses/components/DashboardHeader"
-import DashBoardLoader from "../../Buses/components/DashboardLoader"
+import DashBoardLoader from "../../Buses/components/Loader"
 import DashboardSidebar from "../../Buses/components/DashboardSidebar"
 import ActionButton from "../../Buses/components/AcctionButton"
+import { useDashboard } from "../../auth/context/DashBoardContext"
 
 
 
 
 
 function DashBoardLayout() {
+    const navigate = useNavigate();
     const [theme, setTheme] = useState<"dark" | "light">("dark")
 
     const [currentTime, setCurrentTime] = useState(new Date())
-    const [isLoading, setIsLoading] = useState(true)
+    const { isLoading } = useDashboard();
 
     const canvasRef = useRef<HTMLCanvasElement>(null)
-
-    // Simulate data loading
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsLoading(false)
-        }, 2000)
-
-        return () => clearTimeout(timer)
-    }, [])
 
     // Update time
     useEffect(() => {
@@ -45,7 +38,7 @@ function DashBoardLayout() {
         }, 1000)
 
         return () => clearInterval(interval)
-    }, [])
+    }, []);
 
     // Particle effect
     useEffect(() => {
@@ -126,7 +119,8 @@ function DashBoardLayout() {
         return () => {
             window.removeEventListener("resize", handleResize)
         }
-    }, [])
+    }, []);
+
 
     return (
         <div className={`${theme} mx-auto min-h-screen bg-gradient-to-br from-black to-slate-900 text-slate-100 relative overflow-hidden`} >
@@ -190,7 +184,7 @@ function DashBoardLayout() {
                                         <ActionButton icon={RefreshCw} label="Sync Data" />
                                         <ActionButton icon={Download} label="Backup" />
                                         <ActionButton icon={Terminal} label="Console" />
-                                       
+
                                     </div>
                                 </CardContent>
                             </Card>

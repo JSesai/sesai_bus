@@ -3,7 +3,7 @@ import { getDB } from "../connection.js";
 const db = getDB();
 
 export const agenciesRepo = {
-  getAll: () =>
+  getAgency: () =>
     new Promise((resolve, reject) => {
       db.all("SELECT * FROM agencies", (err, rows) => (err ? reject(err) : resolve(rows)));
     }),

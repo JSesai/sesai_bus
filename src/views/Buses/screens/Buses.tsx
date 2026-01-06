@@ -4,10 +4,9 @@ import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Badge } from "../../components/ui/badge"
 import { Input } from "../../components/ui/input"
-import { MapPin, Plus, Search, Edit, Trash2, ArrowLeft, Phone, MapIcon, RectangleEllipsis, WholeWord, BusIcon } from "lucide-react"
+import { Plus, Search, Edit, Trash2, ArrowLeft, RectangleEllipsis, WholeWord, BusIcon } from "lucide-react"
 import RegisterBus from "./RegisterBus"
 import { useDashboard } from "../../auth/context/DashBoardContext"
-import { CalendarCustom } from "../components/CalendarCustom"
 
 
 
@@ -21,9 +20,9 @@ export default function Buses() {
     useEffect(() => {
         const getDataBus = async () => {
             const dataBuses = await handleGetBuses();
-            setBuses(dataBuses)
+            setBuses(dataBuses);
         }
-        getDataBus()
+        getDataBus();
     }, [view])
 
 
@@ -49,8 +48,8 @@ export default function Buses() {
     }
 
     const startEdit = (bus: Bus) => {
-        setEditingBus(bus)
-        setView("edit")
+        setEditingBus(bus);
+        setView("edit");
     }
 
     if (view === "add") {
@@ -90,7 +89,7 @@ export default function Buses() {
                     <h1 className="text-3xl font-bold text-balance mb-2">Gestión de Automobiles</h1>
                     <p className="text-muted-foreground text-pretty">Administra y gestiona la flotatilla de automobiles</p>
                 </div>
-                <CalendarCustom />
+              
                 <Button onClick={() => setView("add")} size="lg" className="gap-2">
                     <Plus className="h-5 w-5" />
                     Agregar

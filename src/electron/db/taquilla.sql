@@ -1,5 +1,3 @@
-
-
 -- 1. AGENCIES (Sucursales)
 
 CREATE TABLE IF NOT EXISTS agencies (
@@ -27,7 +25,7 @@ CREATE TABLE IF NOT EXISTS buses (
 );
 
 -- asignacion diaria de numero de autobus
-CREATE TABLE bus_number_assignments (
+CREATE TABLE bus_daily_assignments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     bus_id INTEGER NOT NULL,
     terminal_id INTEGER NOT NULL,
@@ -40,8 +38,6 @@ CREATE TABLE bus_number_assignments (
 
     FOREIGN KEY (bus_id) REFERENCES buses(id)
 );
-
-
 
 
 -- 3. DRIVERS (Choferes)

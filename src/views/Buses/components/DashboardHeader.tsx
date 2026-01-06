@@ -8,7 +8,8 @@ import { useAuth } from "../../auth/context/AuthContext"
 import { getInitials, translateRole } from "../../../shared/utils/helpers"
 
 export default function DashboardHeader() {
-  const { userLogged, logout } = useAuth()
+  const { userLogged, logout } = useAuth();
+  
   const [theme, setTheme] = useState<"dark" | "light">("dark")
 
   const toggleTheme = () => {

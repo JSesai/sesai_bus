@@ -20,7 +20,7 @@ const initialStateBus: Bus = {
     status: "active",
 }
 
-export default function RegisterBus({ editingBus }: { editingBus: Bus | null }) {
+export default function RegisterBus({ editingBus }: { editingBus?: Bus | null }) {
 
     const { handleRegisterBus, isLoading } = useDashboard();
     const [formData, setFormData] = useState<Bus>(editingBus ? editingBus : initialStateBus);

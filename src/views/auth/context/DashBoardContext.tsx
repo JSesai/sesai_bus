@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
@@ -7,6 +7,7 @@ import { AppError, BusError, ValidationError } from "../../../shared/errors/cust
 type DashboardContextType = {
     //data
     isLoading: boolean;
+    agency: Agency | null;
 
     //methods
     handleRegisterBus: (dataBus: Bus, editingBus?: boolean) => Promise<boolean>;
@@ -18,7 +19,9 @@ export const DashboardContext = createContext<DashboardContextType | undefined>(
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
-    const [isLoading, setIsLoading] = useState(false)
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const [agency, setAgency] = useState<Agency | null>(null);
 
     //manejador para obtener buses
     const handleGetBuses = async (): Promise<Bus[]> => {
@@ -105,7 +108,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             const year = Number.parseInt(bus.year);
             const currentYear = new Date().getFullYear();
             if (isNaN(year) || year > currentYear + 1) throw new BusError("Año incorrecto", "El año no puede ser superior a 1 año de la fecha actual");
-           
+
 
             setIsLoading(true);
             const resp = editingBus ? await window.electron.buses.updateBus(bus) : await window.electron.buses.addBus(bus);
@@ -150,13 +153,29 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
     }
 
+    const getAgency = async () => {
+
+        const agencyData = await window.electron.agency.getAgency();
+        console.log(agencyData);
+
+        if (agencyData.data.length > 0) setAgency(agencyData.data[0]);
+        navigate('/dashboard/agency')
+
+    }
+
+    // get agencia
+    useEffect(() => {
+
+        getAgency();
+    }, []);
 
     return (
         <DashboardContext.Provider value={{
             handleRegisterBus,
             handleUpdateStatus,
             handleGetBuses,
-            isLoading
+            isLoading,
+            agency
         }}>
             {children}
         </DashboardContext.Provider>

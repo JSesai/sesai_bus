@@ -10,7 +10,7 @@ type AuthContextType = {
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>
   login: (user: UserCredentials) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   handleRegisterUser: (user: UserRegister) => Promise<boolean>;
   getUniqueUserName: (name: User['name']) => Promise<User['userName']>;
   updatePassword: ({ password, comfirmPassword }: { password: string, comfirmPassword: string }) => Promise<boolean>;

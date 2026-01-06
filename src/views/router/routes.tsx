@@ -17,6 +17,9 @@ import Employees from "../Buses/screens/Employees";
 import Customers from "../Buses/screens/Customers";
 import { DashboardProvider } from "../auth/context/DashBoardContext";
 import Buses from "../Buses/screens/Buses";
+import { BusesSetting } from "../Buses/screens/BusesSetting";
+import { BusDailyAssignment } from "../Buses/components/BusDailyAssignment";
+import AgencieForm from "../Buses/components/AgencieForm";
 
 
 export function AppRouter() {
@@ -33,8 +36,6 @@ export function AppRouter() {
                         <Route path="new-password" element={<NewPassword />} />
                     </Route>
 
-
-
                 </Routes>
 
                 <DashboardProvider>
@@ -43,9 +44,12 @@ export function AppRouter() {
                         <Route path="dashboard/" element={<DashBoardLayout />}>
                             <Route index element={<MainDashboard />} />
                             <Route path="summary" element={<Summary />} />
+                            <Route path="agency" element={<AgencieForm />} />
                             <Route path="ticket-sale" element={<TicketSale />} />
                             <Route path="setting" element={<Setting />} />
+                            <Route path="setting-bus" element={<BusesSetting />} />
                             <Route path="buses" element={<Buses />} />
+                            <Route path="bus-daily-assignment" element={<BusDailyAssignment />} />
                             <Route path="add-bus" element={<RegisterBus />} />
                             <Route path="destinations" element={<Destinations />} />
                             <Route path="schedules" element={<Schedules />} />
@@ -55,10 +59,6 @@ export function AppRouter() {
                     </Routes>
                 </DashboardProvider>
 
-                {/* <Route path="dashboard" element={<RouterDashBoard />} /> */}
-                {/* <Route path="/drivers" element={<DriverForm />} /> */}
-                {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-                {/* <Route path="*" element={<Navigate to={"/auth"} />} /> */}
             </AuthProvider>
         </BrowserRouter>
     );

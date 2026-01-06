@@ -55,7 +55,7 @@ export default function UsuarioForm({ initialData, onSubmit, onCancel, isEditing
     // Solo validar contraseña si es un nuevo usuario o si se está cambiando
     if (!isEditing || formData.password) {
       if (!formData.password) {
-        setError("La contraseΓ±a es obligatoria")
+        setError("La contraseña es obligatoria")
         setIsLoading(false)
         return
       }
