@@ -155,20 +155,19 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         return false;
 
     }
-
+    //obtener agencia
     const getAgency = async () => {
         try {
             const agencyData = await window.electron.agency.getAgency();
             console.log(agencyData);
             if (!userLogged || userLogged?.status === "registered") return;
 
-            if (agencyData.ok) return navigate('/dashboard/agency');
+            if (!agencyData.ok) return navigate('/dashboard/agency');
 
             setAgency(agencyData.data);
+            console.log('este es el state de agency', agencyData.data);
+
             return navigate('/dashboard/summary');
-            //todo implementar restart
-
-
 
         } catch (error) {
             console.log('error al obtener agencia', error);
@@ -177,7 +176,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
     }
 
-
+    //registrar o actualizar agencia
     const handleRegisterAgency = async (agency: Agency, editingAgency: boolean = false): Promise<boolean> => {
 
         try {
@@ -188,28 +187,31 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             if (agency.name.length <= 3) throw new AgencyError("Error", "El nombre es demasiado corto");
 
             setIsLoading(true);
-            const resp = editingAgency ? await window.electron.agency.updateAgency(agency) : await window.electron.agency.addAgency(agency);
+            const registerAgency = editingAgency ? await window.electron.agency.updateAgency(agency) : await window.electron.agency.addAgency(agency);
+            console.log(registerAgency);
+            if (registerAgency.error) throw new AgencyError(registerAgency.error.message, registerAgency.error.detail);
 
-            console.log(resp);
-            if (resp.ok) {
-                confetti({
-                    particleCount: 100,
-                    spread: 120,
-                    origin: { y: 0.6 }
-                });
+            if (!registerAgency.ok) throw new AgencyError("Error inesperado", "Valida el registro de la agencia en el sistema");
 
-                toast.success(editingAgency ? 'Cambios guardados' : 'Registro exitoso.', {
-                    description: editingAgency ? 'Agencia editada correctamente' : 'Agencia agregada al sistema.',
-                    richColors: true,
-                    duration: 5_000,
-                    position: 'top-center',
+            confetti({
+                particleCount: 100,
+                spread: 120,
+                origin: { y: 0.6 }
+            });
 
-                })
-                navigate("/dashboard");
-                return true;
-            }
+            toast.success(editingAgency ? 'Cambios guardados' : 'Registro exitoso.', {
+                description: editingAgency ? 'Agencia editada correctamente' : 'Agencia agregada al sistema.',
+                richColors: true,
+                duration: 5_000,
+                position: 'top-center',
 
-            if (resp.error) throw new BusError(resp.error.message, resp.error.detail);
+            })
+
+            setAgency(registerAgency.data);
+            editingAgency ? navigate("/dashboard/setting") : navigate("/dashboard/buses");
+            return true;
+
+
 
         } catch (e) {
             if (e instanceof AppError) {

@@ -1,3 +1,16 @@
+-- 0. Config system
+CREATE TABLE IF NOT EXISTS app_config (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  agency_configured INTEGER DEFAULT 0,
+  buses_configured INTEGER DEFAULT 0,
+  routes_configured INTEGER DEFAULT 0,
+  schedules_configured INTEGER DEFAULT 0,
+  initial_setup_completed INTEGER DEFAULT 0,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
 -- 1. AGENCIES (Sucursales)
 
 CREATE TABLE IF NOT EXISTS agencies (

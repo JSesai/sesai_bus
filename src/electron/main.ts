@@ -14,7 +14,7 @@ import { registerCustomersHandlers } from "./db/handlers/customersHandlers.js";
 import { registerTicketsHandlers } from "./db/handlers/ticketsHandlers.js";
 import { registerPaymentsHandlers } from "./db/handlers/paymentsHandlers.js";
 import { registerBiometricHandlers } from "./db/handlers/biometricHandlers.js";
-import { seedInitialUser } from "./db/seed.js";
+import { seedAppConfig, seedInitialUser } from "./db/seed.js";
 
 
 
@@ -55,6 +55,7 @@ app.whenReady().then(async () => {
 
     //seed
     await seedInitialUser();
+    await seedAppConfig();
 
 
 });

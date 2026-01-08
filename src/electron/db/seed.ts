@@ -1,5 +1,6 @@
 import { AppError, RegisterUserError } from "../../shared/errors/customError.js";
 import { hashPassword } from "../security/pass.js";
+import { appConfigRepo } from "./repositories/appConfigRepo.js";
 import { userRepo } from "./repositories/userRepo.js";
 
 
@@ -34,4 +35,27 @@ export async function seedInitialUser(): Promise<ResponseElectronGeneric> {
     }
 
 
+}
+
+
+
+export async function seedAppConfig() {
+
+    try {
+        console.log('start process creacion config app inicial');
+       
+        const config = await appConfigRepo.getConfig();
+        if (!config) {
+          await appConfigRepo.createDefault();
+        }
+
+    } catch (error: any) {
+        //logger
+        console.log(error);
+        if (error instanceof AppError) return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
+
+        if (error?.code === "SQLITE_CONSTRAINT") return { ok: true, data: "Configuracion table exist", error: null };
+        return { ok: false, data: null, error: { message: "Error interno", detail: "error no esperado" } };
+    }
+    
 }

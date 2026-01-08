@@ -205,6 +205,17 @@ interface ResponseElectronBuses {
   error: null | ErrorApp
 }
 
+interface AppConfig {
+  id?: number;                   
+  agency_configured: number;      
+  buses_configured: number;        
+  routes_configured: number;       
+  schedules_configured: number;    
+  initial_setup_completed: number; 
+  created_at: string;            
+}
+
+
 
 interface BiometricService {
   enroll(userId: number): Promise<string>;

@@ -84,6 +84,10 @@ contextBridge.exposeInMainWorld("electron", {
   biometric: {
     enroll: (userId: number) => ipcRenderer.invoke("biometric:enroll", userId),
     authenticate: () => ipcRenderer.invoke("biometric:auth"),
+  },
+
+  AppConfig:{
+    getAppConfig :() => ipcRenderer.invoke("getAppConfig")
   }
 
 
