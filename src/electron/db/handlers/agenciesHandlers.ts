@@ -21,7 +21,7 @@ export function registerAgenciesHandlers() {
   });
   ipcMain.handle("addAgency", async(_, agency: Agency): Promise<ResponseElectronAgencie> => {
     try {
-      console.log("init process getAgencie");
+      console.log("init process add agency");
       
       
       const data = await agenciesRepo.add(agency) as Agency;
@@ -32,10 +32,27 @@ export function registerAgenciesHandlers() {
     } catch (error) {
       console.log('error al obtener agencie ->', error);
 
-      return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible actualizar el bus" } };
+      return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible crear información agency" } };
 
     }
   });
-  ipcMain.handle("updateAgency", (_, agency) => agenciesRepo.update(agency));
+
+  ipcMain.handle("updateAgency", async(_, agency):  Promise<ResponseElectronGeneric> => {
+
+      try {
+      console.log("init process update agency");
+      
+      const data = await  agenciesRepo.update(agency)
+      return { ok: true, data: agency, error: null }
+
+    } catch (error) {
+      console.log('error al actualizar agencie ->', error);
+
+      return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible actualizar información agency" } };
+
+    }
+   
+  
+  });
   ipcMain.handle("deleteAgency", (_, id: number) => agenciesRepo.delete(id));
 }

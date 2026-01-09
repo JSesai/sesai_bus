@@ -24,39 +24,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     const { agency,  } = useDashboard();
     const [isLoading, setIsLoading] = useState(false);
 
-    const validateOperationalData = async () => {
 
-        try {
-
-            // Validaciones - mostrar modal grandote
-            if (!agency) throw new ValidationError("El administrador debe", "registrar los datos de la agencia");
-
-            setIsLoading(true);
-         
-        
-            
-        } catch (e) {
-            if (e instanceof AppError) {
-
-                toast.error(e.message, {
-                    richColors: true,
-                    description: e.details,
-                    duration: 10_000,
-                    position: 'top-center'
-                });
-                return false;
-            }
-
-        } finally {
-            setIsLoading(false)
-        }
-
-    }
-
-    // get agencia
-    useEffect(() => {
-        validateOperationalData();
-    }, []);
 
     return (
         <TicketContext.Provider value={{

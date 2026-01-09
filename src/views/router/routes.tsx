@@ -21,6 +21,8 @@ import { BusesSetting } from "../Buses/screens/BusesSetting";
 import { BusDailyAssignment } from "../Buses/components/BusDailyAssignment";
 import AgencieForm from "../Buses/components/AgencieForm";
 import { TicketProvider } from "../auth/context/TicketContext";
+import SetupWizard from "../Buses/screens/SetupWizard";
+import SetupLayout from "../shared/layouts/SetupLayout";
 
 
 export function AppRouter() {
@@ -43,7 +45,11 @@ export function AppRouter() {
                     <TicketProvider>
 
                         <Routes>
+                            <Route path="setup/" element={<SetupLayout />} >
+                                <Route index element={<SetupWizard />} />
 
+                            </Route>
+                            
                             <Route path="dashboard/" element={<DashBoardLayout />}>
                                 <Route index element={<MainDashboard />} />
                                 <Route path="summary" element={<Summary />} />
@@ -59,8 +65,9 @@ export function AppRouter() {
                                 <Route path="employees" element={<Employees />} />
                                 <Route path="customers" element={<Customers />} />
                             </Route>
+
                         </Routes>
-                        
+
                     </TicketProvider>
                 </DashboardProvider>
 

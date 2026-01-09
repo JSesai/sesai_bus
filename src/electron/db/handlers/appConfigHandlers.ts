@@ -5,7 +5,7 @@ import { appConfigRepo } from "../repositories/appConfigRepo.js";
 
 
 
-export function appConfigHandlers() {
+export function registerAppConfigHandlers() {
 
     ipcMain.handle("getAppConfig", async (): Promise<ResponseElectronGeneric> => {
 

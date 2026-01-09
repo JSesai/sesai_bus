@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (responseSession.ok) {
         setUserLogged(responseSession.data);
-        navigate("dashboard");
+        validateSystemConfiguration();
         return;
       }
 
@@ -68,12 +68,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     validaSesionActiva();
   }, []);
 
+  const systemConfigurationStatus = async (): Promise<AppConfigStatus> => {
+    try {
+        const validateAppConfig = await window.electron.appConfig.getAppConfig();
+        console.log({ validateAppConfig });
+
+        return (!validateAppConfig.data?.initial_setup_completed) ? "incomplete" : "complete"
+
+    } catch (error) {
+        console.log('error al obtener el estatus de configuración', error);
+        return "incomplete"
+
+    }
+}
+
+
+const validateSystemConfiguration = async () => {
+    console.log('ejecutando validacion de configuracion del sistema');
+
+    const currentConfiguration = await systemConfigurationStatus();
+    currentConfiguration === "complete" ? navigate('/dashboard/ticket') : navigate('/setup');;
+
+
+}
   // Login
   const login = async (userData: UserCredentials) => {
     try {
       console.log('haciendo login', userData);
       const validateUser = await window.electron.users.authUser(userData);
-      const { ok, error, data } = validateUser;
+   
       if (validateUser.data && validateUser.data.status === 'registered') {
         toast.warning('Acción requerida', {
           description: 'Debes de actualizar tu contraseña',
@@ -86,9 +109,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      if (!ok) {
-        toast.error(error?.message || 'error', {
-          description: error?.detail,
+      if (!validateUser.ok) {
+        toast.error(validateUser.error?.message || 'error', {
+          description: validateUser.error?.detail,
           richColors: true,
           duration: 10_000,
           position: 'top-center'
@@ -96,8 +119,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      setUserLogged(data);
-      navigate("dashboard");
+      setUserLogged(validateUser.data);
+      validateSystemConfiguration();
+      
     } catch (error) {
       console.log('el error', error);
 

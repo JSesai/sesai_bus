@@ -1,17 +1,15 @@
-import React, { useEffect, useState, useRef, useMemo } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import {
-    CircleOff, Download, Lock,
-    type LucideIcon, Radio,
+    CircleOff, Download, Lock, Radio,
     RefreshCw, Shield, Terminal, Zap
 } from "lucide-react"
 
-import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { Slider } from "../../components/ui/slider"
 import { Switch } from "../../components/ui/switch"
 import { Label } from "../../components/ui/label"
 import { formatDate, formatTime } from "../../../shared/utils/helpers"
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom"
 import DashboardHeader from "../../Buses/components/DashboardHeader"
 import DashBoardLoader from "../../Buses/components/Loader"
 import DashboardSidebar from "../../Buses/components/DashboardSidebar"
@@ -24,12 +22,10 @@ import { useAuth } from "../../auth/context/AuthContext"
 
 
 function DashBoardLayout() {
-    const navigate = useNavigate();
     const [theme, setTheme] = useState<"dark" | "light">("dark")
 
     const [currentTime, setCurrentTime] = useState(new Date())
     const { isLoading } = useDashboard();
-    const { userLogged } = useAuth();
 
     const canvasRef = useRef<HTMLCanvasElement>(null)
 

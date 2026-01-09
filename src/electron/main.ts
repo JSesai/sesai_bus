@@ -15,6 +15,7 @@ import { registerTicketsHandlers } from "./db/handlers/ticketsHandlers.js";
 import { registerPaymentsHandlers } from "./db/handlers/paymentsHandlers.js";
 import { registerBiometricHandlers } from "./db/handlers/biometricHandlers.js";
 import { seedAppConfig, seedInitialUser } from "./db/seed.js";
+import { registerAppConfigHandlers } from "./db/handlers/appConfigHandlers.js";
 
 
 
@@ -42,6 +43,7 @@ let db = getDB()
 app.whenReady().then(async () => {
     await initDatabase(db);
     createWindow();
+    registerAppConfigHandlers();
     registerUserHandlers();
     registerAgenciesHandlers();
     busesHandlers();

@@ -36,6 +36,10 @@ interface UsersAPI {
   generateUniqueUserName: (UserCredentials) => Promise<ResponseElectronGeneric>;
 }
 
+interface appConfigAPI {
+  getAppConfig: () => Promise<ResponseElectronAppConfig>;
+}
+
 interface Agency {
   id?: number;
   name: string;
@@ -194,16 +198,26 @@ interface ResponseElectronGeneric {
   data: any;
   error: null | ErrorApp
 }
+
+interface ResponseElectronAppConfig {
+  ok: boolean,
+  data: AppConfig | null;
+  error: null | ErrorApp
+}
+
 interface ResponseElectronAgencie {
   ok: boolean,
   data: Agency | null;
   error: null | ErrorApp
 }
+
 interface ResponseElectronBuses {
   ok: boolean,
   data: Bus[];
   error: null | ErrorApp
 }
+
+type AppConfigStatus = "complete" | "incomplete" ;
 
 interface AppConfig {
   id?: number;                   
@@ -233,6 +247,7 @@ interface Window {
     tickets: TicketAPI;
     payments: PaymentsAPI;
     biometric: BiometricService;
+    appConfig: appConfigAPI
 
   };
 }

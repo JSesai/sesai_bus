@@ -1,15 +1,11 @@
 
-
-
-
 import type React from "react"
 import { useEffect, useState } from "react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
-import { MapPin, Calendar, Users, Minus, Plus, ArrowRight, CheckCircle2, Repeat, Ticket, Phone, HousePlus, MapPinHouse } from "lucide-react"
+import { Phone, HousePlus, MapPinHouse } from "lucide-react"
 import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useAuth } from "../../auth/context/AuthContext"
 
@@ -25,15 +21,14 @@ const initialStateAgency: Agency = {
 export default function AgencieForm({ editingAgency }: { editingAgency?: boolean }) {
 
     const { userLogged } = useAuth();
-    const { isLoading, handleRegisterAgency } = useDashboard();
+    const { isLoading, handleRegisterAgency, agency } = useDashboard();
     const [formData, setFormData] = useState<Agency>(initialStateAgency)
 
 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        const addAgency = await handleRegisterAgency(formData, editingAgency);
-        if(addAgency) setFormData(initialStateAgency);
+        await handleRegisterAgency(formData, editingAgency);
 
     }
 
@@ -42,13 +37,16 @@ export default function AgencieForm({ editingAgency }: { editingAgency?: boolean
     }
 
     useEffect(() => {
-        if (userLogged?.role === 'developer') {
+
+        if (userLogged?.role === 'developer' && !editingAgency) {
             setFormData({
                 name: 'Agencia - develop',
                 location: 'En desarrollo',
                 phone: '5522552255'
             })
         }
+
+        if (agency) setFormData(agency);
 
     }, [])
 

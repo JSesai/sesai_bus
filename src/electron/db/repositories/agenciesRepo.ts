@@ -27,11 +27,11 @@ export const agenciesRepo = {
       );
     }),
 
-  update: (agency: { id: number; name?: string; address?: string; phone?: string }) =>
+  update: (agency: Agency) =>
     new Promise((resolve, reject) => {
       db.run(
-        "UPDATE agencies SET name = COALESCE(?, name), address = COALESCE(?, address), phone = COALESCE(?, phone) WHERE id = ?",
-        [agency.name, agency.address, agency.phone, agency.id],
+        "UPDATE agencies SET name = COALESCE(?, name), location = COALESCE(?, location), phone = COALESCE(?, phone) WHERE id = ?",
+        [agency.name, agency.location, agency.phone, agency.id],
         function (err) {
           if (err) reject(err);
           else resolve({ changes: this.changes });
