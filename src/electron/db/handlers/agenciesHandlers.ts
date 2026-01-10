@@ -7,7 +7,7 @@ export function registerAgenciesHandlers() {
       console.log("init process getAgencie");
 
       const agency = await agenciesRepo.getAgency();
-      if(!agency) return { ok: false, data: null, error: null }
+      if(!agency) return { ok: false, data: null, error: {message: "No existe agencia registrada", detail: "Registra una agencia"} }
 
       return { ok: true, data: agency, error: null }
 

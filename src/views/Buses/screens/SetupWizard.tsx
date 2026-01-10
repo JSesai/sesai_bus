@@ -62,7 +62,7 @@ export default function SetupWizard() {
             {step === 1 && <BusesStep onNext={next} onBack={back} />}
             {step === 2 && <RoutesStep onNext={next} onBack={back} />}
             {step === 3 && <SchedulesStep onNext={next} onBack={back} />}
-            {step === 2 && <FinishStep />}
+            {step === 4 && <FinishStep />}
         </>
     )
 }

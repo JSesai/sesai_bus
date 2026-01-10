@@ -7,26 +7,30 @@ import { Input } from "../../components/ui/input"
 import { Plus, Search, Edit, Trash2, ArrowLeft, RectangleEllipsis, WholeWord, BusIcon } from "lucide-react"
 import RegisterBus from "./RegisterBus"
 import { useDashboard } from "../../auth/context/DashBoardContext"
+import { useSearchParams } from "react-router-dom"
 
 
 
-export default function Buses() {
-    const { handleUpdateStatus, handleGetBuses } = useDashboard();
+export default function Buses({ configInitial = false }: { configInitial?: boolean }) {
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const { handleUpdateStatus, vehicles } = useDashboard();
     const [buses, setBuses] = useState<Bus[]>([])
     const [searchTerm, setSearchTerm] = useState("")
-    const [view, setView] = useState<"list" | "add" | "edit">("list")
     const [editingBus, setEditingBus] = useState<Bus | null>(null)
 
+
+    const activeView = searchParams.get('view') ?? 'list';
+    console.log({ activeView });
+
+
     useEffect(() => {
-        const getDataBus = async () => {
-            const dataBuses = await handleGetBuses();
-            setBuses(dataBuses);
-        }
-        getDataBus();
-    }, [view])
+        setBuses(vehicles);
+    }, [activeView])
 
 
     const handleDeletebuses = async (bus: Bus) => {
+        
         if (confirm("Estas seguro de que deseas eliminar este automovil?")) {
             const updateBus: Bus = {
                 ...bus,
@@ -49,16 +53,21 @@ export default function Buses() {
 
     const startEdit = (bus: Bus) => {
         setEditingBus(bus);
-        setView("edit");
+        setSearchParams(prev => {
+            prev.set('view', 'edit')
+            return prev;
+        })
     }
 
-    if (view === "add") {
+    if (activeView === "add") {
         return (
             <div className="space-y-6">
                 <Button variant="ghost" className="gap-2" onClick={() => {
                     setEditingBus(null);
-                    setView("list");
-
+                    setSearchParams(prev => {
+                        prev.set('view', 'list')
+                        return prev;
+                    })
                 }}
                 >
                     <ArrowLeft className="h-4 w-4" />
@@ -69,10 +78,16 @@ export default function Buses() {
         )
     }
 
-    if (view === "edit" && editingBus) {
+    if (activeView === "edit" && editingBus) {
         return (
             <div className="space-y-6">
-                <Button variant="ghost" onClick={() => setView("list")} className="gap-2">
+                <Button variant="ghost" onClick={() => {
+                    setSearchParams(prev => {
+                        prev.set('view', 'list')
+                        return prev;
+                    })
+                }}
+                    className="gap-2">
                     <ArrowLeft className="h-4 w-4" />
                     Volver a la lista
                 </Button>
@@ -82,21 +97,35 @@ export default function Buses() {
     }
 
 
+
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-balance mb-2">Gestión de Automobiles</h1>
-                    <p className="text-muted-foreground text-pretty">Administra y gestiona la flotatilla de automobiles</p>
-                </div>
-              
-                <Button onClick={() => setView("add")} size="lg" className="gap-2">
-                    <Plus className="h-5 w-5" />
-                    Agregar
-                </Button>
+                {configInitial ??
+                    <div>
+                        <h1 className="text-3xl font-bold text-balance mb-2">Gestión de Automobiles</h1>
+                        <p className="text-muted-foreground text-pretty">Administra y gestiona la flotatilla de automobiles</p>
+                    </div>
+
+                }
+                {buses.length > 0 &&
+                    <Button onClick={() => {
+                        setSearchParams(prev => {
+                            prev.set('view', 'add')
+                            return prev;
+                        })
+
+                    }}
+                        size="lg" className="gap-2">
+                        <Plus className="h-5 w-5" />
+                        Agregar
+                    </Button>
+                }
+
             </div>
 
-            <div className="relative">
+            {configInitial ?? <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                     type="text"
@@ -106,11 +135,24 @@ export default function Buses() {
                     className="pl-10 h-11"
                 />
             </div>
+            }
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {buses.map((buses) => (
                     <Card key={buses.id} className={`transition-all hover:shadow-md ${buses.status === 'disabled' ? "opacity-60" : ""}`}>
                         <CardContent className="p-5 space-y-4">
+                            <div className="mt-2">
+                                <Button
+                                    aria-description="eliminar"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleDeletebuses(buses)}
+                                    className="text-destructive hover:text-destructive hover:cursor-pointer"
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+
                             <div className="flex items-start justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
@@ -121,7 +163,7 @@ export default function Buses() {
                                         <p className="text-sm text-muted-foreground">{buses.model}</p>
                                     </div>
                                 </div>
-                                <Badge variant={buses.status === "active" ? "default" : "secondary"} className="text-xs">
+                                <Badge variant={buses.status === "active" ? "default" : "secondary"} className="text-xs hover:cursor-pointer">
                                     {buses.status === "active" ? "Activo" : "Inactivo"}
                                 </Badge>
                             </div>
@@ -156,22 +198,15 @@ export default function Buses() {
                             )}
 
                             <div className="flex gap-2 pt-2">
-                                <Button variant="outline" size="sm" onClick={() => startEdit(buses)} className="flex-1 gap-2">
+                                <Button variant="outline" size="sm" onClick={() => startEdit(buses)} className="flex-1 gap-2 hover:cursor-pointer">
                                     <Edit className="h-4 w-4" />
                                     Editar
                                 </Button>
-                                <Button variant="outline" size="sm" onClick={() => handleToggleActivo(buses)} className="flex-1">
+                                <Button variant="outline" size="sm" onClick={() => handleToggleActivo(buses)} className="flex-1 hover:cursor-pointer">
                                     {buses.status === "active" ? "Desactivar" : "Activar"}
                                 </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleDeletebuses(buses)}
-                                    className="text-destructive hover:text-destructive"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
                             </div>
+
                         </CardContent>
                     </Card>
                 ))}
@@ -181,8 +216,15 @@ export default function Buses() {
                 <div className="text-center py-12">
                     <BusIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
                     <h3 className="text-lg font-semibold mb-2">No se encontraron transportes</h3>
-                    <p className="text-muted-foreground mb-4">Intenta con otra búsqueda o agrega un nuevo transporte</p>
-                    <Button onClick={() => setView("add")} className="gap-2">
+                    {configInitial ?? <p className="text-muted-foreground mb-4">Intenta con otra búsqueda o agrega un nuevo transporte</p>}
+                    <Button onClick={() => {
+                        // setView("add")
+                        setSearchParams(prev => {
+                            prev.set('view', 'add')
+                            return prev;
+                        })
+
+                    }} className="gap-2">
                         <Plus className="h-4 w-4" />
                         Agregar Primer Transporte
                     </Button>

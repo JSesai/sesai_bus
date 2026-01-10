@@ -5,7 +5,7 @@ import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
-import { Phone, HousePlus, MapPinHouse } from "lucide-react"
+import { Phone, HousePlus, MapPinHouse, Map } from "lucide-react"
 import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useAuth } from "../../auth/context/AuthContext"
 
@@ -15,20 +15,21 @@ import { useAuth } from "../../auth/context/AuthContext"
 const initialStateAgency: Agency = {
     location: "",
     name: "",
-    phone: ""
+    phone: "",
+    city: ""
 }
 
-export default function AgencieForm({ editingAgency }: { editingAgency?: boolean }) {
+export default function AgencieForm({ editingAgency, configInitial = false }: { editingAgency?: boolean, configInitial?: boolean }) {
 
     const { userLogged } = useAuth();
     const { isLoading, handleRegisterAgency, agency } = useDashboard();
-    const [formData, setFormData] = useState<Agency>(initialStateAgency)
+    const [formData, setFormData] = useState<Agency>(agency ?? initialStateAgency)
 
 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        await handleRegisterAgency(formData, editingAgency);
+        await handleRegisterAgency(formData, editingAgency, configInitial);
 
     }
 
@@ -38,11 +39,12 @@ export default function AgencieForm({ editingAgency }: { editingAgency?: boolean
 
     useEffect(() => {
 
-        if (userLogged?.role === 'developer' && !editingAgency) {
+        if (userLogged?.role === 'developer' && !agency) {
             setFormData({
                 name: 'Agencia - develop',
                 location: 'En desarrollo',
-                phone: '5522552255'
+                phone: '5522552255',
+                city: 'Oax'
             })
         }
 
@@ -75,6 +77,20 @@ export default function AgencieForm({ editingAgency }: { editingAgency?: boolean
                             value={formData.name}
                             onChange={(e) => handleChange('name', e.target.value)}
                             maxLength={80}
+                        />
+                    </div>
+                    <div className="space-y-3">
+                        <Label htmlFor="location">
+                            <Map size={15} />
+                            Ciudad <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                            id="city"
+                            type="tel"
+                            placeholder="ej: CDMX"
+                            value={formData.city}
+                            onChange={(e) => handleChange('city', e.target.value)}
+                            maxLength={200}
                         />
                     </div>
                     <div className="space-y-3">

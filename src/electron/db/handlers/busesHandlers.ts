@@ -6,8 +6,10 @@ export function busesHandlers() {
   ipcMain.handle("getBuses", async (): Promise<ResponseElectronGeneric> => {
     try {
       const buses = await busesRepo.getAll();
+      const busesFilters = Array.isArray(buses) ? buses.filter(bus => bus.status !== 'removed') : [];
       console.log('buses registrados', buses);
-      return { ok: true, data: buses, error: null }
+      console.log('buses busesFilters', busesFilters);
+      return { ok: true, data: busesFilters, error: null }
 
     } catch (error) {
       console.log('error al obtener autobus ->', error);
@@ -31,7 +33,7 @@ export function busesHandlers() {
       console.log({ registerBus });
 
       if (!registerBus) throw new BusError("Error al crear registro", "No se ha registrado autobus");
-      return { ok: true, error: null, data: "Registro creado correctamente" }
+      return { ok: true, error: null, data: registerBus }
     } catch (error: any) {
       console.log('error al registrar autobus ->', error);
 

@@ -7,66 +7,19 @@ import { Input } from "../../components/ui/input"
 import { MapPin, Plus, Search, Edit, Trash2, ArrowLeft, Phone, MapIcon } from "lucide-react"
 import DestinoForm from "../components/DestinoForm"
 import { useDashboard } from "../../auth/context/DashBoardContext"
+import { useSearchParams } from "react-router-dom"
 
-// Datos de ejemplo - reemplazar con datos de tu base de datos
-const initialDestinations = [
-  {
-    id: 1,
-    nombre: "Ciudad de MΓ©xico",
-    estado: "Ciudad de MΓ©xico",
-    direccionTerminal: "Terminal Central del Norte, Eje Central LΓ'zaro CΓ'rdenas 4907",
-    telefono: "5555551234",
-    distanciaKm: 0,
-    precioBase: 0,
-    tiempoEstimado: "0h 0m",
-    activo: true,
-    notas: "Terminal principal",
-  },
-  {
-    id: 2,
-    nombre: "Guadalajara",
-    estado: "Jalisco",
-    direccionTerminal: "Nueva Central Camionera, Av. Dr. Roberto Michel 3000",
-    telefono: "3333334567",
-    distanciaKm: 550,
-    precioBase: 850,
-    tiempoEstimado: "7h 30m",
-    activo: true,
-    notas: "Segunda ciudad mΓ's importante",
-  },
-  {
-    id: 3,
-    nombre: "Monterrey",
-    estado: "Nuevo LeΓ³n",
-    direccionTerminal: "Central de Autobuses, Av. Colón 850",
-    telefono: "8188887890",
-    distanciaKm: 900,
-    precioBase: 1200,
-    tiempoEstimado: "11h 0m",
-    activo: true,
-    notas: "Capital del norte",
-  },
-  {
-    id: 4,
-    nombre: "Puebla",
-    estado: "Puebla",
-    direccionTerminal: "Central de Autobuses CAPU, Blvd. Norte 4222",
-    telefono: "2222221234",
-    distanciaKm: 130,
-    precioBase: 250,
-    tiempoEstimado: "2h 0m",
-    activo: false,
-    notas: "Temporalmente fuera de servicio",
-  },
-]
 
-type Destino = (typeof initialDestinations)[0]
+type view = "list" | "add" | "edit";
 
-export default function DestinationsManager() {
-  const { destinations } = useDashboard();
+export default function DestinationsManager({ configInitial = false }: { configInitial?: boolean }) {
+  const { destinations, numberRegisteredDestinations } = useDashboard();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [searchTerm, setSearchTerm] = useState("")
-  const [view, setView] = useState<"list" | "add" | "edit">("list")
   const [editingDestino, setEditingDestino] = useState<Route | null>(null)
+
+  const viewActiveAtDestination = searchParams.get("viewAtDestination") ?? "list";
 
   const filteredDestinations = destinations.filter(
     (destino) =>
@@ -74,13 +27,13 @@ export default function DestinationsManager() {
       destino.cityName.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
-  const handleAddDestino = (newDestino: Omit<Destino, "id">) => {
+  const handleAddDestino = (newDestino: Omit<Route, "id">) => {
     // const id = Math.max(...destinations.map((d) => d.id), 0) + 1
     // setDestinations([...destinations, { ...newDestino, id }])
     // setView("list")
   }
 
-  const handleEditDestino = (updatedDestino: Omit<Destino, "id">) => {
+  const handleEditDestino = (updatedDestino: Omit<Route, "id">) => {
     // if (editingDestino) {
     //   setDestinations(destinations.map((d) => (d.id === editingDestino.id ? { ...updatedDestino, id: editingDestino.id } : d)))
     //   setEditingDestino(null)
@@ -100,34 +53,50 @@ export default function DestinationsManager() {
 
   const startEdit = (destino: Route) => {
     setEditingDestino(destino)
-    setView("edit")
+    setSearchParams(prev => {
+      prev.set('viewAtDestination', 'edit')
+      return prev;
+    })
   }
 
-  if (view === "add") {
+  if (viewActiveAtDestination === "add") {
     return (
       <div className="space-y-6">
-        <Button variant="ghost" onClick={() => setView("list")} className="gap-2">
+        {/* <Button variant="ghost" onClick={() => {
+           setSearchParams(prev => {
+            prev.set('viewAtDestination', 'list')
+            return prev;
+        })
+        }} className="gap-2">
           <ArrowLeft className="h-4 w-4" />
           Volver a la lista
-        </Button>
-        <DestinoForm configInitial={false} onCancel={() => setView("list")} />
+        </Button> */}
+        <DestinoForm configInitial={false} onCancel={() => {
+          setSearchParams(prev => {
+            prev.set('viewAtDestination', 'list')
+            return prev;
+          })
+        }} />
       </div>
     )
   }
 
-  if (view === "edit" && editingDestino) {
+  if (viewActiveAtDestination === "edit" && editingDestino) {
     return (
       <div className="space-y-6">
-        <Button variant="ghost" onClick={() => setView("list")} className="gap-2">
+        {/* <Button variant="ghost" onClick={() => setView("list")} className="gap-2">
           <ArrowLeft className="h-4 w-4" />
           Volver a la lista
-        </Button>
+        </Button> */}
         <DestinoForm
           configInitial={false}
           initialData={editingDestino}
           onCancel={() => {
             setEditingDestino(null)
-            setView("list")
+            setSearchParams(prev => {
+              prev.set('viewAtDestination', 'list')
+              return prev;
+            })
           }}
           isEditing
         />
@@ -139,25 +108,34 @@ export default function DestinationsManager() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-balance mb-2">Gestión de Destinations</h1>
-          <p className="text-muted-foreground text-pretty">Administra las rutas y ciudades disponibles</p>
+          <h1 className="text-3xl font-bold text-balance mb-2">Gestión de Destinos</h1>
+          <p className="text-muted-foreground text-pretty">Administra las rutas disponibles para viajar</p>
         </div>
-        <Button onClick={() => setView("add")} size="lg" className="gap-2">
-          <Plus className="h-5 w-5" />
-          Agregar Destino
-        </Button>
+        {numberRegisteredDestinations > 0 &&
+          <Button onClick={() => {
+            setSearchParams(prev => {
+              prev.set('viewAtDestination', 'add')
+              return prev;
+            })
+          }} size="lg" className="gap-2">
+            <Plus className="h-5 w-5" />
+            Agregar Destino
+          </Button>
+        }
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="text"
-          placeholder="Buscar por ciudad o estado..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 h-11"
-        />
-      </div>
+      {configInitial ??
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Buscar por ciudad o estado..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 h-11"
+          />
+        </div>
+      }
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filteredDestinations.map((destino) => (
@@ -233,9 +211,14 @@ export default function DestinationsManager() {
       {filteredDestinations.length === 0 && (
         <div className="text-center py-12">
           <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-          <h3 className="text-lg font-semibold mb-2">No se encontraron destinations</h3>
-          <p className="text-muted-foreground mb-4">Intenta con otra bΓΊsqueda o agrega un nuevo destino</p>
-          <Button onClick={() => setView("add")} className="gap-2">
+          <h3 className="text-lg font-semibold mb-2">No se encontraron destinos</h3>
+          {configInitial ?? <p className="text-muted-foreground mb-4">Intenta con otra búsqueda o agrega un nuevo destino</p>}
+          <Button onClick={() => {
+            setSearchParams(prev => {
+              prev.set('viewAtDestination', 'add')
+              return prev;
+            })
+          }} className="gap-2">
             <Plus className="h-4 w-4" />
             Agregar Primer Destino
           </Button>

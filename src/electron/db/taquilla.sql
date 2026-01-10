@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS app_config (
     schedules_configured INTEGER DEFAULT 0,
     initial_setup_completed INTEGER DEFAULT 0,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    status TEXT NOT NULL DEFAULT 'active',
+    status TEXT NOT NULL DEFAULT 'active'
 
 );
 
@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS agencies (
     name TEXT NOT NULL,
     location TEXT,
     phone TEXT,
+    city TEXT
+    
     dynamic_bus_numbering INTEGER NOT NULL DEFAULT 0 -- 0 = fijo, 1 = dinámico
 
 );
@@ -26,7 +28,6 @@ CREATE TABLE IF NOT EXISTS agencies (
 -- 2. BUSES (Unidades)
 CREATE TABLE IF NOT EXISTS buses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    -- number TEXT NOT NULL UNIQUE,
     seatingCapacity INTEGER NOT NULL,
     plate TEXT NOT NULL UNIQUE,
     serialNumber TEXT NOT NULL UNIQUE,
@@ -59,7 +60,9 @@ CREATE TABLE bus_daily_assignments (
 CREATE TABLE IF NOT EXISTS drivers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    license_number TEXT NOT NULL UNIQUE
+    license_number TEXT NOT NULL UNIQUE,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+
 );
 
 
@@ -67,17 +70,18 @@ CREATE TABLE IF NOT EXISTS drivers (
 CREATE TABLE IF NOT EXISTS routes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     origin TEXT NOT NULL,
-    terminalName: TEXT NOT NULL,
-    stateName: TEXT NOT NULL,
-    cityName: TEXT NOT NULL,
-    address: TEXT NOT NULL,
-    -- destination TEXT NOT NULL,
-    baseFare: TEXT NOT NULL,
-    estimatedTravelTime:
-    distanceFromOriginKm: TEXT NOT NULL,
-    remarks: TEXT,
+    terminalName TEXT NOT NULL,
+    stateName TEXT NOT NULL,
+    cityName TEXT NOT NULL,
+    address TEXT NOT NULL,
+    baseFare TEXT NOT NULL,
+    estimatedTravelTime TEXT,
+    distanceFromOriginKm TEXT NOT NULL,
+    remarks TEXT,
     phone TEXT,
-    status TEXT NOT NULL DEFAULT 'active'
+    status TEXT NOT NULL DEFAULT 'active',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+
 );
 
 
@@ -91,13 +95,13 @@ CREATE TABLE IF NOT EXISTS schedules (
     agency_id INTEGER NOT NULL,
     departure_time TEXT NOT NULL,
     arrival DATETIME NOT NULL,
+    status TEXT NOT NULL DEFAULT 'active',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
     FOREIGN KEY (route_id) REFERENCES routes(id) ON DELETE CASCADE,
     FOREIGN KEY (bus_id) REFERENCES buses(id),
     FOREIGN KEY (driver_id) REFERENCES drivers(id),
     FOREIGN KEY (agency_id) REFERENCES agencies(id)
-
-    status TEXT NOT NULL DEFAULT 'active',
-
 );
 
 
@@ -107,8 +111,9 @@ CREATE TABLE IF NOT EXISTS customers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     email TEXT UNIQUE,
-    phone TEXT NOT NULL
+    phone TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'active',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
 
 );
 
@@ -122,12 +127,10 @@ CREATE TABLE IF NOT EXISTS tickets (
     seat_number INTEGER NOT NULL,
     price REAL NOT NULL,
     purchase_time TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status TEXT NOT NULL DEFAULT 'active',
 
     FOREIGN KEY (schedule_id) REFERENCES schedules(id),
     FOREIGN KEY (customer_id) REFERENCES customers(id)
-
-    status TEXT NOT NULL DEFAULT 'active',
-
 );
 
 
@@ -138,10 +141,10 @@ CREATE TABLE IF NOT EXISTS payments (
     ticket_id INTEGER NOT NULL,
     method TEXT NOT NULL,   -- cash, card, transfer
     amount REAL NOT NULL,
-    timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status TEXT NOT NULL DEFAULT 'confirmed',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (ticket_id) REFERENCES tickets(id)
-    status TEXT NOT NULL DEFAULT 'confirmed',
 
 );
 
@@ -155,5 +158,7 @@ CREATE TABLE IF NOT EXISTS users (
     password TEXT NOT NULL,
     status TEXT NOT NULL,
     phone TEXT NOT NULL UNIQUE,
-    role TEXT NOT NULL DEFAULT 'clerk'   -- clerk, admin, supervisor
+    role TEXT NOT NULL,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+
 );

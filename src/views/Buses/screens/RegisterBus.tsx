@@ -7,6 +7,7 @@ import { Textarea } from "../../components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { CreditCard, Hash, Users, Calendar } from "lucide-react"
 import { useDashboard } from "../../auth/context/DashBoardContext"
+import { useSearchParams } from "react-router-dom";
 
 
 const initialStateBus: Bus = {
@@ -22,6 +23,7 @@ const initialStateBus: Bus = {
 
 export default function RegisterBus({ editingBus }: { editingBus?: Bus | null }) {
 
+    const [_, setSearchParams] = useSearchParams();
     const { handleRegisterBus, isLoading } = useDashboard();
     const [formData, setFormData] = useState<Bus>(editingBus ? editingBus : initialStateBus);
 
@@ -29,7 +31,13 @@ export default function RegisterBus({ editingBus }: { editingBus?: Bus | null })
         e.preventDefault();
 
         const registerSucces = await handleRegisterBus(formData, Boolean(editingBus));
-        if (registerSucces) setFormData(initialStateBus);
+        if (!registerSucces) return;
+
+        setFormData(initialStateBus);
+        setSearchParams(prev => {
+            prev.set('view', 'list')
+            return prev;
+        })
     }
 
     const handleChange = (field: string, value: string) => {
@@ -90,7 +98,7 @@ export default function RegisterBus({ editingBus }: { editingBus?: Bus | null })
                         </div>
                     </div>
 
-               
+
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">

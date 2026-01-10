@@ -5,7 +5,6 @@ import { Label } from "../../components/ui/label"
 import { Textarea } from "../../components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { Alert, AlertDescription } from "../../components/ui/alert"
-import { Switch } from "../../components/ui/switch"
 import { MapPin, AlertCircle, MapIcon, Phone, DollarSign, Clock } from "lucide-react"
 import { useDashboard } from "../../auth/context/DashBoardContext"
 
@@ -95,7 +94,7 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
                 <Input
                   id="nombre"
                   type="text"
-                  placeholder="Terminal Revolución"
+                  placeholder="ej: Terminal Revolución"
                   value={formData.terminalName}
                   onChange={(e) => handleChange("terminalName", e.target.value)}
                   className="pl-10"
@@ -112,7 +111,7 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
               <Input
                 id="estado"
                 type="text"
-                placeholder="Ciudad de MΓ©xico"
+                placeholder="ej: Ciudad de México"
                 value={formData.cityName}
                 onChange={(e) => handleChange("cityName", e.target.value)}
                 required
@@ -123,14 +122,14 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
 
           <div className="space-y-2">
             <Label htmlFor="direccionTerminal" className="text-sm font-medium">
-              DirecciΓ³n de la terminal <span className="text-destructive">*</span>
+              Dirección de la terminal <span className="text-destructive">*</span>
             </Label>
             <div className="relative">
               <MapIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="direccionTerminal"
                 type="text"
-                placeholder="Av. Principal 1234, Col. Centro"
+                placeholder="ej: Av. Principal 1234, Col. Centro"
                 value={formData.address}
                 onChange={(e) => handleChange("address", e.target.value)}
                 className="pl-10"
@@ -142,14 +141,14 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
 
           <div className="space-y-2">
             <Label htmlFor="telefono" className="text-sm font-medium">
-              TelΓ©fono de contacto <span className="text-destructive">*</span>
+              Teléfono de contacto <span className="text-destructive">*</span>
             </Label>
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="telefono"
                 type="tel"
-                placeholder="5555551234"
+                placeholder="ej: 5555551234"
                 value={formData.contactPhone}
                 onChange={(e) => {
                   const value = e.target.value.replace(/\D/g, "")
@@ -211,7 +210,7 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
                 <Input
                   id="tiempoEstimado"
                   type="text"
-                  placeholder="7h 30m"
+                  placeholder="ej: 7h 30m"
                   value={formData.estimatedTravelTime}
                   onChange={(e) => handleChange("estimatedTravelTime", e.target.value)}
                   className="pl-10"
@@ -228,7 +227,7 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
             </Label>
             <Textarea
               id="notas"
-              placeholder="Ej: Horarios de atención, servicios disponibles en la terminal, información de contacto adicional..."
+              placeholder="ej: Horarios de atención, servicios disponibles en la terminal, información de contacto adicional..."
               value={formData.remarks}
               onChange={(e) => handleChange("remarks", e.target.value)}
               disabled={isLoading}

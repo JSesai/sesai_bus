@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
 import { AgencyError, AppError, BusError, DestinationRouteError, ValidationError } from "../../../shared/errors/customError";
@@ -11,11 +10,14 @@ type DashboardContextType = {
     agency: Agency | null;
     vehicles: Bus[];
     destinations: Route[];
+    numberRegisteredVehicles: number;
+    numberRegisteredDestinations: number;
+
 
     //methods
     handleRegisterBus: (dataBus: Bus, editingBus?: boolean, configInitial?: boolean) => Promise<boolean>;
     handleUpdateStatus: (dataBus: Bus, configInitial?: boolean) => Promise<boolean>;
-    handleGetBuses: () => Promise<Bus[]>
+    handleGetBuses: () => Promise<void>
     handleRegisterAgency: (agency: Agency, editingAgency?: boolean, configInitial?: boolean) => Promise<boolean>;
     handleRegisterRoute: (dataRoute: Route, editingRoute?: boolean, configInitial?: boolean) => Promise<boolean>;
 };
@@ -24,7 +26,6 @@ export const DashboardContext = createContext<DashboardContextType | undefined>(
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
-    const navigate = useNavigate();
     const { userLogged } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [agency, setAgency] = useState<Agency | null>(null);
@@ -33,17 +34,21 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
 
     //manejador para obtener buses
-    const handleGetBuses = async (): Promise<Bus[]> => {
+    const handleGetBuses = async (): Promise<void> => {
 
         try {
             setIsLoading(true);
             const buses = await window.electron.buses.getBuses();
 
-
             console.log(buses);
-            if (buses.ok && buses.data.length > 0) return buses.data.filter(bus => bus.status !== "removed");
+            if (!buses.ok) {
+                setVehicles([]);
+                return;
+            }
 
-            return [];
+            setVehicles(buses.data);
+
+
 
         } catch (e) {
             if (e instanceof AppError) {
@@ -54,14 +59,14 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
                     duration: 10_000,
                     position: 'top-center'
                 });
-                return [];
+                return 
             }
 
         } finally {
             setIsLoading(false)
         }
 
-        return [];
+
 
     }
     //manejador para cambio de estatus de autobus 
@@ -105,7 +110,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
     }
     //manejador para registro de autobus 
-    const handleRegisterBus = async (bus: Bus, editingBus: boolean = false,  configInitial = false): Promise<boolean> => {
+    const handleRegisterBus = async (bus: Bus, editingBus: boolean = false, configInitial = false): Promise<boolean> => {
 
         try {
 
@@ -124,7 +129,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
             console.log(resp);
             if (resp.ok) {
-               configInitial ?? confetti({
+                configInitial ?? confetti({
                     particleCount: 100,
                     spread: 120,
                     origin: { y: 0.6 }
@@ -137,7 +142,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
                     position: 'top-center'
                 })
 
-                setVehicles([...vehicles, bus]);
+                setVehicles([...vehicles, resp.data]);
                 return true;
             }
 
@@ -181,9 +186,10 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     }
 
     //registrar o actualizar agencia
-    const handleRegisterAgency = async (agencyForm: Agency, editingAgency: boolean = false,  configInitial = false): Promise<boolean> => {
+    const handleRegisterAgency = async (agencyForm: Agency, editingAgency: boolean = false, configInitial = false): Promise<boolean> => {
 
         try {
+            console.log('hay agencia??', agency);
 
             // Validaciones
             if (Object.values(agencyForm).includes('')) throw new ValidationError("Ingresa todos los datos", "Hay campos obligatorios vacíos");
@@ -238,10 +244,10 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const handleRegisterRoute = async (destination: Route, editingRoute: boolean = false, configInitial = false): Promise<boolean> => {
 
         try {
-            const {terminalName, cityName, address, contactPhone, estimatedTravelTime } = destination;
+            const { terminalName, cityName, address, contactPhone, estimatedTravelTime } = destination;
             // Validaciones
-            if ( !terminalName ||!cityName ||!address ||!contactPhone ||!estimatedTravelTime) throw new DestinationRouteError("Por favor completa todos los campos obligatorios")
-             
+            if (!terminalName || !cityName || !address || !contactPhone || !estimatedTravelTime) throw new DestinationRouteError("Por favor completa todos los campos obligatorios")
+
             setIsLoading(true);
             const resp = editingRoute ? await window.electron.routeTravel.updateRoute(destination) : await window.electron.routeTravel.addRoute(destination);
 
@@ -288,13 +294,27 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
 
     const loadSystemInformation = async () => {
+        try {
 
-        //multiples peticiones para traer informacion del sistema busesm horarios, clientes, ventas, etc...
+            //multiples peticiones para traer informacion del sistema busesm horarios, clientes, ventas, etc...
+            const results = await Promise.allSettled([getAgency(), handleGetBuses()]);
+            results.forEach((result, index) => {
+                if (result.status === "fulfilled") {
+                    console.log(`Petición ${index} OK:`, result.value);
+                } else {
+                    console.error(`Petición ${index} falló:`, result.reason);
+                }
+            });
 
-        //usar el promise all que no revienta la aplicacion
+
+        } catch (error) {
+            console.log('error al obtener data system', error);
+
+        }
 
 
     }
+
 
 
 
@@ -314,7 +334,11 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             destinations,
             vehicles,
             isLoading,
-            agency
+            agency,
+            numberRegisteredVehicles: vehicles.length,
+            numberRegisteredDestinations: destinations.length,
+
+
         }}>
             {children}
         </DashboardContext.Provider>
