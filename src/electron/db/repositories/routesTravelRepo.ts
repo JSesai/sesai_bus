@@ -15,11 +15,12 @@ export const routesTravelRepo = {
       );
     }),
 
-  add: (route: { origin: string; destination: string; distance_km?: number }) =>
+  add: (route: Route) =>
     new Promise((resolve, reject) => {
+      const {origin, terminalName, stateName, cityName, address, baseFare,estimatedTravelTime, distanceFromOriginKm, remarks, contactPhone} = route;
       db.run(
-        "INSERT INTO routes (origin, destination, distance_km) VALUES (?, ?, ?)",
-        [route.origin, route.destination, route.distance_km || null],
+        "INSERT INTO routes (origin, terminalName, stateName, cityName, address, baseFare, estimatedTravelTime, distanceFromOriginKm, remarks, contactPhone) VALUES (?,?,?,?,?,?,?,?,?,?)",
+        [origin, terminalName, stateName, cityName, address, baseFare,estimatedTravelTime, distanceFromOriginKm, remarks, contactPhone],
         function (err) {
           if (err) reject(err);
           else resolve({ id: this.lastID, ...route });

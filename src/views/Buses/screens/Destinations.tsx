@@ -6,9 +6,10 @@ import { Badge } from "../../components/ui/badge"
 import { Input } from "../../components/ui/input"
 import { MapPin, Plus, Search, Edit, Trash2, ArrowLeft, Phone, MapIcon } from "lucide-react"
 import DestinoForm from "../components/DestinoForm"
+import { useDashboard } from "../../auth/context/DashBoardContext"
 
 // Datos de ejemplo - reemplazar con datos de tu base de datos
-const initialDestinos = [
+const initialDestinations = [
   {
     id: 1,
     nombre: "Ciudad de MΓ©xico",
@@ -59,45 +60,45 @@ const initialDestinos = [
   },
 ]
 
-type Destino = (typeof initialDestinos)[0]
+type Destino = (typeof initialDestinations)[0]
 
-export default function DestinosManager() {
-  const [destinos, setDestinos] = useState<Destino[]>(initialDestinos)
+export default function DestinationsManager() {
+  const { destinations } = useDashboard();
   const [searchTerm, setSearchTerm] = useState("")
   const [view, setView] = useState<"list" | "add" | "edit">("list")
-  const [editingDestino, setEditingDestino] = useState<Destino | null>(null)
+  const [editingDestino, setEditingDestino] = useState<Route | null>(null)
 
-  const filteredDestinos = destinos.filter(
+  const filteredDestinations = destinations.filter(
     (destino) =>
-      destino.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      destino.estado.toLowerCase().includes(searchTerm.toLowerCase()),
+      destino.terminalName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      destino.cityName.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
   const handleAddDestino = (newDestino: Omit<Destino, "id">) => {
-    const id = Math.max(...destinos.map((d) => d.id), 0) + 1
-    setDestinos([...destinos, { ...newDestino, id }])
-    setView("list")
+    // const id = Math.max(...destinations.map((d) => d.id), 0) + 1
+    // setDestinations([...destinations, { ...newDestino, id }])
+    // setView("list")
   }
 
   const handleEditDestino = (updatedDestino: Omit<Destino, "id">) => {
-    if (editingDestino) {
-      setDestinos(destinos.map((d) => (d.id === editingDestino.id ? { ...updatedDestino, id: editingDestino.id } : d)))
-      setEditingDestino(null)
-      setView("list")
-    }
+    // if (editingDestino) {
+    //   setDestinations(destinations.map((d) => (d.id === editingDestino.id ? { ...updatedDestino, id: editingDestino.id } : d)))
+    //   setEditingDestino(null)
+    //   setView("list")
+    // }
   }
 
-  const handleDeleteDestino = (id: number) => {
-    if (confirm("ΒΏEstΓ's seguro de que deseas eliminar este destino?")) {
-      setDestinos(destinos.filter((d) => d.id !== id))
-    }
+  const handleDeleteDestino = (id: Route['id']) => {
+    // if (confirm("ΒΏEstΓ's seguro de que deseas eliminar este destino?")) {
+    //   setDestinations(destinations.filter((d) => d.id !== id))
+    // }
   }
 
-  const handleToggleActivo = (id: number) => {
-    setDestinos(destinos.map((d) => (d.id === id ? { ...d, activo: !d.activo } : d)))
+  const handleToggleActivo = (id: Route['id']) => {
+    // setDestinations(destinations.map((d) => (d.id === id ? { ...d, activo: !d.activo } : d)))
   }
 
-  const startEdit = (destino: Destino) => {
+  const startEdit = (destino: Route) => {
     setEditingDestino(destino)
     setView("edit")
   }
@@ -109,7 +110,7 @@ export default function DestinosManager() {
           <ArrowLeft className="h-4 w-4" />
           Volver a la lista
         </Button>
-        <DestinoForm onSubmit={handleAddDestino} onCancel={() => setView("list")} />
+        <DestinoForm configInitial={false} onCancel={() => setView("list")} />
       </div>
     )
   }
@@ -122,8 +123,8 @@ export default function DestinosManager() {
           Volver a la lista
         </Button>
         <DestinoForm
+          configInitial={false}
           initialData={editingDestino}
-          onSubmit={handleEditDestino}
           onCancel={() => {
             setEditingDestino(null)
             setView("list")
@@ -138,7 +139,7 @@ export default function DestinosManager() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-balance mb-2">Gestión de Destinos</h1>
+          <h1 className="text-3xl font-bold text-balance mb-2">Gestión de Destinations</h1>
           <p className="text-muted-foreground text-pretty">Administra las rutas y ciudades disponibles</p>
         </div>
         <Button onClick={() => setView("add")} size="lg" className="gap-2">
@@ -159,8 +160,8 @@ export default function DestinosManager() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredDestinos.map((destino) => (
-          <Card key={destino.id} className={`transition-all hover:shadow-md ${!destino.activo ? "opacity-60" : ""}`}>
+        {filteredDestinations.map((destino) => (
+          <Card key={destino.id} className={`transition-all hover:shadow-md`}>
             <CardContent className="p-5 space-y-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
@@ -168,44 +169,44 @@ export default function DestinosManager() {
                     <MapPin className="h-6 w-6 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg text-balance">{destino.nombre}</h3>
-                    <p className="text-sm text-muted-foreground">{destino.estado}</p>
+                    <h3 className="font-semibold text-lg text-balance">{destino.cityName}</h3>
+                    <p className="text-sm text-muted-foreground">{destino.terminalName}</p>
                   </div>
                 </div>
-                <Badge variant={destino.activo ? "default" : "secondary"} className="text-xs">
-                  {destino.activo ? "Activo" : "Inactivo"}
+                <Badge variant={"default"} className="text-xs">
+                  "Activo"
                 </Badge>
               </div>
 
               <div className="space-y-2 text-sm">
                 <div className="flex items-start gap-2">
                   <MapIcon className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                  <span className="text-muted-foreground text-pretty">{destino.direccionTerminal}</span>
+                  <span className="text-muted-foreground text-pretty">{destino.address}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">{destino.telefono}</span>
+                  <span className="text-muted-foreground">{destino.contactPhone}</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-2 pt-2 border-t border-border">
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground">Distancia</p>
-                  <p className="font-semibold text-sm">{destino.distanciaKm} km</p>
+                  <p className="font-semibold text-sm">{destino.distanceFromOriginKm} km</p>
                 </div>
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground">Precio base</p>
-                  <p className="font-semibold text-sm">${destino.precioBase}</p>
+                  <p className="font-semibold text-sm">${destino.baseFare}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground">Tiempo</p>
-                  <p className="font-semibold text-sm">{destino.tiempoEstimado}</p>
+                  <p className="font-semibold text-sm">{destino.estimatedTravelTime}</p>
                 </div>
               </div>
 
-              {destino.notas && (
+              {destino.remarks && (
                 <p className="text-xs text-muted-foreground italic text-pretty border-t border-border pt-2">
-                  {destino.notas}
+                  {destino.remarks}
                 </p>
               )}
 
@@ -214,9 +215,7 @@ export default function DestinosManager() {
                   <Edit className="h-4 w-4" />
                   Editar
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => handleToggleActivo(destino.id)} className="flex-1">
-                  {destino.activo ? "Desactivar" : "Activar"}
-                </Button>
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -231,10 +230,10 @@ export default function DestinosManager() {
         ))}
       </div>
 
-      {filteredDestinos.length === 0 && (
+      {filteredDestinations.length === 0 && (
         <div className="text-center py-12">
           <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-          <h3 className="text-lg font-semibold mb-2">No se encontraron destinos</h3>
+          <h3 className="text-lg font-semibold mb-2">No se encontraron destinations</h3>
           <p className="text-muted-foreground mb-4">Intenta con otra bΓΊsqueda o agrega un nuevo destino</p>
           <Button onClick={() => setView("add")} className="gap-2">
             <Plus className="h-4 w-4" />

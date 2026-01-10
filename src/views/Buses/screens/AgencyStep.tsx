@@ -2,15 +2,15 @@
 
 import { Button } from "../../components/ui/button"
 import AgencieForm from "../components/AgencieForm"
+import type { handlerSteps } from "./SetupWizard"
 
-export default function AgencyStep({ onNext }: { onNext: () => void }) {
+export default function AgencyStep({ onNext }: handlerSteps) {
 
 
    
 
     return (
         <div className="space-y-6">
-            {/* <h2 className="text-xl font-semibold text-white">Datos de la agencia</h2> */}
 
             <AgencieForm />
 

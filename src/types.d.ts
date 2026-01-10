@@ -43,6 +43,7 @@ interface appConfigAPI {
 interface Agency {
   id?: number;
   name: string;
+  city: string;
   location: string;
   phone: string;
 }
@@ -95,16 +96,24 @@ interface BusesAPI {
 
 interface Route {
   id?: number;
-  origin: string;
-  destination: string;
-  distance_km?: number;
+  origin: Agency['city'];
+  terminalName: string;
+  cityName: string;
+  stateName: string;
+  address: string;
+  contactPhone: string;
+  distanceFromOriginKm: number;
+  baseFare: number;
+  estimatedTravelTime: string;
+  remarks: string;
+
 }
 
 interface RouteTravelAPI {
   getRoutes: () => Promise<Route[]>;
   getRouteById: (id: Route['id']) => Promise<Route>;
-  addRoute: (routeTravel: Route) => Promise<Route>;
-  updateRoute: (routeTravel: Route) => Promise<void>;
+  addRoute: (routeTravel: Route) => Promise<ResponseElectronGeneric>;
+  updateRoute: (routeTravel: Route) => Promise<ResponseElectronGeneric>;
   deleteRoute: (id: Route['id']) => Promise<void>;
 }
 
@@ -217,16 +226,23 @@ interface ResponseElectronBuses {
   error: null | ErrorApp
 }
 
-type AppConfigStatus = "complete" | "incomplete" ;
+interface ResponseElectronRoutesTravel {
+  ok: boolean,
+  data: Route[] | null;
+  error: null | ErrorApp
+}
+
+
+type AppConfigStatus = "complete" | "incomplete";
 
 interface AppConfig {
-  id?: number;                   
-  agency_configured: number;      
-  buses_configured: number;        
-  routes_configured: number;       
-  schedules_configured: number;    
-  initial_setup_completed: number; 
-  created_at: string;            
+  id?: number;
+  agency_configured: number;
+  buses_configured: number;
+  routes_configured: number;
+  schedules_configured: number;
+  initial_setup_completed: number;
+  created_at: string;
 }
 
 

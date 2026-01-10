@@ -1,20 +1,19 @@
 -- 0. Config system
 CREATE TABLE IF NOT EXISTS app_config (
-  id INTEGER PRIMARY KEY CHECK (id = 1),
-  agency_configured INTEGER DEFAULT 0,
-  buses_configured INTEGER DEFAULT 0,
-  routes_configured INTEGER DEFAULT 0,
-  schedules_configured INTEGER DEFAULT 0,
-  initial_setup_completed INTEGER DEFAULT 0,
-  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    agency_configured INTEGER DEFAULT 0,
+    buses_configured INTEGER DEFAULT 0,
+    routes_configured INTEGER DEFAULT 0,
+    schedules_configured INTEGER DEFAULT 0,
+    initial_setup_completed INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    status TEXT NOT NULL DEFAULT 'active',
+
 );
 
 
-
 -- 1. AGENCIES (Sucursales)
-
 CREATE TABLE IF NOT EXISTS agencies (
-    -- id INTEGER PRIMARY KEY AUTOINCREMENT,
     id INTEGER PRIMARY KEY CHECK (id = 1),
     name TEXT NOT NULL,
     location TEXT,
@@ -46,6 +45,7 @@ CREATE TABLE bus_daily_assignments (
     service_date TEXT NOT NULL, -- YYYY-MM-DD
     bus_number INTEGER NOT NULL,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    status TEXT NOT NULL DEFAULT 'active',
 
     UNIQUE (terminal_id, service_date, bus_number),
     UNIQUE (bus_id, terminal_id, service_date),
@@ -64,12 +64,20 @@ CREATE TABLE IF NOT EXISTS drivers (
 
 
 -- 4. ROUTES (Ruta base Ciudad A → Ciudad B)
-
 CREATE TABLE IF NOT EXISTS routes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     origin TEXT NOT NULL,
-    destination TEXT NOT NULL,
-    distance_km INTEGER
+    terminalName: TEXT NOT NULL,
+    stateName: TEXT NOT NULL,
+    cityName: TEXT NOT NULL,
+    address: TEXT NOT NULL,
+    -- destination TEXT NOT NULL,
+    baseFare: TEXT NOT NULL,
+    estimatedTravelTime:
+    distanceFromOriginKm: TEXT NOT NULL,
+    remarks: TEXT,
+    phone TEXT,
+    status TEXT NOT NULL DEFAULT 'active'
 );
 
 
@@ -87,6 +95,9 @@ CREATE TABLE IF NOT EXISTS schedules (
     FOREIGN KEY (bus_id) REFERENCES buses(id),
     FOREIGN KEY (driver_id) REFERENCES drivers(id),
     FOREIGN KEY (agency_id) REFERENCES agencies(id)
+
+    status TEXT NOT NULL DEFAULT 'active',
+
 );
 
 
@@ -97,6 +108,8 @@ CREATE TABLE IF NOT EXISTS customers (
     name TEXT NOT NULL,
     email TEXT UNIQUE,
     phone TEXT NOT NULL
+    status TEXT NOT NULL DEFAULT 'active',
+
 );
 
 
@@ -112,6 +125,9 @@ CREATE TABLE IF NOT EXISTS tickets (
 
     FOREIGN KEY (schedule_id) REFERENCES schedules(id),
     FOREIGN KEY (customer_id) REFERENCES customers(id)
+
+    status TEXT NOT NULL DEFAULT 'active',
+
 );
 
 
@@ -125,6 +141,8 @@ CREATE TABLE IF NOT EXISTS payments (
     timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (ticket_id) REFERENCES tickets(id)
+    status TEXT NOT NULL DEFAULT 'confirmed',
+
 );
 
 

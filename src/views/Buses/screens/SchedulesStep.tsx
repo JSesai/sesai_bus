@@ -1,23 +1,20 @@
 
 
 
-
-
 import { Button } from "../../components/ui/button"
 import AgencieForm from "../components/AgencieForm"
-import DestinoForm from "../components/DestinoForm"
-import DestinosManager from "./Destinations"
+import SchedulesManager from "../components/SchedulesManager"
 import type { handlerSteps } from "./SetupWizard"
 
-export default function RoutesStep({ onNext }: handlerSteps) {
+export default function SchedulesStep({ onNext }: handlerSteps) {
 
 
-
+   
 
     return (
         <div className="space-y-6">
 
-            <DestinoForm configInitial={true} />
+            <SchedulesManager />
 
             <div className="flex justify-end">
                 <Button onClick={onNext}>

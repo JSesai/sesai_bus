@@ -7,95 +7,48 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Alert, AlertDescription } from "../../components/ui/alert"
 import { Switch } from "../../components/ui/switch"
 import { MapPin, AlertCircle, MapIcon, Phone, DollarSign, Clock } from "lucide-react"
+import { useDashboard } from "../../auth/context/DashBoardContext"
 
-type DestinoData = {
-  nombre: string
-  estado: string
-  direccionTerminal: string
-  telefono: string
-  distanciaKm: number
-  precioBase: number
-  tiempoEstimado: string
-  activo: boolean
-  notas: string
-}
+
 
 type DestinoFormProps = {
-  initialData?: DestinoData
-  onSubmit: (data: DestinoData) => void
-  onCancel: () => void
-  isEditing?: boolean
+  initialData?: Route;
+  onCancel?: () => void
+  isEditing?: boolean;
+  configInitial: boolean;
 }
 
-export default function DestinoForm({ initialData, onSubmit, onCancel, isEditing = false }: DestinoFormProps) {
-  const [formData, setFormData] = useState<DestinoData>(
-    initialData || {
-      nombre: "",
-      estado: "",
-      direccionTerminal: "",
-      telefono: "",
-      distanciaKm: 0,
-      precioBase: 0,
-      tiempoEstimado: "",
-      activo: true,
-      notas: "",
-    },
-  )
-  const [isLoading, setIsLoading] = useState(false)
+
+
+const initialStateForm: Route = {
+  terminalName: "",
+  cityName: "",
+  address: "",
+  contactPhone: "",
+  distanceFromOriginKm: 0,
+  baseFare: 0,
+  estimatedTravelTime: "",
+  remarks: "",
+  stateName: "",
+  origin: ""
+}
+
+export default function DestinoForm({ initialData, onCancel, isEditing = false, configInitial = false }: DestinoFormProps) {
+  const { isLoading, handleRegisterRoute } = useDashboard();
+  const [formData, setFormData] = useState<Route>(initialData ?? initialStateForm)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
-    setSuccess(false)
-    setIsLoading(true)
 
-    // Validaciones
-    if (
-      !formData.nombre ||
-      !formData.estado ||
-      !formData.direccionTerminal ||
-      !formData.telefono ||
-      !formData.tiempoEstimado
-    ) {
-      setError("Por favor completa todos los campos obligatorios")
-      setIsLoading(false)
-      return
-    }
+    const registerDestination = await handleRegisterRoute(formData, isEditing, configInitial);
+    if (registerDestination) setFormData(initialStateForm);
 
-    if (formData.telefono.length < 10) {
-      setError("El telΓ©fono debe tener al menos 10 dΓ­gitos")
-      setIsLoading(false)
-      return
-    }
-
-    if (formData.distanciaKm < 0) {
-      setError("La distancia no puede ser negativa")
-      setIsLoading(false)
-      return
-    }
-
-    if (formData.precioBase < 0) {
-      setError("El precio base no puede ser negativo")
-      setIsLoading(false)
-      return
-    }
-
-    // SimulaciΓ³n de guardado - AquΓ­ integrarΓ­as tu API
-    setTimeout(() => {
-      setSuccess(true)
-      setIsLoading(false)
-      setTimeout(() => {
-        onSubmit(formData)
-      }, 1000)
-    }, 1000)
   }
 
-  const handleChange = (field: keyof DestinoData, value: string | number | boolean) => {
+  const handleChange = (field: keyof Route, value: string | number | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
-    setError("")
-    setSuccess(false)
   }
 
   return (
@@ -142,9 +95,9 @@ export default function DestinoForm({ initialData, onSubmit, onCancel, isEditing
                 <Input
                   id="nombre"
                   type="text"
-                  placeholder="Ciudad de MΓ©xico"
-                  value={formData.nombre}
-                  onChange={(e) => handleChange("nombre", e.target.value)}
+                  placeholder="Terminal Revolución"
+                  value={formData.terminalName}
+                  onChange={(e) => handleChange("terminalName", e.target.value)}
                   className="pl-10"
                   required
                   disabled={isLoading}
@@ -160,8 +113,8 @@ export default function DestinoForm({ initialData, onSubmit, onCancel, isEditing
                 id="estado"
                 type="text"
                 placeholder="Ciudad de MΓ©xico"
-                value={formData.estado}
-                onChange={(e) => handleChange("estado", e.target.value)}
+                value={formData.cityName}
+                onChange={(e) => handleChange("cityName", e.target.value)}
                 required
                 disabled={isLoading}
               />
@@ -178,8 +131,8 @@ export default function DestinoForm({ initialData, onSubmit, onCancel, isEditing
                 id="direccionTerminal"
                 type="text"
                 placeholder="Av. Principal 1234, Col. Centro"
-                value={formData.direccionTerminal}
-                onChange={(e) => handleChange("direccionTerminal", e.target.value)}
+                value={formData.address}
+                onChange={(e) => handleChange("address", e.target.value)}
                 className="pl-10"
                 required
                 disabled={isLoading}
@@ -197,10 +150,10 @@ export default function DestinoForm({ initialData, onSubmit, onCancel, isEditing
                 id="telefono"
                 type="tel"
                 placeholder="5555551234"
-                value={formData.telefono}
+                value={formData.contactPhone}
                 onChange={(e) => {
                   const value = e.target.value.replace(/\D/g, "")
-                  handleChange("telefono", value)
+                  handleChange("contactPhone", value)
                 }}
                 className="pl-10"
                 required
@@ -219,8 +172,8 @@ export default function DestinoForm({ initialData, onSubmit, onCancel, isEditing
                 id="distanciaKm"
                 type="number"
                 placeholder="550"
-                value={formData.distanciaKm}
-                onChange={(e) => handleChange("distanciaKm", Number.parseFloat(e.target.value) || 0)}
+                value={formData.distanceFromOriginKm}
+                onChange={(e) => handleChange("distanceFromOriginKm", Number.parseFloat(e.target.value) || 0)}
                 required
                 disabled={isLoading}
                 min="0"
@@ -238,8 +191,8 @@ export default function DestinoForm({ initialData, onSubmit, onCancel, isEditing
                   id="precioBase"
                   type="number"
                   placeholder="850"
-                  value={formData.precioBase}
-                  onChange={(e) => handleChange("precioBase", Number.parseFloat(e.target.value) || 0)}
+                  value={formData.baseFare}
+                  onChange={(e) => handleChange("baseFare", Number.parseFloat(e.target.value) || 0)}
                   className="pl-10"
                   required
                   disabled={isLoading}
@@ -259,8 +212,8 @@ export default function DestinoForm({ initialData, onSubmit, onCancel, isEditing
                   id="tiempoEstimado"
                   type="text"
                   placeholder="7h 30m"
-                  value={formData.tiempoEstimado}
-                  onChange={(e) => handleChange("tiempoEstimado", e.target.value)}
+                  value={formData.estimatedTravelTime}
+                  onChange={(e) => handleChange("estimatedTravelTime", e.target.value)}
                   className="pl-10"
                   required
                   disabled={isLoading}
@@ -276,28 +229,11 @@ export default function DestinoForm({ initialData, onSubmit, onCancel, isEditing
             <Textarea
               id="notas"
               placeholder="Ej: Horarios de atención, servicios disponibles en la terminal, información de contacto adicional..."
-              value={formData.notas}
-              onChange={(e) => handleChange("notas", e.target.value)}
+              value={formData.remarks}
+              onChange={(e) => handleChange("remarks", e.target.value)}
               disabled={isLoading}
               rows={3}
               className="resize-none"
-            />
-          </div>
-
-          <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-            <div className="space-y-0.5">
-              <Label htmlFor="activo" className="text-sm font-medium">
-                Estado del destino
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                {formData.activo ? "Este destino estΓ' activo y disponible" : "Este destino estΓ' inactivo"}
-              </p>
-            </div>
-            <Switch
-              id="activo"
-              checked={formData.activo}
-              onCheckedChange={(checked) => handleChange("activo", checked)}
-              disabled={isLoading}
             />
           </div>
 

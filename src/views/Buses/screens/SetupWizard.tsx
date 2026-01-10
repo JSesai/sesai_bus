@@ -4,7 +4,16 @@ import BusesStep from "./BusesStep"
 // import RoutesStep from "./steps/RoutesStep"
 // import SchedulesStep from "./steps/SchedulesStep"
 import FinishStep from "./FinishStep"
+import { MonitorCog } from "lucide-react"
+import RoutesStep from "./RoutesStep"
+import SchedulesStep from "./SchedulesStep"
 
+export type handlerSteps = {
+    onNext?: () => void;
+    onBack?: () => void;
+
+
+}
 const steps = [
     "Agencia",
     "Autobuses",
@@ -12,6 +21,8 @@ const steps = [
     "Horarios",
     "Finalizar"
 ]
+
+
 
 export default function SetupWizard() {
     const [step, setStep] = useState(0)
@@ -23,9 +34,13 @@ export default function SetupWizard() {
         <>
             {/* Header */}
             <div className="mb-6">
-                <h1 className="text-2xl font-bold text-cyan-400">
-                    Configuración inicial
-                </h1>
+                <div>
+                    <h1 className="text-2xl font-bold text-cyan-400 flex items-center gap-2">
+                        <MonitorCog />
+                        Configuración inicial
+                    </h1>
+
+                </div>
                 <p className="text-slate-400 text-sm">
                     Paso {step + 1} de {steps.length} — {steps[step]}
                 </p>
@@ -45,8 +60,8 @@ export default function SetupWizard() {
             {/* Step content */}
             {step === 0 && <AgencyStep onNext={next} />}
             {step === 1 && <BusesStep onNext={next} onBack={back} />}
-            {/* {step === 2 && <RoutesStep onNext={next} onBack={back} />}
-            {step === 3 && <SchedulesStep onNext={next} onBack={back} />} */}
+            {step === 2 && <RoutesStep onNext={next} onBack={back} />}
+            {step === 3 && <SchedulesStep onNext={next} onBack={back} />}
             {step === 2 && <FinishStep />}
         </>
     )

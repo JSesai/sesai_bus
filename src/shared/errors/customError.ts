@@ -56,3 +56,9 @@ export class AgencyError extends AppError {
         super(message, 401, details);
     }
 }
+
+export class DestinationRouteError extends AppError {
+    constructor(message:string, details?:string) {
+        super(message, 401, details);
+    }
+}
