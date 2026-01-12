@@ -22,7 +22,7 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     try {
       e.preventDefault()
-      setError("");
+      
       setLoading(true);
       if (!userName && !password) return setError("Por favor completa todos los campos");
       await login({ userName, password });

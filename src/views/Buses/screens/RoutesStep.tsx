@@ -5,10 +5,7 @@
 
 import { useDashboard } from "../../auth/context/DashBoardContext"
 import { Button } from "../../components/ui/button"
-import AgencieForm from "../components/AgencieForm"
-import DestinoForm from "../components/DestinoForm"
 import DestinationsManager from "./Destinations"
-import DestinosManager from "./Destinations"
 import type { handlerSteps } from "./SetupWizard"
 
 export default function RoutesStep({ onNext, onBack }: handlerSteps) {

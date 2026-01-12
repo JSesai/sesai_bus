@@ -23,6 +23,8 @@ export function registerRoutesHandlersTravel() {
   ipcMain.handle("getRouteById", (_, id: number) => routesTravelRepo.getById(id));
   ipcMain.handle("addRoute", async (_, route: Route): Promise<ResponseElectronGeneric> => {
     try {
+      console.log('init process add route');
+
       const routeAdd = await routesTravelRepo.add(route)
       if (!routeAdd) return { ok: false, data: null, error: { message: "No se obtuvo información", detail: "No hay routes debes agregar" } }
       return { ok: true, error: null, data: routeAdd }
@@ -36,7 +38,7 @@ export function registerRoutesHandlersTravel() {
     }
 
   });
-  ipcMain.handle("updateRoute", async (_, route): Promise<ResponseElectronGeneric>  => {
+  ipcMain.handle("updateRoute", async (_, route): Promise<ResponseElectronGeneric> => {
     try {
       const routeUpdate = await routesTravelRepo.update(route);
       if (!routeUpdate) return { ok: false, data: null, error: { message: "No se obtuvo información", detail: "No actualizó route - destino" } }

@@ -30,7 +30,6 @@ interface UsersAPI {
   addUser: (user: User) => Promise<ResponseElectronUser>;
   updateUser: (user: User) => Promise<ResponseElectronGeneric>;
   logout: () => Promise<ResponseElectronGeneric>;
-  delete: (id: number) => Promise<void>;
   authUser: (UserCredentials) => Promise<ResponseElectronUser>;
   checkSession: () => Promise<ResponseElectronUser>;
   generateUniqueUserName: (UserCredentials) => Promise<ResponseElectronGeneric>;
@@ -84,13 +83,13 @@ interface Driver {
   license_number: string;
 }
 
-interface BusesAPI {
-  getDrivers: () => Promise<Driver[]>;
-  getDriverById: (id: Driver['id']) => Promise<Driver>;
-  addDriver: (driver: Driver) => Promise<Driver>;
-  updateDriver: (driver: Driver) => Promise<void>;
-  deleteDriver: (id: Driver['id']) => Promise<void>;
-}
+// interface DriverAPI {
+//   getDrivers: () => Promise<Driver[]>;
+//   getDriverById: (id: Driver['id']) => Promise<Driver>;
+//   addDriver: (driver: Driver) => Promise<Driver>;
+//   updateDriver: (driver: Driver) => Promise<void>;
+//   deleteDriver: (id: Driver['id']) => Promise<void>;
+// }
 
 
 
@@ -99,7 +98,7 @@ interface Route {
   origin: Agency['city'];
   terminalName: string;
   cityName: string;
-  stateName: string;
+  // stateName: string;
   address: string;
   contactPhone: string;
   distanceFromOriginKm: number;
@@ -257,7 +256,7 @@ interface Window {
     users: UsersAPI;
     agency: AgencyAPI;
     buses: BusesAPI;
-    routeTravel: RouteTravelAPI;
+    routesTravel: RouteTravelAPI;
     schedules: ScheduleAPI;
     customers: CustomersAPI
     tickets: TicketAPI;

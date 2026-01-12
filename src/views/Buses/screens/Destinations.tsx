@@ -10,7 +10,6 @@ import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useSearchParams } from "react-router-dom"
 
 
-type view = "list" | "add" | "edit";
 
 export default function DestinationsManager({ configInitial = false }: { configInitial?: boolean }) {
   const { destinations, numberRegisteredDestinations } = useDashboard();
@@ -21,19 +20,15 @@ export default function DestinationsManager({ configInitial = false }: { configI
 
   const viewActiveAtDestination = searchParams.get("viewAtDestination") ?? "list";
 
-  const filteredDestinations = destinations.filter(
-    (destino) =>
-      destino.terminalName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      destino.cityName.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  const filteredDestinations = destinations.filter((destino) => destino.terminalName.toLowerCase().includes(searchTerm.toLowerCase()) || destino.cityName.toLowerCase().includes(searchTerm.toLowerCase()))
 
-  const handleAddDestino = (newDestino: Omit<Route, "id">) => {
+  const handleAddDestination = (newDestino: Omit<Route, "id">) => {
     // const id = Math.max(...destinations.map((d) => d.id), 0) + 1
     // setDestinations([...destinations, { ...newDestino, id }])
     // setView("list")
   }
 
-  const handleEditDestino = (updatedDestino: Omit<Route, "id">) => {
+  const handleEditDestination = (updatedDestino: Omit<Route, "id">) => {
     // if (editingDestino) {
     //   setDestinations(destinations.map((d) => (d.id === editingDestino.id ? { ...updatedDestino, id: editingDestino.id } : d)))
     //   setEditingDestino(null)
@@ -41,13 +36,13 @@ export default function DestinationsManager({ configInitial = false }: { configI
     // }
   }
 
-  const handleDeleteDestino = (id: Route['id']) => {
+  const handleDeleteDestination = (id: Route['id']) => {
     // if (confirm("ΒΏEstΓ's seguro de que deseas eliminar este destino?")) {
     //   setDestinations(destinations.filter((d) => d.id !== id))
     // }
   }
 
-  const handleToggleActivo = (id: Route['id']) => {
+  const handleToggleActiveDestination = (id: Route['id']) => {
     // setDestinations(destinations.map((d) => (d.id === id ? { ...d, activo: !d.activo } : d)))
   }
 
@@ -71,7 +66,7 @@ export default function DestinationsManager({ configInitial = false }: { configI
           <ArrowLeft className="h-4 w-4" />
           Volver a la lista
         </Button> */}
-        <DestinoForm configInitial={false} onCancel={() => {
+        <DestinoForm onCancel={() => {
           setSearchParams(prev => {
             prev.set('viewAtDestination', 'list')
             return prev;
@@ -89,7 +84,6 @@ export default function DestinationsManager({ configInitial = false }: { configI
           Volver a la lista
         </Button> */}
         <DestinoForm
-          configInitial={false}
           initialData={editingDestino}
           onCancel={() => {
             setEditingDestino(null)
@@ -152,7 +146,7 @@ export default function DestinationsManager({ configInitial = false }: { configI
                   </div>
                 </div>
                 <Badge variant={"default"} className="text-xs">
-                  "Activo"
+                  Activo
                 </Badge>
               </div>
 
@@ -197,7 +191,7 @@ export default function DestinationsManager({ configInitial = false }: { configI
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleDeleteDestino(destino.id)}
+                  onClick={() => handleDeleteDestination(destino.id)}
                   className="text-destructive hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />

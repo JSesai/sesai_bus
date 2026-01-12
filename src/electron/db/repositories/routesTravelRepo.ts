@@ -17,10 +17,10 @@ export const routesTravelRepo = {
 
   add: (route: Route) =>
     new Promise((resolve, reject) => {
-      const {origin, terminalName, stateName, cityName, address, baseFare,estimatedTravelTime, distanceFromOriginKm, remarks, contactPhone} = route;
+      const {origin, terminalName, cityName, address, baseFare,estimatedTravelTime, distanceFromOriginKm, remarks, contactPhone} = route;
       db.run(
-        "INSERT INTO routes (origin, terminalName, stateName, cityName, address, baseFare, estimatedTravelTime, distanceFromOriginKm, remarks, contactPhone) VALUES (?,?,?,?,?,?,?,?,?,?)",
-        [origin, terminalName, stateName, cityName, address, baseFare,estimatedTravelTime, distanceFromOriginKm, remarks, contactPhone],
+        "INSERT INTO routes (origin, terminalName, cityName, address, baseFare, estimatedTravelTime, distanceFromOriginKm, remarks, contactPhone) VALUES (?,?,?,?,?,?,?,?,?)",
+        [origin, terminalName, cityName, address, baseFare,estimatedTravelTime, distanceFromOriginKm, remarks, contactPhone],
         function (err) {
           if (err) reject(err);
           else resolve({ id: this.lastID, ...route });

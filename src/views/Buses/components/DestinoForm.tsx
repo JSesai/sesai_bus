@@ -1,12 +1,13 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Textarea } from "../../components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
-import { Alert, AlertDescription } from "../../components/ui/alert"
-import { MapPin, AlertCircle, MapIcon, Phone, DollarSign, Clock } from "lucide-react"
+import { MapPin, MapIcon, Phone, DollarSign, Clock } from "lucide-react"
 import { useDashboard } from "../../auth/context/DashBoardContext"
+import { useAuth } from "../../auth/context/AuthContext"
+import { useSearchParams } from "react-router-dom"
 
 
 
@@ -14,7 +15,6 @@ type DestinoFormProps = {
   initialData?: Route;
   onCancel?: () => void
   isEditing?: boolean;
-  configInitial: boolean;
 }
 
 
@@ -28,27 +28,55 @@ const initialStateForm: Route = {
   baseFare: 0,
   estimatedTravelTime: "",
   remarks: "",
-  stateName: "",
   origin: ""
 }
 
-export default function DestinoForm({ initialData, onCancel, isEditing = false, configInitial = false }: DestinoFormProps) {
-  const { isLoading, handleRegisterRoute } = useDashboard();
+export default function DestinoForm({ initialData, onCancel, isEditing = false }: DestinoFormProps) {
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { agency, isLoading, handleRegisterRoute } = useDashboard();
+  const { userLogged } = useAuth();
+
   const [formData, setFormData] = useState<Route>(initialData ?? initialStateForm)
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const registerDestination = await handleRegisterRoute(formData, isEditing, configInitial);
-    if (registerDestination) setFormData(initialStateForm);
+    const registerDestination = await handleRegisterRoute(formData, isEditing);
+    if (registerDestination){
+      setFormData(initialStateForm);
+      setSearchParams(prev => {
+        prev.set('viewAtDestination', 'list')
+        return prev;
+      })
+
+    } 
 
   }
 
   const handleChange = (field: keyof Route, value: string | number | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
+
+
+  useEffect(() => {
+
+    if (userLogged?.role === 'developer' && !initialData) {
+      setFormData({
+        cityName: 'Oaxaca',
+        address: 'av Reforma 222',
+        contactPhone: '5522552255',
+        baseFare: 250,
+        origin: agency?.city || "city",
+        distanceFromOriginKm: 100,
+        estimatedTravelTime: '8',
+        terminalName: 'terminal periferico',
+        remarks: 'Inicia servicio de atención a las 11:00 am'
+      })
+    }
+
+  }, [])
+
 
   return (
     <Card className="w-full max-w-3xl mx-auto shadow-lg">
@@ -68,26 +96,10 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
 
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-5">
-          {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {success && (
-            <Alert className="border-green-600 bg-green-50 dark:bg-green-950/20">
-              <AlertCircle className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-800 dark:text-green-400">
-                {isEditing ? "Destino actualizado exitosamente" : "Destino registrado exitosamente en el sistema"}
-              </AlertDescription>
-            </Alert>
-          )}
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="nombre" className="text-sm font-medium">
-                Nombre del destino <span className="text-destructive">*</span>
+                Nombre de la terminal destino <span className="text-destructive">*</span>
               </Label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -106,7 +118,7 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
 
             <div className="space-y-2">
               <Label htmlFor="estado" className="text-sm font-medium">
-                Estado / Región <span className="text-destructive">*</span>
+                Estado / Región del destino <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="estado"
@@ -252,11 +264,8 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
                   <span className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                   {isEditing ? "Actualizando..." : "Guardando..."}
                 </span>
-              ) : isEditing ? (
-                "Actualizar destino"
-              ) : (
-                "Agregar destino"
-              )}
+              ) : isEditing ? "Actualizar destino" : "Agregar destino"
+              }
             </Button>
           </div>
         </form>

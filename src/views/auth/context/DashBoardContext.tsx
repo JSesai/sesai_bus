@@ -59,7 +59,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
                     duration: 10_000,
                     position: 'top-center'
                 });
-                return 
+                return
             }
 
         } finally {
@@ -244,12 +244,13 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const handleRegisterRoute = async (destination: Route, editingRoute: boolean = false, configInitial = false): Promise<boolean> => {
 
         try {
+            console.log('init proces register route', destination);
             const { terminalName, cityName, address, contactPhone, estimatedTravelTime } = destination;
             // Validaciones
             if (!terminalName || !cityName || !address || !contactPhone || !estimatedTravelTime) throw new DestinationRouteError("Por favor completa todos los campos obligatorios")
-
+            destination.origin = agency?.city ?? '';
             setIsLoading(true);
-            const resp = editingRoute ? await window.electron.routeTravel.updateRoute(destination) : await window.electron.routeTravel.addRoute(destination);
+            const resp = editingRoute ? await window.electron.routesTravel.updateRoute(destination) : await window.electron.routesTravel.addRoute(destination);
 
             console.log(resp);
             if (resp.ok) {
@@ -273,6 +274,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             if (resp.error) throw new DestinationRouteError(resp.error.message, resp.error?.detail);
 
         } catch (e) {
+            console.log('error al agregar destino / route', e);
+
             if (e instanceof AppError) {
 
                 toast.error(e.message, {

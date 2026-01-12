@@ -71,14 +71,14 @@ CREATE TABLE IF NOT EXISTS routes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     origin TEXT NOT NULL,
     terminalName TEXT NOT NULL,
-    stateName TEXT NOT NULL,
+    -- stateName TEXT NOT NULL,
     cityName TEXT NOT NULL,
     address TEXT NOT NULL,
     baseFare TEXT NOT NULL,
     estimatedTravelTime TEXT,
     distanceFromOriginKm TEXT NOT NULL,
     remarks TEXT,
-    phone TEXT,
+    contactPhone TEXT,
     status TEXT NOT NULL DEFAULT 'active',
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
 
