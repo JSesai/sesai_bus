@@ -40,6 +40,7 @@ export function registerRoutesHandlersTravel() {
   });
   ipcMain.handle("updateRoute", async (_, route): Promise<ResponseElectronGeneric> => {
     try {
+      console.log('init process update route');
       const routeUpdate = await routesTravelRepo.update(route);
       if (!routeUpdate) return { ok: false, data: null, error: { message: "No se obtuvo información", detail: "No actualizó route - destino" } }
       return { ok: true, error: null, data: routeUpdate }

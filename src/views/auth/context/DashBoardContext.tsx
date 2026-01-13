@@ -295,12 +295,46 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
     }
 
+    //manejador para obtener buses
+    const handleGetRoutes = async (): Promise<void> => {
+
+        try {
+            setIsLoading(true);
+            const destinatios = await window.electron.routesTravel.getRoutes();
+            console.log(destinatios);
+            if (!destinatios.ok) {
+                setDestinations([]);
+                return;
+            }
+
+            setDestinations(destinatios?.data);
+
+        } catch (e) {
+            console.log('ocurrio un error al obtener los destinos', e);
+            
+            if (e instanceof AppError) {
+
+                toast.error(e.message, {
+                    richColors: true,
+                    description: e.details,
+                    duration: 10_000,
+                    position: 'top-center'
+                });
+                return
+            }
+
+        } finally {
+            setIsLoading(false)
+        }
+
+    }
+
 
     const loadSystemInformation = async () => {
         try {
 
             //multiples peticiones para traer informacion del sistema busesm horarios, clientes, ventas, etc...
-            const results = await Promise.allSettled([getAgency(), handleGetBuses()]);
+            const results = await Promise.allSettled([getAgency(), handleGetBuses(), handleGetRoutes()]);
             results.forEach((result, index) => {
                 if (result.status === "fulfilled") {
                     console.log(`Petición ${index} OK:`, result.value);
@@ -309,12 +343,10 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
                 }
             });
 
-
         } catch (error) {
             console.log('error al obtener data system', error);
 
         }
-
 
     }
 

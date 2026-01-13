@@ -17,10 +17,10 @@ export const routesTravelRepo = {
 
   add: (route: Route) =>
     new Promise((resolve, reject) => {
-      const {origin, terminalName, cityName, address, baseFare,estimatedTravelTime, distanceFromOriginKm, remarks, contactPhone} = route;
+      const { origin, terminalName, cityName, address, baseFare, estimatedTravelTime, distanceFromOriginKm, remarks, contactPhone } = route;
       db.run(
         "INSERT INTO routes (origin, terminalName, cityName, address, baseFare, estimatedTravelTime, distanceFromOriginKm, remarks, contactPhone) VALUES (?,?,?,?,?,?,?,?,?)",
-        [origin, terminalName, cityName, address, baseFare,estimatedTravelTime, distanceFromOriginKm, remarks, contactPhone],
+        [origin, terminalName, cityName, address, baseFare, estimatedTravelTime, distanceFromOriginKm, remarks, contactPhone],
         function (err) {
           if (err) reject(err);
           else resolve({ id: this.lastID, ...route });
@@ -28,16 +28,36 @@ export const routesTravelRepo = {
       );
     }),
 
-  update: (route: { id: number; origin?: string; destination?: string; distance_km?: number }) =>
+  update: (route: Route) =>
     new Promise((resolve, reject) => {
       db.run(
-        "UPDATE routes SET origin = COALESCE(?, origin), destination = COALESCE(?, destination), distance_km = COALESCE(?, distance_km) WHERE id = ?",
-        [route.origin, route.destination, route.distance_km, route.id],
+        `UPDATE routes SET
+        origin = COALESCE(?, origin),
+        terminalName = COALESCE(?, terminalName), 
+        cityName = COALESCE(?, cityName),
+        address = COALESCE(?, address), 
+        baseFare = COALESCE(?, baseFare),
+        estimatedTravelTime = COALESCE(?, estimatedTravelTime), 
+        distanceFromOriginKm = COALESCE(?, distanceFromOriginKm), 
+        remarks = COALESCE(?, remarks), 
+        contactPhone = COALESCE(?, contactPhone) 
+        WHERE id = ?`,
+        [
+          route.origin,
+          route.terminalName,
+          route.cityName,
+          route.address,
+          route.baseFare,
+          route.estimatedTravelTime,
+          route.distanceFromOriginKm,
+          route.remarks,
+          route.contactPhone,
+          route.id,
+        ],
         function (err) {
           if (err) reject(err);
           else resolve({ changes: this.changes });
-        }
-      );
+        });
     }),
 
   delete: (id: number) =>

@@ -15,6 +15,7 @@ type DestinoFormProps = {
   initialData?: Route;
   onCancel?: () => void
   isEditing?: boolean;
+  configInitial?: boolean;
 }
 
 
@@ -31,7 +32,7 @@ const initialStateForm: Route = {
   origin: ""
 }
 
-export default function DestinoForm({ initialData, onCancel, isEditing = false }: DestinoFormProps) {
+export default function DestinoForm({ initialData, onCancel, isEditing = false, configInitial = false }: DestinoFormProps) {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const { agency, isLoading, handleRegisterRoute } = useDashboard();
@@ -41,16 +42,17 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log({ isEditing });
 
-    const registerDestination = await handleRegisterRoute(formData, isEditing);
-    if (registerDestination){
+    const registerDestination = await handleRegisterRoute(formData, isEditing, configInitial);
+    if (registerDestination) {
       setFormData(initialStateForm);
       setSearchParams(prev => {
         prev.set('viewAtDestination', 'list')
         return prev;
       })
 
-    } 
+    }
 
   }
 

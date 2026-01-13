@@ -109,7 +109,7 @@ interface Route {
 }
 
 interface RouteTravelAPI {
-  getRoutes: () => Promise<Route[]>;
+  getRoutes: () => Promise<ResponseElectronRoutesTravel>;
   getRouteById: (id: Route['id']) => Promise<Route>;
   addRoute: (routeTravel: Route) => Promise<ResponseElectronGeneric>;
   updateRoute: (routeTravel: Route) => Promise<ResponseElectronGeneric>;
@@ -227,7 +227,7 @@ interface ResponseElectronBuses {
 
 interface ResponseElectronRoutesTravel {
   ok: boolean,
-  data: Route[] | null;
+  data: Route[];
   error: null | ErrorApp
 }
 
