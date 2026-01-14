@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS drivers (
 CREATE TABLE IF NOT EXISTS routes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     origin TEXT NOT NULL,
-    terminalName TEXT NOT NULL,
+    terminalName TEXT NOT NULL UNIQUE,
     -- stateName TEXT NOT NULL,
     cityName TEXT NOT NULL,
     address TEXT NOT NULL,
@@ -86,7 +86,6 @@ CREATE TABLE IF NOT EXISTS routes (
 
 
 -- 5. SCHEDULES (Salidas programadas)
-
 CREATE TABLE IF NOT EXISTS schedules (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     route_id INTEGER NOT NULL,
@@ -111,7 +110,7 @@ CREATE TABLE IF NOT EXISTS customers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     email TEXT UNIQUE,
-    phone TEXT NOT NULL,
+    phone TEXT NOT NULL UNIQUE,
     status TEXT NOT NULL DEFAULT 'active',
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
 

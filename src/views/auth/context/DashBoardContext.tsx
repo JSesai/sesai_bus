@@ -141,8 +141,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
                     duration: 10_000,
                     position: 'top-center'
                 })
-
-                setVehicles([...vehicles, resp.data]);
+                const vehiclesUpdate = editingBus ? vehicles.map(v => v.id === bus.id ? bus : v) : [...vehicles, resp.data];
+                setVehicles(vehiclesUpdate);
                 return true;
             }
 
@@ -245,6 +245,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
         try {
             console.log('init proces register route', destination);
+            console.log({ editingRoute });
+
             const { terminalName, cityName, address, contactPhone, estimatedTravelTime } = destination;
             // Validaciones
             if (!terminalName || !cityName || !address || !contactPhone || !estimatedTravelTime) throw new DestinationRouteError("Por favor completa todos los campos obligatorios")
@@ -267,7 +269,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
                     position: 'top-center'
                 })
 
-                setDestinations([...destinations, destination]);
+                const updateDestinations = editingRoute ? destinations.map(d => d.id === destination.id ? destination : d) : [...destinations, destination];
+                setDestinations(updateDestinations);
                 return true;
             }
 
@@ -311,7 +314,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
         } catch (e) {
             console.log('ocurrio un error al obtener los destinos', e);
-            
+
             if (e instanceof AppError) {
 
                 toast.error(e.message, {

@@ -28,11 +28,23 @@ export function registerRoutesHandlersTravel() {
       const routeAdd = await routesTravelRepo.add(route)
       if (!routeAdd) return { ok: false, data: null, error: { message: "No se obtuvo información", detail: "No hay routes debes agregar" } }
       return { ok: true, error: null, data: routeAdd }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       if (error instanceof DestinationRouteError) {
         return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
       }
+
+      if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('routes.terminalName')) {
+        return {
+          ok: false,
+          data: null,
+          error: {
+            message: 'La terminal destino ya se encuentra registrada',
+            detail: 'Cambia el nombre de la terminal destino'
+          }
+        };
+      }
+
 
       return { ok: false, data: null, error: { message: "Error interno no esperado", detail: "No fue posible obtener la configuración" } };
     }
@@ -40,15 +52,17 @@ export function registerRoutesHandlersTravel() {
   });
   ipcMain.handle("updateRoute", async (_, route): Promise<ResponseElectronGeneric> => {
     try {
-      console.log('init process update route');
+      console.log('init process update route', route);
       const routeUpdate = await routesTravelRepo.update(route);
       if (!routeUpdate) return { ok: false, data: null, error: { message: "No se obtuvo información", detail: "No actualizó route - destino" } }
       return { ok: true, error: null, data: routeUpdate }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       if (error instanceof DestinationRouteError) {
         return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
       }
+
+
 
       return { ok: false, data: null, error: { message: "Error interno no esperado", detail: "No fue posible actualizar route - destino" } };
     }
