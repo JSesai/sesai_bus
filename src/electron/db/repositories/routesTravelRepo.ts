@@ -31,17 +31,19 @@ export const routesTravelRepo = {
   update: (route: Route) =>
     new Promise((resolve, reject) => {
       db.run(
-        `UPDATE routes SET
-        origin = COALESCE(?, origin),
-        terminalName = COALESCE(?, terminalName), 
-        cityName = COALESCE(?, cityName),
-        address = COALESCE(?, address), 
-        baseFare = COALESCE(?, baseFare),
-        estimatedTravelTime = COALESCE(?, estimatedTravelTime), 
-        distanceFromOriginKm = COALESCE(?, distanceFromOriginKm), 
-        remarks = COALESCE(?, remarks), 
-        contactPhone = COALESCE(?, contactPhone) 
-        WHERE id = ?`,
+        `
+        UPDATE routes SET
+          origin                  = COALESCE(?, origin),
+          terminalName            = COALESCE(?, terminalName), 
+          cityName                = COALESCE(?, cityName),
+          address                 = COALESCE(?, address), 
+          baseFare                = COALESCE(?, baseFare),
+          estimatedTravelTime     = COALESCE(?, estimatedTravelTime), 
+          distanceFromOriginKm    = COALESCE(?, distanceFromOriginKm), 
+          remarks                 = COALESCE(?, remarks), 
+          contactPhone            = COALESCE(?, contactPhone) 
+        WHERE id = ?
+        `,
         [
           route.origin,
           route.terminalName,

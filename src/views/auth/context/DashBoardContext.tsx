@@ -332,7 +332,6 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
     }
 
-
     const loadSystemInformation = async () => {
         try {
 

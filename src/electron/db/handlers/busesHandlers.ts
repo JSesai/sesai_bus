@@ -45,11 +45,9 @@ export function busesHandlers() {
         return { ok: false, data: null, error: { message: 'Placas ya registradas', detail: 'El número de placas ya está asociada a otro autobus' } };
       }
       if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('buses.serialNumber')) {
-        return { ok: false, data: null, error: { message: 'Número de serie ya registrado', detail: 'El número de serie ya está asociada a otro autobus' } };
+        return { ok: false, data: null, error: { message: 'Número de serie ya registrado', detail: 'El número de serie ya está asociado a otro autobus' } };
       }
-      if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('buses.number')) {
-        return { ok: false, data: null, error: { message: 'Numero ya esta registrado', detail: 'El número de autobus ya está asociada a otro autobus' } };
-      }
+   
 
 
       return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible agregar el bus" } };
@@ -64,8 +62,16 @@ export function busesHandlers() {
 
       return { ok: true, error: null, data: response }
 
-    } catch (error) {
+    } catch (error: any) {
       console.log('error al actualizar bus ->', error);
+
+      if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('buses.plate')) {
+        return { ok: false, data: null, error: { message: 'Placas ya registradas', detail: 'El número de placas ya está asociada a otro autobus' } };
+      }
+      if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('buses.serialNumber')) {
+        return { ok: false, data: null, error: { message: 'Número de serie ya registrado', detail: 'El número de serie ya está asociado a otro autobus' } };
+      }
+      
 
       return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible actualizar el bus" } };
 

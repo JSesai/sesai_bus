@@ -7,6 +7,8 @@ export function registerRoutesHandlersTravel() {
 
     try {
       const routes = await routesTravelRepo.getAll()
+      console.log('routes', routes);
+
       if (!routes) return { ok: false, data: null, error: { message: "No se obtuvo información", detail: "No hay routes debes agregar" } }
       return { ok: true, error: null, data: routes }
     } catch (error) {
@@ -62,9 +64,12 @@ export function registerRoutesHandlersTravel() {
         return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
       }
 
-
+      if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('routes.terminalName')) {
+        return { ok: false, data: null, error: { message: 'La terminal destino ya se encuentra registrada', detail: 'Cambia el nombre de la terminal destino' } };
+      }
 
       return { ok: false, data: null, error: { message: "Error interno no esperado", detail: "No fue posible actualizar route - destino" } };
+
     }
 
 

@@ -21,6 +21,9 @@ export default function DestinationsManager({ configInitial = false }: { configI
   const viewActiveAtDestination = searchParams.get("viewAtDestination") ?? "list";
 
   const filteredDestinations = destinations.filter((destino) => destino.terminalName.toLowerCase().includes(searchTerm.toLowerCase()) || destino.cityName.toLowerCase().includes(searchTerm.toLowerCase()))
+  console.log(filteredDestinations);
+  console.log({ destinations });
+
 
   const handleAddDestination = (newDestino: Omit<Route, "id">) => {
     // const id = Math.max(...destinations.map((d) => d.id), 0) + 1
