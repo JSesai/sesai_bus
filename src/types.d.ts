@@ -127,7 +127,7 @@ interface Schedule {
 }
 
 interface ScheduleAPI {
-  getSchedules: () => Promise<Schedule[]>;
+  getSchedules: () => Promise<ResponseElectronGeneric>;
   getScheduleById: (id: Schedule['id']) => Promise<Schedule>;
   addSchedule: (schedule: Schedule) => Promise<Schedule>;
   updateSchedule: (schedule: Schedule['id']) => Promise<void>;

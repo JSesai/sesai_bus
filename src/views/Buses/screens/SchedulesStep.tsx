@@ -1,24 +1,30 @@
 
 
 
+import { useDashboard } from "../../auth/context/DashBoardContext";
 import { Button } from "../../components/ui/button"
-import AgencieForm from "../components/AgencieForm"
 import SchedulesManager from "../components/SchedulesManager"
 import type { handlerSteps } from "./SetupWizard"
 
-export default function SchedulesStep({ onNext }: handlerSteps) {
+export default function SchedulesStep({ onNext, onBack }: handlerSteps) {
 
 
-   
+    const { numberRegisterSchedule } = useDashboard();
+
 
     return (
         <div className="space-y-6">
 
-            <SchedulesManager />
+            <SchedulesManager configInitial={true}  />
 
             <div className="flex justify-end">
-                <Button onClick={onNext}>
-                    Guardar y continuar
+
+                <Button variant="outline" onClick={onBack}>
+                    Atrás
+                </Button>
+
+                <Button onClick={onNext} disabled={numberRegisterSchedule === 0}>
+                    continuar
                 </Button>
             </div>
         </div>

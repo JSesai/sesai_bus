@@ -62,3 +62,9 @@ export class DestinationRouteError extends AppError {
         super(message, 401, details);
     }
 }
+
+export class ScheduleError extends AppError {
+    constructor(message:string, details?:string) {
+        super(message, 401, details);
+    }
+}

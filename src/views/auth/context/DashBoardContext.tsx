@@ -12,6 +12,8 @@ type DashboardContextType = {
     destinations: Route[];
     numberRegisteredVehicles: number;
     numberRegisteredDestinations: number;
+    runningSchedules: Schedule[];
+    numberRegisterSchedule: number;
 
 
     //methods
@@ -30,7 +32,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(false);
     const [agency, setAgency] = useState<Agency | null>(null);
     const [vehicles, setVehicles] = useState<Bus[]>([]);
-    const [destinations, setDestinations] = useState<Route[]>([])
+    const [destinations, setDestinations] = useState<Route[]>([]);
+    const [runningSchedules, setRunningSchedules] = useState<Schedule[]>([]);
 
 
     //manejador para obtener buses
@@ -332,11 +335,45 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
     }
 
+    //manejador para obtener horariosde  salidas
+    const handleGetSchedules = async (): Promise<void> => {
+
+        try {
+            setIsLoading(true);
+            const schedules = await window.electron.schedules.getSchedules();
+            console.log({ schedules });
+            if (!schedules.ok) {
+                setRunningSchedules([]);
+                return;
+            }
+
+            setRunningSchedules(schedules?.data);
+
+        } catch (e) {
+            console.log('ocurrio un error al obtener los horarios', e);
+
+            if (e instanceof AppError) {
+
+                toast.error(e.message, {
+                    richColors: true,
+                    description: e.details,
+                    duration: 10_000,
+                    position: 'top-center'
+                });
+                return
+            }
+
+        } finally {
+            setIsLoading(false)
+        }
+
+    }
+
     const loadSystemInformation = async () => {
         try {
 
             //multiples peticiones para traer informacion del sistema busesm horarios, clientes, ventas, etc...
-            const results = await Promise.allSettled([getAgency(), handleGetBuses(), handleGetRoutes()]);
+            const results = await Promise.allSettled([getAgency(), handleGetBuses(), handleGetRoutes(), handleGetSchedules()]);
             results.forEach((result, index) => {
                 if (result.status === "fulfilled") {
                     console.log(`Petición ${index} OK:`, result.value);
@@ -369,11 +406,13 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             handleRegisterAgency,
             handleRegisterRoute,
             destinations,
+            runningSchedules,
             vehicles,
             isLoading,
             agency,
             numberRegisteredVehicles: vehicles.length,
             numberRegisteredDestinations: destinations.length,
+            numberRegisterSchedule: runningSchedules.length
 
 
         }}>

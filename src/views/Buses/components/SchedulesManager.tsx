@@ -7,6 +7,7 @@ import { Badge } from "../../components/ui/badge"
 import { Input } from "../../components/ui/input"
 import { Clock, Plus, Search, Edit, Trash2, ArrowLeft, Bus, MapPin, Calendar } from "lucide-react"
 import ScheduleForm from "./ScheduleForm"
+import { useDashboard } from "../../auth/context/DashBoardContext"
 
 // Datos de ejemplo - reemplazar con datos de tu base de datos
 const initialHorarios = [
@@ -62,7 +63,12 @@ const initialHorarios = [
 
 type Horario = (typeof initialHorarios)[0]
 
-export default function SchedulesManager() {
+
+// poner search params para manejar las vista activa
+
+
+export default function SchedulesManager({ configInitial = false }: { configInitial?: boolean }) {
+  const { numberRegisterSchedule } = useDashboard();
   const [horarios, setHorarios] = useState<Horario[]>(initialHorarios)
   const [searchTerm, setSearchTerm] = useState("")
   const [view, setView] = useState<"list" | "add" | "edit">("list")
@@ -141,24 +147,29 @@ export default function SchedulesManager() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-balance mb-2">Gestión de Horarios</h1>
-          <p className="text-muted-foreground text-pretty">Administra los horarios y rutas disponibles</p>
+          <p className="text-muted-foreground text-pretty">Administra los horarios y salidas disponibles</p>
         </div>
-        <Button onClick={() => setView("add")} size="lg" className="gap-2">
-          <Plus className="h-5 w-5" />
-          Agregar Horario
-        </Button>
+        {configInitial ??
+          <Button onClick={() => setView("add")} size="lg" className="gap-2">
+            <Plus className="h-5 w-5" />
+            Agregar Horario
+          </Button>
+
+        }
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="text"
-          placeholder="Buscar por origen, destino o autobΓΊs..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 h-11"
-        />
-      </div>
+      {configInitial ??
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Buscar por origen, destino o autobΓΊs..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 h-11"
+          />
+        </div>
+      }
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filteredHorarios.map((horario) => (

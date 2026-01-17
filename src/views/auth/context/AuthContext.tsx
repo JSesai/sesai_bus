@@ -70,33 +70,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const systemConfigurationStatus = async (): Promise<AppConfigStatus> => {
     try {
-        const validateAppConfig = await window.electron.appConfig.getAppConfig();
-        console.log({ validateAppConfig });
+      const validateAppConfig = await window.electron.appConfig.getAppConfig();
+      console.log({ validateAppConfig });
 
-        return (!validateAppConfig.data?.initial_setup_completed) ? "incomplete" : "complete"
+      return (!validateAppConfig.data?.initial_setup_completed) ? "incomplete" : "complete"
 
     } catch (error) {
-        console.log('error al obtener el estatus de configuración', error);
-        return "incomplete"
+      console.log('error al obtener el estatus de configuración', error);
+      return "incomplete"
 
     }
-}
+  }
 
 
-const validateSystemConfiguration = async () => {
+  const validateSystemConfiguration = async () => {
     console.log('ejecutando validacion de configuracion del sistema');
 
     const currentConfiguration = await systemConfigurationStatus();
+    console.log({ systemConfigurationStatus });
+
     currentConfiguration === "complete" ? navigate('/dashboard/ticket') : navigate('/setup');;
 
 
-}
+  }
   // Login
   const login = async (userData: UserCredentials) => {
     try {
       console.log('haciendo login', userData);
       const validateUser = await window.electron.users.authUser(userData);
-   
+
       if (validateUser.data && validateUser.data.status === 'registered') {
         toast.warning('Acción requerida', {
           description: 'Debes de actualizar tu contraseña',
@@ -121,7 +123,7 @@ const validateSystemConfiguration = async () => {
 
       setUserLogged(validateUser.data);
       validateSystemConfiguration();
-      
+
     } catch (error) {
       console.log('el error', error);
 
