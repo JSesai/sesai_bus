@@ -1,16 +1,17 @@
 import { ipcMain } from "electron";
 import { routesTravelRepo } from "../repositories/routesTravelRepo.js";
 import { AppError, DestinationRouteError } from "../../../shared/errors/customError.js";
+import { HHMMToTimestamp, timestamToHHMM } from "../../../shared/utils/helpers.js";
 
 export function registerRoutesHandlersTravel() {
   ipcMain.handle("getRoutes", async (): Promise<ResponseElectronGeneric> => {
 
     try {
-      const routes = await routesTravelRepo.getAll()
+      const routes: Route[] = await routesTravelRepo.getAll()
       console.log('routes', routes);
-
       if (!routes) return { ok: false, data: null, error: { message: "No se obtuvo información", detail: "No hay routes debes agregar" } }
-      return { ok: true, error: null, data: routes }
+      const routesMaped = routes.map(route => ({ ...route, estimatedTravelTime: timestamToHHMM(Number(route.estimatedTravelTime)) || route.estimatedTravelTime }))
+      return { ok: true, error: null, data: routesMaped }
     } catch (error) {
       console.log(error);
       if (error instanceof DestinationRouteError) {
@@ -25,11 +26,11 @@ export function registerRoutesHandlersTravel() {
   ipcMain.handle("getRouteById", (_, id: number) => routesTravelRepo.getById(id));
   ipcMain.handle("addRoute", async (_, route: Route): Promise<ResponseElectronGeneric> => {
     try {
-      console.log('init process add route');
-
-      const routeAdd = await routesTravelRepo.add(route)
+      console.log('init process add route -->', route);
+      const estimatedTravelTimeAtTimeStamp = HHMMToTimestamp(String(route.estimatedTravelTime));
+      const routeAdd = await routesTravelRepo.add({ ...route, estimatedTravelTime: estimatedTravelTimeAtTimeStamp })
       if (!routeAdd) return { ok: false, data: null, error: { message: "No se obtuvo información", detail: "No hay routes debes agregar" } }
-      return { ok: true, error: null, data: routeAdd }
+      return { ok: true, error: null, data: { ...routeAdd, estimatedTravelTime: route.estimatedTravelTime } }
     } catch (error: any) {
       console.log(error);
       if (error instanceof DestinationRouteError) {
@@ -55,11 +56,12 @@ export function registerRoutesHandlersTravel() {
   ipcMain.handle("updateRoute", async (_, route: Route): Promise<ResponseElectronGeneric> => {
     try {
       console.log('init process update route', route);
-      if(!route.id) throw new DestinationRouteError("Falta id para poder actualizar destino");
+      if (!route.id) throw new DestinationRouteError("Falta id para poder actualizar destino");
       route.terminalName = route.terminalName.trim();
-      const routeUpdate = await routesTravelRepo.update(route);
+      const estimatedTravelTimeAtTimeStamp = HHMMToTimestamp(String(route.estimatedTravelTime));
+      const routeUpdate = await routesTravelRepo.update({ ...route, estimatedTravelTime: estimatedTravelTimeAtTimeStamp });
       if (!routeUpdate) return { ok: false, data: null, error: { message: "No se obtuvo información", detail: "No actualizó route - destino" } }
-      return { ok: true, error: null, data: routeUpdate }
+      return { ok: true, error: null, data: { ...routeUpdate, estimatedTravelTime: route.estimatedTravelTime } }
     } catch (error: any) {
       console.log(error);
       if (error instanceof DestinationRouteError) {

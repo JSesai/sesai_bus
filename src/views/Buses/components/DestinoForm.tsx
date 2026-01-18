@@ -186,7 +186,7 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
                 type="number"
                 placeholder="550"
                 value={formData.distanceFromOriginKm}
-                onChange={(e) => handleChange("distanceFromOriginKm", Number.parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleChange("distanceFromOriginKm",  Number.parseFloat(e.target.value) || 0)}
                 required
                 disabled={isLoading}
                 min="0"

@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS routes (
     cityName TEXT NOT NULL,
     address TEXT NOT NULL,
     baseFare TEXT NOT NULL,
-    estimatedTravelTime TEXT,
+    estimatedTravelTime INTEGER,
     distanceFromOriginKm TEXT NOT NULL,
     remarks TEXT,
     contactPhone TEXT,

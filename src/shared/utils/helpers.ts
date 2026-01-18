@@ -1,4 +1,6 @@
 
+import { parse, addMinutes, format, addHours } from "date-fns";
+
 
 // Format time
 export const formatTime = (date: Date) => {
@@ -45,3 +47,65 @@ export function translateRole(role?: Rol): string {
 
     return roleMap[role] ?? role
 }
+
+
+
+// Función para sumar minutos a un string "HH:mm"
+export const addTimeOnMinutes = (horaStr: string, minutosASumar: number): string => {
+    // Parsear el string a un objeto Date
+    const date = parse(horaStr, "HH:mm", new Date());
+
+    // Sumar minutos
+    const nuevaHora = addMinutes(date, minutosASumar);
+
+    // Formatear de nuevo a "HH:mm"
+    return format(nuevaHora, "HH:mm");
+}
+
+
+
+export const addTimeOnHours = (horaStr: string, horasASumar: number): string => {
+    const date = parse(horaStr, "HH:mm", new Date());
+    const nuevaHora = addHours(date, horasASumar);
+    return format(nuevaHora, "HH:mm");
+}
+
+
+
+export const sumarHorasYMinutos = (horaBase: string, tiempoASumar: string): string => {
+    // Parsear la hora base
+    const baseDate = parse(horaBase, "HH:mm", new Date());
+
+    // Separar horas y minutos del tiempo a sumar
+    const [horas, minutos] = tiempoASumar.split(":").map(Number);
+
+    // Convertir todo a minutos
+    const totalMinutos = horas * 60 + minutos;
+
+    // Sumar minutos
+    const nuevaHora = addMinutes(baseDate, totalMinutos);
+
+    // Formatear resultado
+    return format(nuevaHora, "HH:mm");
+}
+
+
+
+export const HHMMToTimestamp = (horaStr: string): number | string => {
+    try {
+        const [horas, minutos] = horaStr.includes(":") ? horaStr.split(":").map(Number) : [Number(horaStr), 0];
+        console.log({ horas, minutos });
+    
+        return horas * 60 + minutos;
+        
+    } catch (error) {
+        return horaStr
+    }
+};
+
+export const timestamToHHMM = (minutos: number) => {
+    const date = new Date(0, 0, 0, 0, minutos); // base ficticia
+    return format(date, "HH:mm");
+};
+
+

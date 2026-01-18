@@ -272,7 +272,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
                     position: 'top-center'
                 })
 
-                const updateDestinations = editingRoute ? destinations.map(d => d.id === destination.id ? destination : d) : [...destinations, destination];
+                const updateDestinations = editingRoute ? destinations.map(d => d.id === destination.id ? destination : d) : [...destinations, resp.data];
                 setDestinations(updateDestinations);
                 return true;
             }

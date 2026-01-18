@@ -103,7 +103,7 @@ interface Route {
   contactPhone: string;
   distanceFromOriginKm: number;
   baseFare: number;
-  estimatedTravelTime: string;
+  estimatedTravelTime: string | number;
   remarks: string;
 
 }

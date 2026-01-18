@@ -73,7 +73,18 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
     }))
   }
 
-  if (!agency) throw new ScheduleError("No se encontro registro de agencia")
+  if (!agency) throw new ScheduleError("No se encontro registro de agencia");
+
+  const handleDepartureTime = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const deapureTime = e.target.value;
+
+    const arrivalTime = Number(deapureTime) + Number(destinations[0].estimatedTravelTime)
+    console.log({ deapureTime, arrivalTime });
+    setFormData({ ...formData, horaSalida: e.target.value, horaLlegada: e.target.value })
+
+  }
+  console.log(formData);
+
 
   return (
     <Card className="max-w-3xl mx-auto">
@@ -113,7 +124,7 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
                 </SelectTrigger>
                 <SelectContent>
                   {destinations.map((destino) => (
-                    <SelectItem key={destino.id} value={destino.terminalName}>
+                    <SelectItem key={destino.id} value={String(destino.id)}>
                       {destino.cityName}{' - '}{destino.terminalName}
                     </SelectItem>
                   ))}
@@ -131,13 +142,7 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
                 type="time"
                 value={formData.horaSalida}
                 defaultValue={'10:00'}
-                onChange={(e) => {
-                  console.log(formData);
-
-                  console.log({ horaSalida: e.target.value });
-
-                  setFormData({ ...formData, horaSalida: e.target.value })
-                }}
+                onChange={handleDepartureTime}
                 className="h-11"
                 required
               />

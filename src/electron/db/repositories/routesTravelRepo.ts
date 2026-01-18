@@ -3,9 +3,9 @@ import { getDB } from "../connection.js";
 const db = getDB();
 
 export const routesTravelRepo = {
-  getAll: () =>
+  getAll: (): Promise<Route[]> =>
     new Promise((resolve, reject) => {
-      db.all("SELECT * FROM routes", (err, rows) => (err ? reject(err) : resolve(rows)));
+      db.all("SELECT * FROM routes", (err, rows) => (err ? reject(err) : resolve(rows as Route[])));
     }),
 
   getById: (id: number) =>
