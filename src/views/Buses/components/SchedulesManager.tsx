@@ -8,6 +8,7 @@ import { Input } from "../../components/ui/input"
 import { Clock, Plus, Search, Edit, Trash2, ArrowLeft, Bus, MapPin, Calendar } from "lucide-react"
 import ScheduleForm from "./ScheduleForm"
 import { useDashboard } from "../../auth/context/DashBoardContext"
+import { useSearchParams } from "react-router-dom"
 
 // Datos de ejemplo - reemplazar con datos de tu base de datos
 const initialHorarios = [
@@ -68,11 +69,15 @@ type Horario = (typeof initialHorarios)[0]
 
 
 export default function SchedulesManager({ configInitial = false }: { configInitial?: boolean }) {
-  const { numberRegisterSchedule } = useDashboard();
+  const { numberRegisterSchedule, runningSchedules } = useDashboard();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [horarios, setHorarios] = useState<Horario[]>(initialHorarios)
   const [searchTerm, setSearchTerm] = useState("")
-  const [view, setView] = useState<"list" | "add" | "edit">("list")
   const [editingHorario, setEditingHorario] = useState<Horario | null>(null)
+
+  const viewActiveAtSchedule = searchParams.get("viewAtSchedule") ?? "list";
+
 
   const filteredHorarios = horarios.filter(
     (horario) =>
@@ -84,14 +89,20 @@ export default function SchedulesManager({ configInitial = false }: { configInit
   const handleAddHorario = (newHorario: Omit<Horario, "id">) => {
     const id = Math.max(...horarios.map((h) => h.id), 0) + 1
     setHorarios([...horarios, { ...newHorario, id }])
-    setView("list")
+    setSearchParams(prev => {
+      prev.set('viewAtSchedule', 'list')
+      return prev;
+    })
   }
 
   const handleEditHorario = (updatedHorario: Omit<Horario, "id">) => {
     if (editingHorario) {
       setHorarios(horarios.map((h) => (h.id === editingHorario.id ? { ...updatedHorario, id: editingHorario.id } : h)))
       setEditingHorario(null)
-      setView("list")
+      setSearchParams(prev => {
+        prev.set('viewAtSchedule', 'list')
+        return prev;
+      })
     }
   }
 
@@ -107,25 +118,35 @@ export default function SchedulesManager({ configInitial = false }: { configInit
 
   const startEdit = (horario: Horario) => {
     setEditingHorario(horario)
-    setView("edit")
+    setSearchParams(prev => {
+      prev.set('viewAtSchedule', 'edit')
+      return prev;
+    })
   }
 
-  if (view === "add") {
+  if (viewActiveAtSchedule === "add") {
     return (
       <div className="space-y-6">
-        <Button variant="ghost" onClick={() => setView("list")} className="gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          Volver a la lista
-        </Button>
-        <ScheduleForm onSubmit={handleAddHorario} onCancel={() => setView("list")} />
+     
+        <ScheduleForm onSubmit={handleAddHorario} onCancel={() => {
+          setSearchParams(prev => {
+            prev.set('viewAtSchedule', 'list')
+            return prev;
+          })
+        }} />
       </div>
     )
   }
 
-  if (view === "edit" && editingHorario) {
+  if (viewActiveAtSchedule === "edit" && editingHorario) {
     return (
       <div className="space-y-6">
-        <Button variant="ghost" onClick={() => setView("list")} className="gap-2">
+        <Button variant="ghost" onClick={() => {
+          setSearchParams(prev => {
+            prev.set('viewAtSchedule', 'list')
+            return prev;
+          })
+        }} className="gap-2">
           <ArrowLeft className="h-4 w-4" />
           Volver a la lista
         </Button>
@@ -134,7 +155,10 @@ export default function SchedulesManager({ configInitial = false }: { configInit
           onSubmit={handleEditHorario}
           onCancel={() => {
             setEditingHorario(null)
-            setView("list")
+            setSearchParams(prev => {
+              prev.set('viewAtSchedule', 'list')
+              return prev;
+            })
           }}
           isEditing
         />
@@ -149,8 +173,13 @@ export default function SchedulesManager({ configInitial = false }: { configInit
           <h1 className="text-3xl font-bold text-balance mb-2">Gestión de Horarios</h1>
           <p className="text-muted-foreground text-pretty">Administra los horarios y salidas disponibles</p>
         </div>
-        {configInitial ??
-          <Button onClick={() => setView("add")} size="lg" className="gap-2">
+        {numberRegisterSchedule > 0 &&
+          <Button onClick={() => {
+            setSearchParams(prev => {
+              prev.set('viewAtSchedule', 'add')
+              return prev;
+            })
+          }} size="lg" className="gap-2">
             <Plus className="h-5 w-5" />
             Agregar Horario
           </Button>
@@ -270,12 +299,17 @@ export default function SchedulesManager({ configInitial = false }: { configInit
         ))}
       </div>
 
-      {filteredHorarios.length === 0 && (
+      {numberRegisterSchedule === 0 && (
         <div className="text-center py-12">
           <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
           <h3 className="text-lg font-semibold mb-2">No se encontraron horarios</h3>
           <p className="text-muted-foreground mb-4">Intenta con otra bΓΊsqueda o agrega un nuevo horario</p>
-          <Button onClick={() => setView("add")} className="gap-2">
+          <Button onClick={() => {
+            setSearchParams(prev => {
+              prev.set('viewAtSchedule', 'add')
+              return prev;
+            })
+          }} className="gap-2">
             <Plus className="h-4 w-4" />
             Agregar Primer Horario
           </Button>

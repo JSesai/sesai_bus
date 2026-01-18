@@ -52,9 +52,11 @@ export function registerRoutesHandlersTravel() {
     }
 
   });
-  ipcMain.handle("updateRoute", async (_, route): Promise<ResponseElectronGeneric> => {
+  ipcMain.handle("updateRoute", async (_, route: Route): Promise<ResponseElectronGeneric> => {
     try {
       console.log('init process update route', route);
+      if(!route.id) throw new DestinationRouteError("Falta id para poder actualizar destino");
+      route.terminalName = route.terminalName.trim();
       const routeUpdate = await routesTravelRepo.update(route);
       if (!routeUpdate) return { ok: false, data: null, error: { message: "No se obtuvo información", detail: "No actualizó route - destino" } }
       return { ok: true, error: null, data: routeUpdate }

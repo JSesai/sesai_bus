@@ -6,13 +6,12 @@ import { Label } from "../../components/ui/label"
 import { Textarea } from "../../components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { Checkbox } from "../../components/ui/checkbox"
-import { Clock, MapPin, Bus, Calendar, DollarSign } from "lucide-react"
+import { Clock, MapPin, Bus, Calendar, DollarSign, BusFront, BubblesIcon, PanelTopOpen, ListOrdered } from "lucide-react"
+import { useDashboard } from "../../auth/context/DashBoardContext"
+import { useSearchParams } from "react-router-dom"
+import { ScheduleError } from "../../../shared/errors/customError"
 
-const destinos = ["Ciudad de MΓ©xico", "Guadalajara", "Monterrey", "Puebla", "CancΓΊn", "Tijuana", "LeΓ³n", "Querétaro"]
 
-const autobuses = ["101", "102", "103", "205", "206", "310", "311", "312"]
-
-const diasSemana = ["Lunes", "Martes", "MiΓ©rcoles", "Jueves", "Viernes", "SΓ'bado", "Domingo"]
 
 type HorarioFormData = {
   origen: string
@@ -34,6 +33,10 @@ type HorarioFormProps = {
 }
 
 export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing = false }: HorarioFormProps) {
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { agency, destinations, vehicles } = useDashboard();
+
   const [formData, setFormData] = useState<HorarioFormData>(
     initialData || {
       origen: "",
@@ -70,11 +73,13 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
     }))
   }
 
+  if (!agency) throw new ScheduleError("No se encontro registro de agencia")
+
   return (
     <Card className="max-w-3xl mx-auto">
       <CardHeader>
         <CardTitle className="text-2xl flex items-center gap-2">
-          <Clock className="h-6 w-6 text-blue-600" />
+          <Clock className="h-6 w-6 text-cyan-500" />
           {isEditing ? "Editar Horario" : "Agregar Nuevo Horario"}
         </CardTitle>
       </CardHeader>
@@ -82,23 +87,20 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="origen" className="flex items-center gap-2">
+              <Label htmlFor="horaSalida" className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 Origen
               </Label>
-              <Select value={formData.origen} onValueChange={(value) => setFormData({ ...formData, origen: value })}>
-                <SelectTrigger id="origen" className="h-11">
-                  <SelectValue placeholder="Seleccionar origen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {destinos.map((destino) => (
-                    <SelectItem key={destino} value={destino}>
-                      {destino}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input
+                id="horaSalida"
+                type="text"
+                value={`${agency.city} - ${agency.name}`}
+                className="h-11"
+                required
+                disabled
+              />
             </div>
+
 
             <div className="space-y-2">
               <Label htmlFor="destino" className="flex items-center gap-2">
@@ -106,13 +108,13 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
                 Destino
               </Label>
               <Select value={formData.destino} onValueChange={(value) => setFormData({ ...formData, destino: value })}>
-                <SelectTrigger id="destino" className="h-11">
+                <SelectTrigger id="destino" className="w-full py-5">
                   <SelectValue placeholder="Seleccionar destino" />
                 </SelectTrigger>
                 <SelectContent>
-                  {destinos.map((destino) => (
-                    <SelectItem key={destino} value={destino}>
-                      {destino}
+                  {destinations.map((destino) => (
+                    <SelectItem key={destino.id} value={destino.terminalName}>
+                      {destino.cityName}{' - '}{destino.terminalName}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -128,7 +130,14 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
                 id="horaSalida"
                 type="time"
                 value={formData.horaSalida}
-                onChange={(e) => setFormData({ ...formData, horaSalida: e.target.value })}
+                defaultValue={'10:00'}
+                onChange={(e) => {
+                  console.log(formData);
+
+                  console.log({ horaSalida: e.target.value });
+
+                  setFormData({ ...formData, horaSalida: e.target.value })
+                }}
                 className="h-11"
                 required
               />
@@ -143,7 +152,11 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
                 id="horaLlegada"
                 type="time"
                 value={formData.horaLlegada}
-                onChange={(e) => setFormData({ ...formData, horaLlegada: e.target.value })}
+                onChange={(e) => {
+                  console.log(e.target.value);
+
+                  setFormData({ ...formData, horaLlegada: e.target.value })
+                }}
                 className="h-11"
                 required
               />
@@ -152,19 +165,19 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
             <div className="space-y-2">
               <Label htmlFor="numeroAutobus" className="flex items-center gap-2">
                 <Bus className="h-4 w-4 text-muted-foreground" />
-                NΓΊmero de AutobΓΊs
+                Autobús
               </Label>
               <Select
                 value={formData.numeroAutobus}
                 onValueChange={(value) => setFormData({ ...formData, numeroAutobus: value })}
               >
-                <SelectTrigger id="numeroAutobus" className="h-11">
-                  <SelectValue placeholder="Seleccionar autobΓΊs" />
+                <SelectTrigger id="numeroAutobus" className="py-5  w-full">
+                  <SelectValue placeholder="Seleccionar autobús" />
                 </SelectTrigger>
                 <SelectContent>
-                  {autobuses.map((autobus) => (
-                    <SelectItem key={autobus} value={autobus}>
-                      AutobΓΊs #{autobus}
+                  {vehicles.map((vehicle) => (
+                    <SelectItem key={vehicle.id} value={vehicle.model}>
+                      {vehicle.model} {' '}{vehicle.year}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -173,8 +186,8 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
 
             <div className="space-y-2">
               <Label htmlFor="precio" className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                Precio del Boleto
+                <ListOrdered size={15} />
+                Número de Autobús
               </Label>
               <Input
                 id="precio"
@@ -187,51 +200,9 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
                 required
               />
             </div>
+
           </div>
 
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              Días de Operación
-            </Label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 border border-border rounded-lg bg-muted/30">
-              {diasSemana.map((dia) => (
-                <div key={dia} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={dia}
-                    checked={formData.diasOperacion.includes(dia)}
-                    onCheckedChange={() => toggleDia(dia)}
-                  />
-                  <label htmlFor={dia} className="text-sm font-medium cursor-pointer">
-                    {dia}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notas">Notas Adicionales</Label>
-            <Textarea
-              id="notas"
-              placeholder="Ej: Servicio ejecutivo, Wi-Fi disponible, aire acondicionado..."
-              value={formData.notas}
-              onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
-              rows={3}
-              className="resize-none"
-            />
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="activo"
-              checked={formData.activo}
-              onCheckedChange={(checked) => setFormData({ ...formData, activo: checked === true })}
-            />
-            <label htmlFor="activo" className="text-sm font-medium cursor-pointer">
-              Horario activo
-            </label>
-          </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="submit" className="flex-1 h-11" disabled={isLoading}>
