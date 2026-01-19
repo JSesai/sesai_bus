@@ -12,7 +12,7 @@ import { useSearchParams } from "react-router-dom"
 
 
 export default function DestinationsManager({ configInitial = false }: { configInitial?: boolean }) {
-  const { destinations, numberRegisteredDestinations } = useDashboard();
+  const { destinations, numberRegisteredDestinations, handleRegisterRoute } = useDashboard();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [searchTerm, setSearchTerm] = useState("")
@@ -25,30 +25,6 @@ export default function DestinationsManager({ configInitial = false }: { configI
   console.log({ destinations });
 
 
-  const handleAddDestination = (newDestino: Omit<Route, "id">) => {
-    // const id = Math.max(...destinations.map((d) => d.id), 0) + 1
-    // setDestinations([...destinations, { ...newDestino, id }])
-    // setView("list")
-  }
-
-  const handleEditDestination = (updatedDestino: Omit<Route, "id">) => {
-    // if (editingDestino) {
-    //   setDestinations(destinations.map((d) => (d.id === editingDestino.id ? { ...updatedDestino, id: editingDestino.id } : d)))
-    //   setEditingDestino(null)
-    //   setView("list")
-    // }
-  }
-
-  const handleDeleteDestination = (id: Route['id']) => {
-    // if (confirm("ΒΏEstΓ's seguro de que deseas eliminar este destino?")) {
-    //   setDestinations(destinations.filter((d) => d.id !== id))
-    // }
-  }
-
-  const handleToggleActiveDestination = (id: Route['id']) => {
-    // setDestinations(destinations.map((d) => (d.id === id ? { ...d, activo: !d.activo } : d)))
-  }
-
   const startEdit = (destino: Route) => {
     setEditingDestino(destino)
     setSearchParams(prev => {
@@ -57,18 +33,20 @@ export default function DestinationsManager({ configInitial = false }: { configI
     })
   }
 
+  const handleToggleActivo = async (route: Route) => {
+    console.log('actualizar el estatus');
+    const updateRoute: Route = {
+      ...route,
+      status: route.status === "active" ? "disabled" : "active"
+    }
+    await handleRegisterRoute(updateRoute, true, true);
+
+  }
+
   if (viewActiveAtDestination === "add") {
     return (
       <div className="space-y-6">
-        {/* <Button variant="ghost" onClick={() => {
-           setSearchParams(prev => {
-            prev.set('viewAtDestination', 'list')
-            return prev;
-        })
-        }} className="gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          Volver a la lista
-        </Button> */}
+
         <DestinoForm onCancel={() => {
           setSearchParams(prev => {
             prev.set('viewAtDestination', 'list')
@@ -82,10 +60,7 @@ export default function DestinationsManager({ configInitial = false }: { configI
   if (viewActiveAtDestination === "edit" && editingDestino) {
     return (
       <div className="space-y-6">
-        {/* <Button variant="ghost" onClick={() => setView("list")} className="gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          Volver a la lista
-        </Button> */}
+
         <DestinoForm
           initialData={editingDestino}
           onCancel={() => {
@@ -136,7 +111,7 @@ export default function DestinationsManager({ configInitial = false }: { configI
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filteredDestinations.map((destino) => (
-          <Card key={destino.id} className={`transition-all hover:shadow-md`}>
+          <Card key={destino.id} className={`transition-all hover:shadow-md ${destino.status === 'disabled' ? "opacity-60" : ""}`}>
             <CardContent className="p-5 space-y-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
@@ -148,8 +123,8 @@ export default function DestinationsManager({ configInitial = false }: { configI
                     <p className="text-sm text-muted-foreground">{destino.terminalName}</p>
                   </div>
                 </div>
-                <Badge variant={"default"} className="text-xs">
-                  Activo
+                <Badge variant={destino.status === "active" ? "default" : "secondary"} className={`text-xs hover:cursor-pointer ${destino.status === "active" ? "" : "bg-red-400"}`}>
+                  {destino.status === "active" ? "Activo" : "Inactivo"}
                 </Badge>
               </div>
 
@@ -191,13 +166,8 @@ export default function DestinationsManager({ configInitial = false }: { configI
                   Editar
                 </Button>
 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeleteDestination(destino.id)}
-                  className="text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
+                <Button variant="outline" size="sm" onClick={() => handleToggleActivo(destino)} className="flex-1 hover:cursor-pointer">
+                  {destino.status === "active" ? "Desactivar" : "Activar"}
                 </Button>
               </div>
             </CardContent>

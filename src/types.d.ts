@@ -105,6 +105,7 @@ interface Route {
   baseFare: number;
   estimatedTravelTime: string | number;
   remarks: string;
+  status: 'active' | 'disabled' | 'removed';
 
 }
 

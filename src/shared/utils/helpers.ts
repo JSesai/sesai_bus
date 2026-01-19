@@ -95,9 +95,9 @@ export const HHMMToTimestamp = (horaStr: string): number | string => {
     try {
         const [horas, minutos] = horaStr.includes(":") ? horaStr.split(":").map(Number) : [Number(horaStr), 0];
         console.log({ horas, minutos });
-    
+
         return horas * 60 + minutos;
-        
+
     } catch (error) {
         return horaStr
     }
@@ -109,3 +109,10 @@ export const timestamToHHMM = (minutos: number) => {
 };
 
 
+// Expresión regular para formato HH:mm 
+export const isvalidHour = (horaStr: string): boolean => {
+    const regex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    console.log(regex.test(horaStr));
+    
+    return regex.test(horaStr);
+}

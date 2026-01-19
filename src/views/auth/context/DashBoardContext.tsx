@@ -3,6 +3,7 @@ import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
 import { AgencyError, AppError, BusError, DestinationRouteError, ValidationError } from "../../../shared/errors/customError";
 import { useAuth } from "./AuthContext";
+import { isvalidHour } from "../../../shared/utils/helpers";
 
 type DashboardContextType = {
     //data
@@ -252,10 +253,16 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
             const { terminalName, cityName, address, contactPhone, estimatedTravelTime } = destination;
             // Validaciones
-            if (!terminalName || !cityName || !address || !contactPhone || !estimatedTravelTime) throw new DestinationRouteError("Por favor completa todos los campos obligatorios")
-            destination.origin = agency?.city ?? '';
+            if (!terminalName || !cityName || !address || !contactPhone || !estimatedTravelTime) throw new DestinationRouteError("Por favor completa todos los campos obligatorios");
+            if (!isvalidHour(String(destination.estimatedTravelTime))) throw new DestinationRouteError("Tiempo estimado hacia el destino es invalido", "El formato requerido es HH:MM");
+
+            const SendDestination = {
+                ...destination,
+                origin: agency?.city ?? ''            
+            };
+
             setIsLoading(true);
-            const resp = editingRoute ? await window.electron.routesTravel.updateRoute(destination) : await window.electron.routesTravel.addRoute(destination);
+            const resp = editingRoute ? await window.electron.routesTravel.updateRoute(SendDestination) : await window.electron.routesTravel.addRoute(SendDestination);
 
             console.log(resp);
             if (resp.ok) {

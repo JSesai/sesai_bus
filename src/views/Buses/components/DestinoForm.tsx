@@ -29,7 +29,8 @@ const initialStateForm: Route = {
   baseFare: 0,
   estimatedTravelTime: "",
   remarks: "",
-  origin: ""
+  origin: "",
+  status:"active"
 }
 
 export default function DestinoForm({ initialData, onCancel, isEditing = false, configInitial = false }: DestinoFormProps) {
@@ -71,9 +72,10 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
         baseFare: 250,
         origin: agency?.city || "city",
         distanceFromOriginKm: 100,
-        estimatedTravelTime: '8',
+        estimatedTravelTime: '08:22',
         terminalName: 'terminal periferico',
-        remarks: 'Inicia servicio de atención a las 11:00 am'
+        remarks: 'Inicia servicio de atención a las 11:00 am',
+        status:'active'
       })
     }
 
