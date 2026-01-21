@@ -130,8 +130,8 @@ interface Schedule {
 interface ScheduleAPI {
   getSchedules: () => Promise<ResponseElectronGeneric>;
   getScheduleById: (id: Schedule['id']) => Promise<Schedule>;
-  addSchedule: (schedule: Schedule) => Promise<Schedule>;
-  updateSchedule: (schedule: Schedule['id']) => Promise<void>;
+  addSchedule: (schedule: Schedule) => Promise<ResponseElectronGeneric>;
+  updateSchedule: (schedule: Schedule) => Promise<ResponseElectronGeneric>;
   deleteSchedule: (id: Schedule['id']) => Promise<void>;
 }
 

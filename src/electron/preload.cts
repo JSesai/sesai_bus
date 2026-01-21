@@ -43,7 +43,7 @@ const schedulesAPI: ScheduleAPI = {
   getSchedules: () => ipcRenderer.invoke("getSchedules"),
   getScheduleById: (id: Schedule['id']) => ipcRenderer.invoke("getScheduleById", id),
   addSchedule: (schedule: Schedule) => ipcRenderer.invoke("addSchedule", schedule),
-  updateSchedule: (schedule: Schedule['id']) => ipcRenderer.invoke("updateSchedule", schedule),
+  updateSchedule: (schedule: Schedule) => ipcRenderer.invoke("updateSchedule", schedule),
   deleteSchedule: (id: Schedule['id']) => ipcRenderer.invoke("deleteSchedule", id),
 }
 

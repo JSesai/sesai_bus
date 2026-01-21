@@ -18,14 +18,7 @@ export const schedulesRepo = {
       );
     }),
 
-  add: (schedule: {
-    route_id: number;
-    bus_id: number;
-    driver_id: number;
-    agency_id: number;
-    departure_time: string;
-    arrival: string;
-  }) =>
+  add: (schedule: Schedule) =>
     new Promise((resolve, reject) => {
       db.run(
         `INSERT INTO schedules (route_id, bus_id, driver_id, agency_id, departure_time, arrival)

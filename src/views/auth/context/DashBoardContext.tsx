@@ -23,6 +23,7 @@ type DashboardContextType = {
     handleGetBuses: () => Promise<void>
     handleRegisterAgency: (agency: Agency, editingAgency?: boolean, configInitial?: boolean) => Promise<boolean>;
     handleRegisterRoute: (dataRoute: Route, editingRoute?: boolean, configInitial?: boolean) => Promise<boolean>;
+    handleRegisterSchedules: (schedule: Schedule, editingSchedule?: boolean, configInitial?: boolean) => Promise<boolean>;
 };
 
 export const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -258,7 +259,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
             const SendDestination = {
                 ...destination,
-                origin: agency?.city ?? ''            
+                origin: agency?.city ?? ''
             };
 
             setIsLoading(true);
@@ -376,6 +377,36 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
     }
 
+    //manejador para crear/actualizar horarios
+    const handleRegisterSchedules = async (schedule: Schedule, editingSchedule: boolean = false, configInitial = false): Promise<boolean> => {
+
+        try {
+            setIsLoading(true);
+            const schedules = editingSchedule ? await window.electron.schedules.updateSchedule(schedule) : await window.electron.schedules.addSchedule(schedule);
+            console.log({ schedules });
+            if (!schedules.ok) return false;
+            setRunningSchedules(schedules?.data);
+            return true;
+
+        } catch (e) {
+            console.log('ocurrio un error al obtener los horarios', e);
+
+            if (e instanceof AppError) {
+
+                toast.error(e.message, {
+                    richColors: true,
+                    description: e.details,
+                    duration: 10_000,
+                    position: 'top-center'
+                });
+            }
+            return false;
+
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     const loadSystemInformation = async () => {
         try {
 
@@ -412,6 +443,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             handleGetBuses,
             handleRegisterAgency,
             handleRegisterRoute,
+            handleRegisterSchedules,
             destinations,
             runningSchedules,
             vehicles,

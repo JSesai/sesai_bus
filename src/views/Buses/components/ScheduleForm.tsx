@@ -13,21 +13,19 @@ import { ScheduleError } from "../../../shared/errors/customError"
 
 
 
-type HorarioFormData = {
+type ScheduleFormData = {
   origen: string
   destino: string
   horaSalida: string
   horaLlegada: string
   numeroAutobus: string
-  diasOperacion: string[]
-  precio: number
-  activo: boolean
-  notas: string
+  autobus: Bus['id'] | null;
+
 }
 
 type HorarioFormProps = {
-  initialData?: HorarioFormData
-  onSubmit: (data: HorarioFormData) => void
+  initialData?: ScheduleFormData
+  onSubmit: (data: ScheduleFormData) => void
   onCancel: () => void
   isEditing?: boolean
 }
@@ -35,19 +33,16 @@ type HorarioFormProps = {
 export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing = false }: HorarioFormProps) {
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const { agency, destinations, vehicles } = useDashboard();
+  const { agency, destinations, vehicles, runningSchedules, handleRegisterSchedules } = useDashboard();
 
-  const [formData, setFormData] = useState<HorarioFormData>(
+  const [formData, setFormData] = useState<ScheduleFormData>(
     initialData || {
       origen: "",
       destino: "",
       horaSalida: "",
       horaLlegada: "",
       numeroAutobus: "",
-      diasOperacion: [],
-      precio: 0,
-      activo: true,
-      notas: "",
+      autobus: null
     },
   )
 
@@ -57,21 +52,14 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
     e.preventDefault()
     setIsLoading(true)
 
-    // SimulaciΓ³n de guardado
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    const successRegister = await handleRegisterSchedules(formData);
+    if (!successRegister) return;
 
     onSubmit(formData)
     setIsLoading(false)
+
   }
 
-  const toggleDia = (dia: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      diasOperacion: prev.diasOperacion.includes(dia)
-        ? prev.diasOperacion.filter((d) => d !== dia)
-        : [...prev.diasOperacion, dia],
-    }))
-  }
 
   if (!agency) throw new ScheduleError("No se encontro registro de agencia");
 
@@ -168,7 +156,7 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="numeroAutobus" className="flex items-center gap-2">
+              <Label htmlFor="autobus" className="flex items-center gap-2">
                 <Bus className="h-4 w-4 text-muted-foreground" />
                 Autobús
               </Label>
@@ -176,7 +164,7 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
                 value={formData.numeroAutobus}
                 onValueChange={(value) => setFormData({ ...formData, numeroAutobus: value })}
               >
-                <SelectTrigger id="numeroAutobus" className="py-5  w-full">
+                <SelectTrigger id="autobus" className="py-5  w-full">
                   <SelectValue placeholder="Seleccionar autobús" />
                 </SelectTrigger>
                 <SelectContent>
@@ -197,8 +185,8 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
               <Input
                 id="precio"
                 type="number"
-                min="0"
-                step="0.01"
+                min="1"
+                // step="0.01"
                 value={formData.precio}
                 onChange={(e) => setFormData({ ...formData, precio: Number.parseFloat(e.target.value) || 0 })}
                 className="h-11"
