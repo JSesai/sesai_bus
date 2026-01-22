@@ -123,6 +123,7 @@ interface Schedule {
   bus_id: number;
   driver_id: number;
   agency_id: number;
+  vehicle_number: number;
   departure_time: string; // ISO string o formato de tu preferencia
   arrival: string;        // ISO string o formato de tu preferencia
 }

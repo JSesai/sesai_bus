@@ -13,14 +13,13 @@ import { ScheduleError } from "../../../shared/errors/customError"
 
 
 
-type ScheduleFormData = {
-  origen: string
-  destino: string
-  horaSalida: string
-  horaLlegada: string
-  numeroAutobus: string
-  autobus: Bus['id'] | null;
-
+export type ScheduleFormData = {
+  origen: string;
+  destino: string;
+  horaSalida: string;
+  horaLlegada: string;
+  numeroVehiculo: number;
+  vehiculo: string;
 }
 
 type HorarioFormProps = {
@@ -41,8 +40,9 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
       destino: "",
       horaSalida: "",
       horaLlegada: "",
-      numeroAutobus: "",
-      autobus: null
+      vehiculo: "",
+      numeroVehiculo: 0,
+    
     },
   )
 
@@ -51,6 +51,8 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+
+ 
 
     const successRegister = await handleRegisterSchedules(formData);
     if (!successRegister) return;
@@ -161,15 +163,15 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
                 Autobús
               </Label>
               <Select
-                value={formData.numeroAutobus}
-                onValueChange={(value) => setFormData({ ...formData, numeroAutobus: value })}
+                value={formData.vehiculo}
+                onValueChange={(value) => setFormData({ ...formData, vehiculo: value })}
               >
                 <SelectTrigger id="autobus" className="py-5  w-full">
                   <SelectValue placeholder="Seleccionar autobús" />
                 </SelectTrigger>
                 <SelectContent>
                   {vehicles.map((vehicle) => (
-                    <SelectItem key={vehicle.id} value={vehicle.model}>
+                    <SelectItem key={vehicle.id} value={String(vehicle.id)}>
                       {vehicle.model} {' '}{vehicle.year}
                     </SelectItem>
                   ))}
@@ -187,8 +189,8 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
                 type="number"
                 min="1"
                 // step="0.01"
-                value={formData.precio}
-                onChange={(e) => setFormData({ ...formData, precio: Number.parseFloat(e.target.value) || 0 })}
+                value={formData.numeroVehiculo}
+                onChange={(e) => setFormData({ ...formData, numeroVehiculo: Number.parseFloat(e.target.value) || 0 })}
                 className="h-11"
                 required
               />

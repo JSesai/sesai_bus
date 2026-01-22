@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS schedules (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     route_id INTEGER NOT NULL,
     bus_id INTEGER NOT NULL,
+    vehicle_number INTEGER NOT NULL,
     driver_id INTEGER NOT NULL,
     agency_id INTEGER NOT NULL,
     departure_time TEXT NOT NULL,

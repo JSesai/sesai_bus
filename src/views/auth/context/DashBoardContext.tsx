@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { AgencyError, AppError, BusError, DestinationRouteError, ValidationError } from "../../../shared/errors/customError";
 import { useAuth } from "./AuthContext";
 import { isvalidHour } from "../../../shared/utils/helpers";
+import type { ScheduleFormData } from "../../Buses/components/ScheduleForm";
 
 type DashboardContextType = {
     //data
@@ -23,7 +24,7 @@ type DashboardContextType = {
     handleGetBuses: () => Promise<void>
     handleRegisterAgency: (agency: Agency, editingAgency?: boolean, configInitial?: boolean) => Promise<boolean>;
     handleRegisterRoute: (dataRoute: Route, editingRoute?: boolean, configInitial?: boolean) => Promise<boolean>;
-    handleRegisterSchedules: (schedule: Schedule, editingSchedule?: boolean, configInitial?: boolean) => Promise<boolean>;
+    handleRegisterSchedules: (schedule: ScheduleFormData, editingSchedule?: boolean, configInitial?: boolean) => Promise<boolean>;
 };
 
 export const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -378,11 +379,19 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     }
 
     //manejador para crear/actualizar horarios
-    const handleRegisterSchedules = async (schedule: Schedule, editingSchedule: boolean = false, configInitial = false): Promise<boolean> => {
+    const handleRegisterSchedules = async (scheduleForm: ScheduleFormData, editingSchedule: boolean = false, configInitial = false): Promise<boolean> => {
 
         try {
             setIsLoading(true);
-            const schedules = editingSchedule ? await window.electron.schedules.updateSchedule(schedule) : await window.electron.schedules.addSchedule(schedule);
+            //todo seguir revisando que se envie la informacion que requiere el handler para agregar el horario de salida
+            const sendSchedule: Schedule = {
+                ...scheduleForm,
+                route_id: 1,
+                agency_id: agency?.id,
+                bus_id: scheduleForm.autobus,
+
+            }
+            const schedules = editingSchedule ? await window.electron.schedules.updateSchedule(sendSchedule) : await window.electron.schedules.addSchedule(sendSchedule);
             console.log({ schedules });
             if (!schedules.ok) return false;
             setRunningSchedules(schedules?.data);
