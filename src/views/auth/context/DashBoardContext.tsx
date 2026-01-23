@@ -1,10 +1,13 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
 import { AgencyError, AppError, BusError, DestinationRouteError, ValidationError } from "../../../shared/errors/customError";
 import { useAuth } from "./AuthContext";
 import { isvalidHour } from "../../../shared/utils/helpers";
 import type { ScheduleFormData } from "../../Buses/components/ScheduleForm";
+import type { UserForm } from "../screens/RegisterUser";
+
+
 
 type DashboardContextType = {
     //data
@@ -16,7 +19,9 @@ type DashboardContextType = {
     numberRegisteredDestinations: number;
     runningSchedules: Schedule[];
     numberRegisterSchedule: number;
-
+    employees: UserSample[];
+    driverEmployees: UserSample[];
+    numberRegisteredDriver: number;
 
     //methods
     handleRegisterBus: (dataBus: Bus, editingBus?: boolean, configInitial?: boolean) => Promise<boolean>;
@@ -25,6 +30,8 @@ type DashboardContextType = {
     handleRegisterAgency: (agency: Agency, editingAgency?: boolean, configInitial?: boolean) => Promise<boolean>;
     handleRegisterRoute: (dataRoute: Route, editingRoute?: boolean, configInitial?: boolean) => Promise<boolean>;
     handleRegisterSchedules: (schedule: ScheduleFormData, editingSchedule?: boolean, configInitial?: boolean) => Promise<boolean>;
+    handleRegisterUser: (user: UserForm, configInitial: boolean, isEditing: boolean) => Promise<boolean>;
+
 };
 
 export const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -37,7 +44,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const [vehicles, setVehicles] = useState<Bus[]>([]);
     const [destinations, setDestinations] = useState<Route[]>([]);
     const [runningSchedules, setRunningSchedules] = useState<Schedule[]>([]);
-
+    const [employees, setEmployees] = useState<UserSample[]>([]);
 
     //manejador para obtener buses
     const handleGetBuses = async (): Promise<void> => {
@@ -183,6 +190,22 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             if (!agencyData.ok) throw new AgencyError("Error al obtener información", "valida existencia")
 
             setAgency(agencyData.data);
+
+        } catch (error) {
+            console.log('error al obtener agencia', error);
+
+        }
+
+    }
+    //obtener empleados
+    const getEmployees = async () => {
+        try {
+            const employees = await window.electron.users.getUsers();
+            console.log({ employees });
+
+            if (!employees.ok) throw new AgencyError("Error al obtener empleados", "valida existencia")
+
+            setEmployees(employees.data);
 
         } catch (error) {
             console.log('error al obtener agencia', error);
@@ -378,23 +401,111 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
     }
 
+    //Registro/acualizacion de usuario employee
+    const handleRegisterUser = async (userAdd: UserForm, configInitial: boolean, isEditing: boolean): Promise<boolean> => {
+        const { name, phone, role, userName } = userAdd;
+
+        // Validaciones
+        if (!name || !userName || !phone || !role) {
+            toast.error("Por favor completa todos los campos", {
+                richColors: true,
+                duration: 10_000,
+                position: 'top-center'
+            })
+            setIsLoading(false)
+            return false;
+        }
+
+        if (name.length < 8) {
+            toast.error("El nombre del usuario es muy corto", {
+                richColors: true,
+                duration: 10_000,
+                position: 'top-center'
+            })
+            setIsLoading(false)
+            return false;
+        }
+
+        if (phone.length < 10) {
+            toast.error("El número de teléfono debe tener al menos 10 dígitos", {
+                richColors: true,
+                duration: 10_000,
+                position: 'top-center'
+            })
+            setIsLoading(false)
+            return false
+        }
+
+        try {
+            const resp = isEditing ?
+                await window.electron.users.updateUser({ ...userAdd, id: Number(userAdd.id) })
+                :
+                await window.electron.users.addUser({ ...userAdd, password: 'temporal123', })
+
+            console.log(resp);
+            if (resp.ok) {
+                configInitial ?? confetti({
+                    particleCount: 100,
+                    spread: 120,
+                    origin: { y: 0.6 }
+                });
+
+                toast.success('Registro exitoso.', {
+                    description: 'La cuenta ha sido creada correctamente',
+                    richColors: true,
+                    duration: 20_000,
+                    position: 'top-center'
+                })
+                const employeesUpdated = isEditing ? employees.map(emp => emp.id === userAdd.id ? userAdd : emp) : [...employees, resp.data];
+                console.log({ employeesUpdated });
+
+
+                setEmployees(employeesUpdated);
+                return true;
+
+            }
+
+            if (resp.error) {
+
+                toast.error(resp.error.message, {
+                    description: resp.error.detail,
+                    richColors: true,
+                    duration: 10_000,
+                    position: 'top-center'
+                })
+
+            }
+
+        } catch (e) {
+            console.log(e);
+
+        } finally {
+            setIsLoading(false)
+        }
+
+        return false;
+
+    }
+
+
     //manejador para crear/actualizar horarios
     const handleRegisterSchedules = async (scheduleForm: ScheduleFormData, editingSchedule: boolean = false, configInitial = false): Promise<boolean> => {
 
         try {
             setIsLoading(true);
             //todo seguir revisando que se envie la informacion que requiere el handler para agregar el horario de salida
-            const sendSchedule: Schedule = {
-                ...scheduleForm,
-                route_id: 1,
-                agency_id: agency?.id,
-                bus_id: scheduleForm.autobus,
+            // const sendSchedule: Schedule = {
+            //     route_id: Number(scheduleForm.destino),
+            //     agency_id: agency?.id || 0,
+            //     bus_id: Number(scheduleForm.vehiculo),
+            //     vehicle_number: scheduleForm.numeroVehiculo,
 
-            }
-            const schedules = editingSchedule ? await window.electron.schedules.updateSchedule(sendSchedule) : await window.electron.schedules.addSchedule(sendSchedule);
-            console.log({ schedules });
-            if (!schedules.ok) return false;
-            setRunningSchedules(schedules?.data);
+
+            // }
+            // const schedules = editingSchedule ? await window.electron.schedules.updateSchedule(sendSchedule) : await window.electron.schedules.addSchedule(sendSchedule);
+            // console.log({ schedules });
+            // if (!schedules.ok) return false;
+            // setRunningSchedules(schedules?.data);
             return true;
 
         } catch (e) {
@@ -416,11 +527,13 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
+
+
     const loadSystemInformation = async () => {
         try {
 
             //multiples peticiones para traer informacion del sistema busesm horarios, clientes, ventas, etc...
-            const results = await Promise.allSettled([getAgency(), handleGetBuses(), handleGetRoutes(), handleGetSchedules()]);
+            const results = await Promise.allSettled([getAgency(), handleGetBuses(), handleGetRoutes(), handleGetSchedules(), getEmployees()]);
             results.forEach((result, index) => {
                 if (result.status === "fulfilled") {
                     console.log(`Petición ${index} OK:`, result.value);
@@ -437,7 +550,9 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     }
 
 
-
+    const driverEmployees = useMemo(() => employees.filter(e => e.role === 'driver'), [employees]);
+    console.log({driverEmployees});
+    
 
 
     // get agencia
@@ -453,14 +568,18 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             handleRegisterAgency,
             handleRegisterRoute,
             handleRegisterSchedules,
+            handleRegisterUser,
             destinations,
             runningSchedules,
             vehicles,
+            employees,
             isLoading,
             agency,
             numberRegisteredVehicles: vehicles.length,
             numberRegisteredDestinations: destinations.length,
-            numberRegisterSchedule: runningSchedules.length
+            numberRegisterSchedule: runningSchedules.length,
+            driverEmployees,
+            numberRegisteredDriver: driverEmployees.length
 
 
         }}>

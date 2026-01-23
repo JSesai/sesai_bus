@@ -2,8 +2,8 @@ import { createContext, useContext, useEffect, useState, type Dispatch, type Set
 import { useNavigate } from "react-router-dom";
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
-import type { UserRegister } from "../screens/RegisterUser";
 import { AppError, ValidationError } from "../../../shared/errors/customError";
+import type { UserForm } from "../screens/RegisterUser";
 
 type AuthContextType = {
   userLogged: UserResponseAuth | null;
@@ -11,7 +11,6 @@ type AuthContextType = {
   setLoading: Dispatch<SetStateAction<boolean>>
   login: (user: UserCredentials) => Promise<void>;
   logout: () => Promise<void>;
-  handleRegisterUser: (user: UserRegister) => Promise<boolean>;
   getUniqueUserName: (name: User['name']) => Promise<User['userName']>;
   updatePassword: ({ password, comfirmPassword }: { password: string, comfirmPassword: string }) => Promise<boolean>;
   forgotPassword: (userName: User['userName']) => Promise<void>;
@@ -159,93 +158,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   }
 
-  //Registro de usuario
-  const handleRegisterUser = async (user: UserRegister): Promise<boolean> => {
-    const { name, password, phone, role, userName, status, confirmPassword } = user
-
-    // Validaciones
-    if (!name || !userName || !password || !confirmPassword || !phone || !role) {
-      toast.error("Por favor completa todos los campos", {
-        richColors: true,
-        duration: 10_000,
-        position: 'top-center'
-      })
-      setLoading(false)
-      return false;
-    }
-
-    if (name.length < 8) {
-      toast.error("El nombre del usuario es muy corto", {
-        richColors: true,
-        duration: 10_000,
-        position: 'top-center'
-      })
-      setLoading(false)
-      return false;
-    }
-
-    if (phone.length < 10) {
-      toast.error("El número de teléfono debe tener al menos 10 dígitos", {
-        richColors: true,
-        duration: 10_000,
-        position: 'top-center'
-      })
-      setLoading(false)
-      return false
-    }
-
-    try {
-      const resp = await window.electron.users.addUser({
-        role,
-        userName,
-        name,
-        password,
-        phone,
-        status
-      })
-
-      console.log(resp);
-      if (resp.ok) {
-        confetti({
-          particleCount: 100,
-          spread: 120,
-          origin: { y: 0.6 }
-        });
-
-        toast.success('Registro exitoso.', {
-          description: 'La cuenta ha sido creada correctamente',
-          richColors: true,
-          duration: 20_000,
-          position: 'top-center'
-        })
-
-        return true;
-
-
-      }
-
-      if (resp.error) {
-
-        toast.error(resp.error.message, {
-          description: resp.error.detail,
-          richColors: true,
-          duration: 10_000,
-          position: 'top-center'
-        })
-
-      }
-
-    } catch (e) {
-      console.log(e);
-
-    } finally {
-      setLoading(false)
-    }
-
-    return false;
-
-  }
-
   //obtiene nombre de usuario unico
   const getUniqueUserName = async (userName: User['userName']): Promise<User['userName']> => {
 
@@ -351,7 +263,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading,
       login,
       logout,
-      handleRegisterUser,
       getUniqueUserName,
       updatePassword,
       forgotPassword

@@ -10,6 +10,8 @@ interface User {
   phone: string;
 }
 
+type UserSample  = Omit<User, 'password'> & {id: number, created_at?: string};
+
 interface UserCredentials {
   userName: string;
   password: string;
@@ -26,9 +28,9 @@ type BookingType = "reserve" | "purchase"
 interface UsersAPI {
   getById: (id: number) => Promise<User>;
   getByUserName: (userName: User['userName']) => Promise<ResponseElectronUser>;
-  getUsers: () => Promise<User[]>;
-  addUser: (user: User) => Promise<ResponseElectronUser>;
-  updateUser: (user: User) => Promise<ResponseElectronGeneric>;
+  getUsers: () => Promise<ResponseElectronGeneric>;
+  addUser: (user: User) => Promise<ResponseElectronGeneric>;
+  updateUser: (user: UserSample) => Promise<ResponseElectronGeneric>;
   logout: () => Promise<ResponseElectronGeneric>;
   authUser: (UserCredentials) => Promise<ResponseElectronUser>;
   checkSession: () => Promise<ResponseElectronUser>;

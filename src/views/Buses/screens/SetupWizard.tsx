@@ -7,6 +7,7 @@ import FinishStep from "./FinishStep"
 import { MonitorCog } from "lucide-react"
 import RoutesStep from "./RoutesStep"
 import SchedulesStep from "./SchedulesStep"
+import DriverStep from "./DriverStep"
 
 export type handlerSteps = {
     onNext?: () => void;
@@ -61,8 +62,9 @@ export default function SetupWizard() {
             {step === 0 && <AgencyStep onNext={next} />}
             {step === 1 && <BusesStep onNext={next} onBack={back} />}
             {step === 2 && <RoutesStep onNext={next} onBack={back} />}
-            {step === 3 && <SchedulesStep onNext={next} onBack={back} />}
-            {step === 4 && <FinishStep />}
+            {step === 3 && <DriverStep onNext={next} onBack={back} />}
+            {step === 4 && <SchedulesStep onNext={next} onBack={back} />}
+            {step === 5 && <FinishStep />}
         </>
     )
 }

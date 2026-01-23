@@ -3,7 +3,7 @@ const db = getDB();
 
 export const userRepo = {
   getAll: () => new Promise((resolve, reject) => {
-    db.all("SELECT * FROM users", (err, rows) => (err ? reject(err) : resolve(rows)));
+    db.all("SELECT id, name, userName, status, phone, role, date(created_at) as created_at FROM users", (err, rows) => (err ? reject(err) : resolve(rows)));
   }),
 
   getById: (id: User['id']) =>

@@ -43,6 +43,8 @@ export function registerUserHandlers() {
 
         try {
             const users = await userRepo.getAll();
+            console.log('users/employees ->', users);
+
             if (!users) return { ok: false, data: [], error: { message: "No se obtuvieron usuarios", detail: "No data" } }
             return { ok: true, error: null, data: users }
         } catch (error) {
@@ -95,9 +97,11 @@ export function registerUserHandlers() {
     });
     ipcMain.handle("updateUser", async (_event, user: User): Promise<ResponseElectronGeneric> => {
         try {
-            if (!user.password) throw new ValidationError('Falta de datos', 'El password a actualizar es obligatorio');
-            user.password = await hashPassword(user.password);
-            user.status = 'active';
+            if (user.password){
+                user.password = await hashPassword(user.password);
+                user.status = 'active';
+            } 
+            // throw new ValidationError('Falta de datos', 'El password a actualizar es obligatorio');
 
             const userUpdate = await userRepo.update({
                 name: user.name,

@@ -1,31 +1,41 @@
 import type React from "react"
 import { useAuth } from "../context/AuthContext"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { Bus, User as UserIcon, Phone, UserCircle } from "lucide-react"
+import { useSearchParams } from "react-router-dom"
+import { useDashboard } from "../context/DashBoardContext"
 
-export interface UserRegister extends User {
-    confirmPassword: string;
-}
+export type UserForm = Omit<User, 'password'>
 
-const dataInicialForm: UserRegister = {
+const dataInicialForm: UserForm = {
     name: "",
     userName: "",
-    password: "temporal123",
-    confirmPassword: "temporal123",
+    // password: "temporal123",
+    // confirmPassword: "temporal123",
     phone: "",
     role: null,
     status: "registered"
 }
 
-export default function RegisterUser() {
-    const { handleRegisterUser, loading, setLoading, getUniqueUserName } = useAuth();
+interface Props {
+    configInitial: boolean;
+    onCancel: () => void;
+    initialData?: UserSample;
+    isEditing: boolean;
+}
 
-    const [formData, setFormData] = useState<UserRegister>(dataInicialForm)
+export default function RegisterUser({ configInitial, initialData, onCancel, isEditing }: Props) {
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const { getUniqueUserName } = useAuth();
+    const { isLoading, handleRegisterUser } = useDashboard();
+
+    const [formData, setFormData] = useState<UserForm>(initialData ? initialData : dataInicialForm)
     // const [showPassword, setShowPassword] = useState(false)
     // const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -34,18 +44,19 @@ export default function RegisterUser() {
         e.preventDefault()
 
 
-        setLoading(true)
-
-        const resp = await handleRegisterUser(formData);
+        const resp = await handleRegisterUser(formData, configInitial, isEditing);
         if (!resp) return;
+        setSearchParams(prev => {
+            prev.set('viewAtEmployees', 'list')
+            return prev;
+        })
         setFormData(dataInicialForm);
+
 
     }
 
     const handleChange = (field: string, value: string) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
-
-
     }
 
 
@@ -99,7 +110,7 @@ export default function RegisterUser() {
                                 minLength={10}
                                 className="pl-10"
                                 required
-                                disabled={loading}
+                                disabled={isLoading}
                             />
                         </div>
                     </div>
@@ -196,7 +207,7 @@ export default function RegisterUser() {
                                 }}
                                 className="pl-10"
                                 required
-                                disabled={loading}
+                                disabled={isLoading}
                                 maxLength={10}
                             />
                         </div>
@@ -206,7 +217,7 @@ export default function RegisterUser() {
                         <Label htmlFor="role" className="text-sm font-medium">
                             Rol
                         </Label>
-                        <Select value={formData.role || ''} onValueChange={(value) => handleChange("role", value)} disabled={loading}>
+                        <Select value={formData.role || ''} onValueChange={(value) => handleChange("role", value)} disabled={isLoading}>
                             <SelectTrigger id="role" className="w-full">
                                 <SelectValue placeholder="Selecciona un rol" />
                             </SelectTrigger>
@@ -219,15 +230,18 @@ export default function RegisterUser() {
                         </Select>
                     </div>
 
-                    <Button type="submit" className="w-full h-11 text-base font-medium" disabled={loading || !formData.userName}>
-                        {loading ? (
+                    <Button type="submit" className="w-full h-11 text-base font-medium" disabled={isLoading || !formData.userName}>
+                        {isLoading ? (
                             <span className="flex items-center gap-2">
                                 <span className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                                 Registrando...
                             </span>
                         ) : (
-                            "Registrar empleado"
+                            initialData ? "Guardar cambios" : "Registrar empleado"
                         )}
+                    </Button>
+                    <Button type="submit" onClick={onCancel} className="w-full h-11 text-base font-medium">
+                        Cancelar
                     </Button>
 
 
