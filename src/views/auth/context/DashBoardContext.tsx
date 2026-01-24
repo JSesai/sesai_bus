@@ -29,7 +29,7 @@ type DashboardContextType = {
     handleGetBuses: () => Promise<void>
     handleRegisterAgency: (agency: Agency, editingAgency?: boolean, configInitial?: boolean) => Promise<boolean>;
     handleRegisterRoute: (dataRoute: Route, editingRoute?: boolean, configInitial?: boolean) => Promise<boolean>;
-    handleRegisterSchedules: (schedule: ScheduleFormData, editingSchedule?: boolean, configInitial?: boolean) => Promise<boolean>;
+    handleRegisterSchedules: (schedule: Schedule, editingSchedule?: boolean, configInitial?: boolean) => Promise<boolean>;
     handleRegisterUser: (user: UserForm, configInitial: boolean, isEditing: boolean) => Promise<boolean>;
 
 };
@@ -451,7 +451,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
                 });
 
                 toast.success('Registro exitoso.', {
-                    description: 'La cuenta ha sido creada correctamente',
+                    description: isEditing ? 'Cuenta actualizada correctamente' : 'La cuenta ha sido creada correctamente',
                     richColors: true,
                     duration: 20_000,
                     position: 'top-center'
@@ -489,7 +489,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
 
     //manejador para crear/actualizar horarios
-    const handleRegisterSchedules = async (scheduleForm: ScheduleFormData, editingSchedule: boolean = false, configInitial = false): Promise<boolean> => {
+    const handleRegisterSchedules = async (scheduleForm: Schedule, editingSchedule: boolean = false, configInitial = false): Promise<boolean> => {
 
         try {
             setIsLoading(true);
@@ -551,8 +551,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
 
     const driverEmployees = useMemo(() => employees.filter(e => e.role === 'driver'), [employees]);
-    console.log({driverEmployees});
-    
+    console.log({ driverEmployees });
+
 
 
     // get agencia

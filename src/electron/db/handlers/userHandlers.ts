@@ -67,10 +67,10 @@ export function registerUserHandlers() {
                 throw new RegisterUserError("Ingresa la informacion completa.", "Faltan datos para poder realizar el registro del usuario.");
 
             user.password = await hashPassword(user.password);
-            const result: User = await userRepo.add(user);
+            const result: UserSample = await userRepo.add(user);
             if (!result) throw new RegisterUserError("Error al crear usuario", "Intentalo mas tarde");
-            const { password, ...rest } = result;
-            return { ok: true, data: rest, error: null };
+            // const { password, ...rest } = result;
+            return { ok: true, data: result, error: null };
 
         } catch (error: any) {
             //logger

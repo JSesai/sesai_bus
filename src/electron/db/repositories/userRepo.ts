@@ -14,12 +14,19 @@ export const userRepo = {
       });
     }),
 
-  add: (user: User): Promise<User> =>
+  add: (user: User): Promise<UserSample> =>
 
     new Promise((resolve, reject) => {
       db.run("INSERT INTO users (name, userName, password, status, phone, role) VALUES (?, ?, ?, ?, ?, ?)", [user.name, user.userName, user.password, user.status, user.phone, user.role], function (err) {
         if (err) reject(err);
-        else resolve({ id: this.lastID, ...user } as User);
+        else {
+          db.get(`SELECT id, name, userName, status, phone, role, date(created_at) as created_at FROM users WHERE id = ?`,
+            [this.lastID],
+            (err2, rowGet) => {
+              if (err2) reject(err2);
+              else resolve(rowGet as UserSample);
+            });
+        }
       });
     }),
   update: (user: User) =>

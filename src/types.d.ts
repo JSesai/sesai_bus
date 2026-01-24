@@ -10,7 +10,7 @@ interface User {
   phone: string;
 }
 
-type UserSample  = Omit<User, 'password'> & {id: number, created_at?: string};
+type UserSample = Omit<User, 'password'> & { id: number, created_at?: string };
 
 interface UserCredentials {
   userName: string;
@@ -94,6 +94,7 @@ interface Driver {
 // }
 
 
+type StatusType = 'active' | 'disabled' | 'removed';
 
 interface Route {
   id?: number;
@@ -107,7 +108,7 @@ interface Route {
   baseFare: number;
   estimatedTravelTime: string | number;
   remarks: string;
-  status: 'active' | 'disabled' | 'removed';
+  status: StatusType
 
 }
 
@@ -121,13 +122,15 @@ interface RouteTravelAPI {
 
 interface Schedule {
   id?: number;
-  route_id: number;
-  bus_id: number;
-  driver_id: number;
-  agency_id: number;
-  vehicle_number: number;
-  departure_time: string; // ISO string o formato de tu preferencia
-  arrival: string;        // ISO string o formato de tu preferencia
+  route_id: number; //destino
+  bus_id: number; // bus asignado
+  driver_id: number; //chofer
+  agency_id_origin: number;  //origen
+  vehicle_number: number; // numero de venhiculo
+  departure_time: string; //hora de salida
+  arrival_time: string;   //hora de llegada
+  status: StatusType;
+  created_at?: string;
 }
 
 interface ScheduleAPI {

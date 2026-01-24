@@ -59,8 +59,6 @@ export default function RegisterUser({ configInitial, initialData, onCancel, isE
         setFormData((prev) => ({ ...prev, [field]: value }));
     }
 
-
-
     //debounce para busqueda de nombre valido
     useEffect(() => {
 

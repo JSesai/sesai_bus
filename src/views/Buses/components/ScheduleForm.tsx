@@ -23,42 +23,36 @@ export type ScheduleFormData = {
 }
 
 type HorarioFormProps = {
-  initialData?: ScheduleFormData
-  onSubmit: (data: ScheduleFormData) => void
+  initialData?: Schedule
   onCancel: () => void
   isEditing?: boolean
 }
 
-export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing = false }: HorarioFormProps) {
+const initialDataForm: Schedule = {
+  route_id: 0,
+  bus_id: 0,
+  driver_id: 0,
+  agency_id_origin: 0,
+  vehicle_number: 0,
+  departure_time: '',
+  arrival_time: '',
+  status: 'active',
+}
+
+export default function HorarioForm({ initialData, onCancel, isEditing = false }: HorarioFormProps) {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const { agency, destinations, vehicles, runningSchedules, handleRegisterSchedules } = useDashboard();
 
-  const [formData, setFormData] = useState<ScheduleFormData>(
-    initialData || {
-      origen: "",
-      destino: "",
-      horaSalida: "",
-      horaLlegada: "",
-      vehiculo: "",
-      numeroVehiculo: 0,
-    
-    },
-  )
+  const [formData, setFormData] = useState<Schedule>(initialData || initialDataForm)
 
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-
- 
 
     const successRegister = await handleRegisterSchedules(formData);
     if (!successRegister) return;
-
-    onSubmit(formData)
-    setIsLoading(false)
 
   }
 
@@ -70,7 +64,7 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
 
     const arrivalTime = Number(deapureTime) + Number(destinations[0].estimatedTravelTime)
     console.log({ deapureTime, arrivalTime });
-    setFormData({ ...formData, horaSalida: e.target.value, horaLlegada: e.target.value })
+    setFormData({ ...formData, departure_time: e.target.value, arrival_time: e.target.value })
 
   }
   console.log(formData);
@@ -108,7 +102,7 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 Destino
               </Label>
-              <Select value={formData.destino} onValueChange={(value) => setFormData({ ...formData, destino: value })}>
+              <Select value={String(formData.route_id)} onValueChange={(value) => setFormData({ ...formData, route_id: +value })}>
                 <SelectTrigger id="destino" className="w-full py-5">
                   <SelectValue placeholder="Seleccionar destino" />
                 </SelectTrigger>
@@ -130,7 +124,7 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
               <Input
                 id="horaSalida"
                 type="time"
-                value={formData.horaSalida}
+                value={formData.departure_time}
                 defaultValue={'10:00'}
                 onChange={handleDepartureTime}
                 className="h-11"
@@ -146,11 +140,11 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
               <Input
                 id="horaLlegada"
                 type="time"
-                value={formData.horaLlegada}
+                value={formData.arrival_time}
                 onChange={(e) => {
                   console.log(e.target.value);
 
-                  setFormData({ ...formData, horaLlegada: e.target.value })
+                  setFormData({ ...formData, arrival_time: e.target.value })
                 }}
                 className="h-11"
                 required
@@ -163,8 +157,8 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
                 Autobús
               </Label>
               <Select
-                value={formData.vehiculo}
-                onValueChange={(value) => setFormData({ ...formData, vehiculo: value })}
+                value={String(formData.bus_id)}
+                onValueChange={(value) => setFormData({ ...formData, bus_id: +value })}
               >
                 <SelectTrigger id="autobus" className="py-5  w-full">
                   <SelectValue placeholder="Seleccionar autobús" />
@@ -188,9 +182,8 @@ export default function HorarioForm({ initialData, onSubmit, onCancel, isEditing
                 id="precio"
                 type="number"
                 min="1"
-                // step="0.01"
-                value={formData.numeroVehiculo}
-                onChange={(e) => setFormData({ ...formData, numeroVehiculo: Number.parseFloat(e.target.value) || 0 })}
+                value={formData.vehicle_number}
+                onChange={(e) => setFormData({ ...formData, vehicle_number: +e.target.value })}
                 className="h-11"
                 required
               />

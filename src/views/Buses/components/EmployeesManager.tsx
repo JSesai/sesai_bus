@@ -33,13 +33,14 @@ export default function EmployeesManager({ configInitial = false }: { configInit
 
     const { employees, driverEmployees, numberRegisteredDriver } = useDashboard();
     const [searchParams, setSearchParams] = useSearchParams();
-
-    const [users, setUsers] = useState<UserSample[]>(configInitial ? driverEmployees : employees);
     const [searchTerm, setSearchTerm] = useState("")
-    const [view, setView] = useState<"list" | "add" | "edit">("list")
     const [editingUsuario, setEditingUsuario] = useState<UserSample | null>(null)
 
+    const users: UserSample[] = configInitial ? driverEmployees : employees;
     const viewActiveAtEmployees = searchParams.get("viewAtEmployees") ?? "list";
+
+    console.log({ employees, driverEmployees, numberRegisteredDriver, users });
+
 
 
     // const handleAddUsuario = (newUsuario: Omit<Usuario, "id" | "fechaRegistro">) => {
@@ -123,7 +124,7 @@ export default function EmployeesManager({ configInitial = false }: { configInit
                 <div>
                     <h1 className="text-3xl font-bold text-balance mb-2">{configInitial ? 'Gestión de Operadores' : 'Gestión de Usuarios'}</h1>
                     {configInitial ?
-                        <p className="text-muted-foreground text-pretty">Puedes agregar varios usuarios. Al menos un operador es obliogatorio</p>
+                        <p className="text-muted-foreground text-pretty">Puedes agregar varios usuarios. Al menos un operador activo es obliogatorio</p>
                         :
                         <p className="text-muted-foreground text-pretty">Administra los empleados del sistema</p>
                     }
@@ -199,7 +200,7 @@ export default function EmployeesManager({ configInitial = false }: { configInit
                                 </p>
                             </div>
 
-                            <div className="flex gap-2 pt-2">
+                            {configInitial ?? <div className="flex gap-2 pt-2">
                                 <Button variant="outline" size="sm" onClick={() => startEdit(user)} className="flex-1 gap-2">
                                     <Edit className="h-4 w-4" />
                                     Editar
@@ -218,6 +219,7 @@ export default function EmployeesManager({ configInitial = false }: { configInit
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
                             </div>
+                                }
                         </CardContent>
                     </Card>
                 ))}
