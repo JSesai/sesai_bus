@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
-import { AgencyError, AppError, BusError, DestinationRouteError, ValidationError } from "../../../shared/errors/customError";
+import { AgencyError, AppError, BusError, DestinationRouteError, ScheduleError, ValidationError } from "../../../shared/errors/customError";
 import { useAuth } from "./AuthContext";
 import { isvalidHour } from "../../../shared/utils/helpers";
 import type { ScheduleFormData } from "../../Buses/components/ScheduleForm";
@@ -489,24 +489,18 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
 
     //manejador para crear/actualizar horarios
-    const handleRegisterSchedules = async (scheduleForm: Schedule, editingSchedule: boolean = false, configInitial = false): Promise<boolean> => {
+    const handleRegisterSchedules = async (sendSchedule: Schedule, editingSchedule: boolean = false, configInitial = false): Promise<boolean> => {
 
         try {
             setIsLoading(true);
-            //todo seguir revisando que se envie la informacion que requiere el handler para agregar el horario de salida
-            // const sendSchedule: Schedule = {
-            //     route_id: Number(scheduleForm.destino),
-            //     agency_id: agency?.id || 0,
-            //     bus_id: Number(scheduleForm.vehiculo),
-            //     vehicle_number: scheduleForm.numeroVehiculo,
+            const scheduleRegister = editingSchedule ? await window.electron.schedules.updateSchedule(sendSchedule) : await window.electron.schedules.addSchedule(sendSchedule);
+            console.log({ scheduleRegister });
 
+            if (scheduleRegister.error) throw new ScheduleError(scheduleRegister.error.message, scheduleRegister.error.detail)
 
-            // }
-            // const schedules = editingSchedule ? await window.electron.schedules.updateSchedule(sendSchedule) : await window.electron.schedules.addSchedule(sendSchedule);
-            // console.log({ schedules });
-            // if (!schedules.ok) return false;
-            // setRunningSchedules(schedules?.data);
+            setRunningSchedules(scheduleRegister?.data);
             return true;
+
 
         } catch (e) {
             console.log('ocurrio un error al obtener los horarios', e);

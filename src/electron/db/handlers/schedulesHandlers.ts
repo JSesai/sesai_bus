@@ -31,8 +31,8 @@ export function registerSchedulesHandlers() {
     ipcMain.handle("addSchedule", async (_, schedule: Schedule) => {
 
         try {
-            console.log(schedule);
-            if (!schedule.route_id || !schedule.driver_id || !schedule.departure_time || !schedule.bus_id || !schedule.arrival || !schedule.agency_id)
+            console.log('init process add schedule', schedule);
+            if (!schedule.route_id || !schedule.driver_id || !schedule.departure_time || !schedule.bus_id || !schedule.arrival_time || !schedule.agency_id_origin)
                 throw new ScheduleError("No se pudo agregar horario.altan datos por  completar")
             const scheduleResponse = await schedulesRepo.add(schedule);
             console.log('schedules create ->', scheduleResponse);

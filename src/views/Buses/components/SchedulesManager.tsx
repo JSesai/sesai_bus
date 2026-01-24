@@ -72,19 +72,19 @@ export default function SchedulesManager({ configInitial = false }: { configInit
   const { numberRegisterSchedule, runningSchedules } = useDashboard();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [horarios, setHorarios] = useState<Horario[]>(initialHorarios)
+  const [departureTimeRecords, setDepartureTimeRecords] = useState<Schedule[]>(runningSchedules)
   const [searchTerm, setSearchTerm] = useState("")
-  const [editingHorario, setEditingHorario] = useState<Schedule | null>(null)
+  const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null)
 
   const viewActiveAtSchedule = searchParams.get("viewAtSchedule") ?? "list";
 
 
-  const filteredHorarios = horarios.filter(
-    (horario) =>
-      horario.origen.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      horario.destino.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      horario.numeroAutobus.includes(searchTerm),
-  )
+  // const filteredHorarios = departureTimeRecords.filter(
+  //   (schedule) =>
+  //     schedule.agency_id_origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     schedule.route_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     schedule.vehicle_number.includes(searchTerm),
+  // )
 
   // const handleAddHorario = (newHorario: Omit<Horario, "id">) => {
   //   const id = Math.max(...horarios.map((h) => h.id), 0) + 1
@@ -95,29 +95,29 @@ export default function SchedulesManager({ configInitial = false }: { configInit
   //   })
   // }
 
-  const handleEditHorario = (updatedHorario: Omit<Horario, "id">) => {
-    if (editingHorario) {
-      setHorarios(horarios.map((h) => (h.id === editingHorario.id ? { ...updatedHorario, id: editingHorario.id } : h)))
-      setEditingHorario(null)
-      setSearchParams(prev => {
-        prev.set('viewAtSchedule', 'list')
-        return prev;
-      })
-    }
-  }
+  // const handleEditHorario = (updatedHorario: Schedule) => {
+  //   if (editingHorario) {
+
+  //     setEditingHorario(null)
+  //     setSearchParams(prev => {
+  //       prev.set('viewAtSchedule', 'list')
+  //       return prev;
+  //     })
+  //   }
+  // }
 
   const handleDeleteHorario = (id: number) => {
-    if (confirm("¿Estás seguro de que deseas eliminar este horario?")) {
-      setHorarios(horarios.filter((h) => h.id !== id))
-    }
+    // if (confirm("¿Estás seguro de que deseas eliminar este horario?")) {
+    //   setHorarios(horarios.filter((h) => h.id !== id))
+    // }
   }
 
   const handleToggleActivo = (id: number) => {
-    setHorarios(horarios.map((h) => (h.id === id ? { ...h, activo: !h.activo } : h)))
+    // setHorarios(horarios.map((h) => (h.id === id ? { ...h, activo: !h.activo } : h)))
   }
 
-  const startEdit = (horario: Horario) => {
-    setEditingHorario(horario)
+  const startEdit = (horario: Schedule) => {
+    setEditingSchedule(horario)
     setSearchParams(prev => {
       prev.set('viewAtSchedule', 'edit')
       return prev;
@@ -138,20 +138,20 @@ export default function SchedulesManager({ configInitial = false }: { configInit
     )
   }
 
-  if (viewActiveAtSchedule === "edit" && editingHorario) {
+  if (viewActiveAtSchedule === "edit" && editingSchedule) {
     return (
       <div className="space-y-6">
 
         <ScheduleForm
-          initialData={editingHorario}
+          isEditing
+          initialData={editingSchedule}
           onCancel={() => {
-            setEditingHorario(null)
+            setEditingSchedule(null)
             setSearchParams(prev => {
               prev.set('viewAtSchedule', 'list')
               return prev;
             })
           }}
-          isEditing
         />
       </div>
     )
@@ -161,7 +161,7 @@ export default function SchedulesManager({ configInitial = false }: { configInit
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-balance mb-2">Gestión de Horarios</h1>
+          <h1 className="text-3xl font-bold text-balance mb-2">Gestión de Horarios de Salida</h1>
           <p className="text-muted-foreground text-pretty">Administra los horarios y salidas disponibles</p>
         </div>
         {numberRegisterSchedule > 0 &&
@@ -183,7 +183,7 @@ export default function SchedulesManager({ configInitial = false }: { configInit
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Buscar por origen, destino o autobΓΊs..."
+            placeholder="Buscar por origen, destino o autobús..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 h-11"
@@ -192,8 +192,8 @@ export default function SchedulesManager({ configInitial = false }: { configInit
       }
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredHorarios.map((horario) => (
-          <Card key={horario.id} className={`transition-all hover:shadow-md ${!horario.activo ? "opacity-60" : ""}`}>
+        {departureTimeRecords.map((schedule) => (
+          <Card key={schedule.id} className={`transition-all hover:shadow-md ${schedule.status === 'disabled' ? "opacity-60" : ""}`}>
             <CardContent className="p-5 space-y-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
@@ -202,13 +202,13 @@ export default function SchedulesManager({ configInitial = false }: { configInit
                   </div>
                   <div>
                     <h3 className="font-semibold text-base text-balance">
-                      {horario.origen} → {horario.destino}
+                      {schedule.agency_id_origin} → {schedule.route_id}
                     </h3>
-                    <p className="text-sm text-muted-foreground">Salida: {horario.horaSalida}</p>
+                    <p className="text-sm text-muted-foreground">Salida: {schedule.arrival_time}</p>
                   </div>
                 </div>
-                <Badge variant={horario.activo ? "default" : "secondary"} className="text-xs">
-                  {horario.activo ? "Activo" : "Inactivo"}
+                <Badge variant={schedule.status === "active" ? "default" : "secondary"} className="text-xs">
+                  {schedule.status === "active" ? "Activo" : "Inactivo"}
                 </Badge>
               </div>
 
@@ -216,30 +216,30 @@ export default function SchedulesManager({ configInitial = false }: { configInit
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="text-muted-foreground">
-                    Origen: <span className="font-medium text-foreground">{horario.origen}</span>
+                    Origen: <span className="font-medium text-foreground">{schedule.agency_id_origin}</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="text-muted-foreground">
-                    Destino: <span className="font-medium text-foreground">{horario.destino}</span>
+                    Destino: <span className="font-medium text-foreground">{schedule.route_id}</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Bus className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="text-muted-foreground">
-                    AutobΓΊs: <span className="font-medium text-foreground">#{horario.numeroAutobus}</span>
+                    Autobús: <span className="font-medium text-foreground">#{schedule.vehicle_number}</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="text-muted-foreground">
-                    Llegada: <span className="font-medium text-foreground">{horario.horaLlegada}</span>
+                    Llegada: <span className="font-medium text-foreground">{schedule.arrival_time}</span>
                   </span>
                 </div>
               </div>
 
-              <div className="border-t border-border pt-3">
+              {/* <div className="border-t border-border pt-3">
                 <div className="flex items-start gap-2 mb-2">
                   <Calendar className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                   <div className="flex-1">
@@ -253,33 +253,33 @@ export default function SchedulesManager({ configInitial = false }: { configInit
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
-              <div className="flex items-center justify-between pt-2 border-t border-border">
+              {/* <div className="flex items-center justify-between pt-2 border-t border-border">
                 <div>
                   <p className="text-xs text-muted-foreground">Precio</p>
                   <p className="text-xl font-bold text-green-600">${horario.precio}</p>
                 </div>
-              </div>
+              </div> */}
 
-              {horario.notas && (
+              {/* {schedule. && (
                 <p className="text-xs text-muted-foreground italic text-pretty border-t border-border pt-2">
                   {horario.notas}
                 </p>
-              )}
+              )} */}
 
               <div className="flex gap-2 pt-2">
-                <Button variant="outline" size="sm" onClick={() => startEdit(horario)} className="flex-1 gap-2">
+                <Button variant="outline" size="sm" onClick={() => startEdit(schedule)} className="flex-1 gap-2">
                   <Edit className="h-4 w-4" />
                   Editar
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => handleToggleActivo(horario.id)} className="flex-1">
-                  {horario.activo ? "Desactivar" : "Activar"}
+                <Button variant="outline" size="sm" onClick={() => handleToggleActivo(schedule.id || 0)} className="flex-1">
+                  {schedule.status === "active" ? "Desactivar" : "Activar"}
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleDeleteHorario(horario.id)}
+                  onClick={() => handleDeleteHorario(schedule.id || 0)}
                   className="text-destructive hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -294,7 +294,7 @@ export default function SchedulesManager({ configInitial = false }: { configInit
         <div className="text-center py-12">
           <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
           <h3 className="text-lg font-semibold mb-2">No se encontraron horarios</h3>
-          <p className="text-muted-foreground mb-4">Intenta con otra búsqueda o agrega un nuevo horario</p>
+          {configInitial ?? <p className="text-muted-foreground mb-4">Intenta con otra búsqueda o agrega un nuevo horario</p>}
           <Button onClick={() => {
             setSearchParams(prev => {
               prev.set('viewAtSchedule', 'add')

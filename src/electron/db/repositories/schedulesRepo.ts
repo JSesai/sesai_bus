@@ -21,15 +21,16 @@ export const schedulesRepo = {
   add: (schedule: Schedule) =>
     new Promise((resolve, reject) => {
       db.run(
-        `INSERT INTO schedules (route_id, bus_id, driver_id, agency_id, departure_time, arrival)
-         VALUES (?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO schedules (route_id, bus_id,vehicle_number, driver_id, agency_id, departure_time, arrival)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
           schedule.route_id,
           schedule.bus_id,
+          schedule.vehicle_number,
           schedule.driver_id,
-          schedule.agency_id,
+          schedule.agency_id_origin,
           schedule.departure_time,
-          schedule.arrival,
+          schedule.arrival_time,
         ],
         function (err) {
           if (err) reject(err);

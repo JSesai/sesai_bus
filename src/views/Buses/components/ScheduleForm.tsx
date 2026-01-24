@@ -3,10 +3,8 @@ import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
-import { Textarea } from "../../components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
-import { Checkbox } from "../../components/ui/checkbox"
-import { Clock, MapPin, Bus, Calendar, DollarSign, BusFront, BubblesIcon, PanelTopOpen, ListOrdered } from "lucide-react"
+import { MapPin, Bus, ListOrdered, SquareUserRound, Clock3, ClockPlus, Clock2 } from "lucide-react"
 import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useSearchParams } from "react-router-dom"
 import { ScheduleError } from "../../../shared/errors/customError"
@@ -32,7 +30,7 @@ const initialDataForm: Schedule = {
   route_id: 0,
   bus_id: 0,
   driver_id: 0,
-  agency_id_origin: 0,
+  agency_id_origin: 1,
   vehicle_number: 0,
   departure_time: '',
   arrival_time: '',
@@ -42,7 +40,7 @@ const initialDataForm: Schedule = {
 export default function HorarioForm({ initialData, onCancel, isEditing = false }: HorarioFormProps) {
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const { agency, destinations, vehicles, runningSchedules, handleRegisterSchedules } = useDashboard();
+  const { agency, destinations, vehicles, driverEmployees, handleRegisterSchedules } = useDashboard();
 
   const [formData, setFormData] = useState<Schedule>(initialData || initialDataForm)
 
@@ -51,8 +49,13 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const successRegister = await handleRegisterSchedules(formData);
+    const successRegister = await handleRegisterSchedules(formData, isEditing);
     if (!successRegister) return;
+
+    setSearchParams(prev => {
+      prev.set('viewAtSchedule', 'list')
+      return prev;
+    })
 
   }
 
@@ -74,7 +77,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
     <Card className="max-w-3xl mx-auto">
       <CardHeader>
         <CardTitle className="text-2xl flex items-center gap-2">
-          <Clock className="h-6 w-6 text-cyan-500" />
+          <ClockPlus size={30} className="text-cyan-500" />
           {isEditing ? "Editar Horario" : "Agregar Nuevo Horario"}
         </CardTitle>
       </CardHeader>
@@ -89,7 +92,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
               <Input
                 id="horaSalida"
                 type="text"
-                value={`${agency.city} - ${agency.name}`}
+                value={`${agency.city.toUpperCase()} - ${agency.name.toUpperCase()}`}
                 className="h-11"
                 required
                 disabled
@@ -109,7 +112,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
                 <SelectContent>
                   {destinations.map((destino) => (
                     <SelectItem key={destino.id} value={String(destino.id)}>
-                      {destino.cityName}{' - '}{destino.terminalName}
+                      {destino.cityName.toUpperCase()}{' - '}{destino.terminalName.toUpperCase()}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -118,23 +121,23 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
 
             <div className="space-y-2">
               <Label htmlFor="horaSalida" className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <Clock2 className="h-4 w-4 text-muted-foreground" />
                 Hora de Salida
               </Label>
               <Input
                 id="horaSalida"
                 type="time"
                 value={formData.departure_time}
-                defaultValue={'10:00'}
                 onChange={handleDepartureTime}
                 className="h-11"
                 required
+                disabled={formData.route_id === 0}
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="horaLlegada" className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <Clock3 className="h-4 w-4 text-muted-foreground" />
                 Hora de Llegada
               </Label>
               <Input
@@ -148,6 +151,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
                 }}
                 className="h-11"
                 required
+                disabled={formData.arrival_time === ""}
               />
             </div>
 
@@ -157,6 +161,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
                 Autobús
               </Label>
               <Select
+                disabled={formData.arrival_time === ""}
                 value={String(formData.bus_id)}
                 onValueChange={(value) => setFormData({ ...formData, bus_id: +value })}
               >
@@ -166,7 +171,30 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
                 <SelectContent>
                   {vehicles.map((vehicle) => (
                     <SelectItem key={vehicle.id} value={String(vehicle.id)}>
-                      {vehicle.model} {' '}{vehicle.year}
+                      {vehicle.model.toUpperCase()} {' '}{vehicle.year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="operador" className="flex items-center gap-2">
+                <SquareUserRound className="h-4 w-4 text-muted-foreground" />
+                Operador
+              </Label>
+              <Select
+                value={String(formData.driver_id)}
+                onValueChange={(value) => setFormData({ ...formData, driver_id: +value })}
+                disabled={formData.bus_id === 0}
+              >
+                <SelectTrigger id="operador" className="py-5  w-full">
+                  <SelectValue placeholder="Seleccionar operador" />
+                </SelectTrigger>
+                <SelectContent>
+                  {driverEmployees.map((driver) => (
+                    <SelectItem key={driver.id} value={String(driver.id)}>
+                      {driver.name.toUpperCase()}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -186,6 +214,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
                 onChange={(e) => setFormData({ ...formData, vehicle_number: +e.target.value })}
                 className="h-11"
                 required
+                disabled={formData.bus_id === 0}
               />
             </div>
 
@@ -193,9 +222,6 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
 
 
           <div className="flex gap-3 pt-4">
-            <Button type="submit" className="flex-1 h-11" disabled={isLoading}>
-              {isLoading ? "Guardando..." : isEditing ? "Actualizar Horario" : "Crear Horario"}
-            </Button>
             <Button
               type="button"
               variant="outline"
@@ -204,6 +230,9 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
               disabled={isLoading}
             >
               Cancelar
+            </Button>
+            <Button type="submit" className="flex-1 h-11" disabled={isLoading}>
+              {isLoading ? "Guardando..." : isEditing ? "Actualizar Horario" : "Crear Horario"}
             </Button>
           </div>
         </form>
