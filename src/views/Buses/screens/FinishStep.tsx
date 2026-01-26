@@ -1,16 +1,24 @@
 import { useNavigate } from "react-router-dom"
 import { Button } from "../../components/ui/button"
+import { useDashboard } from "../../auth/context/DashBoardContext"
+import { useEffect } from "react";
 
 export default function FinishStep() {
+
+  const { showConfetti } = useDashboard();
   const navigate = useNavigate()
 
-  const finish = async () => {
+  showConfetti();
+
+  const finish = async () => navigate("/dashboard");
+
+
+  useEffect(() => {
     // await window.electron.invoke("updateAppConfig", {
     //   initial_setup_completed: 1
     // })
 
-    navigate("/dashboard")
-  }
+  }, []);
 
   return (
     <div className="text-center space-y-6">

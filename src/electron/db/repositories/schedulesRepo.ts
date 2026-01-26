@@ -6,7 +6,24 @@ export const schedulesRepo = {
   getAll: () =>
     new Promise((resolve, reject) => {
       db.all(
-        `SELECT * FROM schedules`,
+        `
+        SELECT 
+          s.id, 
+          s.vehicle_number, 
+          s.departure_time, 
+          s.arrival as arrival_time, 
+          s.status, 
+          s.created_at, 
+          r.cityName AS route_id,
+          b.model AS bus_id,
+          ud.name AS driver_id,
+          a.name AS agency_id_origin
+          FROM schedules s
+          JOIN routes r ON s.route_id = r.id
+          JOIN buses b ON s.bus_id = b.id 
+          JOIN users ud ON s.driver_id = ud.id 
+          JOIN agencies a ON s.agency_id = a.id;
+        `,
         (err, rows) => (err ? reject(err) : resolve(rows))
       );
     }),

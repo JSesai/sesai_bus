@@ -19,6 +19,7 @@ const steps = [
     "Agencia",
     "Autobuses",
     "Rutas",
+    "operadores",
     "Horarios",
     "Finalizar"
 ]

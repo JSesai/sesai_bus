@@ -10,6 +10,7 @@ export default function SchedulesStep({ onNext, onBack }: handlerSteps) {
 
 
     const { numberRegisterSchedule } = useDashboard();
+console.log(numberRegisterSchedule);
 
 
     return (

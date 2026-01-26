@@ -31,6 +31,7 @@ type DashboardContextType = {
     handleRegisterRoute: (dataRoute: Route, editingRoute?: boolean, configInitial?: boolean) => Promise<boolean>;
     handleRegisterSchedules: (schedule: Schedule, editingSchedule?: boolean, configInitial?: boolean) => Promise<boolean>;
     handleRegisterUser: (user: UserForm, configInitial: boolean, isEditing: boolean) => Promise<boolean>;
+    showConfetti: () => void;
 
 };
 
@@ -45,6 +46,16 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const [destinations, setDestinations] = useState<Route[]>([]);
     const [runningSchedules, setRunningSchedules] = useState<Schedule[]>([]);
     const [employees, setEmployees] = useState<UserSample[]>([]);
+
+
+    //mostrar confetti 
+    const showConfetti = () => {
+        confetti({
+            particleCount: 100,
+            spread: 120,
+            origin: { y: 0.6 }
+        });
+    }
 
     //manejador para obtener buses
     const handleGetBuses = async (): Promise<void> => {
@@ -142,11 +153,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
             console.log(resp);
             if (resp.ok) {
-                configInitial ?? confetti({
-                    particleCount: 100,
-                    spread: 120,
-                    origin: { y: 0.6 }
-                });
+                configInitial ?? showConfetti();
 
                 toast.success(editingBus ? 'Cambios guardados' : 'Registro exitoso.', {
                     description: editingBus ? 'Automobil editado correctamente' : 'Autobús agregado al sistema.',
@@ -232,11 +239,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
             if (!registerAgency.ok) throw new AgencyError("Error inesperado", "Valida el registro de la agencia en el sistema");
 
-            configInitial ?? confetti({
-                particleCount: 100,
-                spread: 120,
-                origin: { y: 0.6 }
-            });
+            configInitial ?? showConfetti();
 
             toast.success(agency ? 'Cambios guardados' : 'Registro exitoso.', {
                 description: agency ? 'Agencia editada correctamente' : 'Agencia agregada al sistema.',
@@ -291,11 +294,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
             console.log(resp);
             if (resp.ok) {
-                configInitial ?? confetti({
-                    particleCount: 100,
-                    spread: 120,
-                    origin: { y: 0.6 }
-                });
+                configInitial ?? showConfetti();
 
                 toast.success(editingRoute ? 'Cambios guardados' : 'Registro exitoso.', {
                     description: editingRoute ? 'Destino editado correctamente' : 'Destino agregado al sistema.',
@@ -444,11 +443,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
             console.log(resp);
             if (resp.ok) {
-                configInitial ?? confetti({
-                    particleCount: 100,
-                    spread: 120,
-                    origin: { y: 0.6 }
-                });
+                configInitial ?? showConfetti();
 
                 toast.success('Registro exitoso.', {
                     description: isEditing ? 'Cuenta actualizada correctamente' : 'La cuenta ha sido creada correctamente',
@@ -563,6 +558,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             handleRegisterRoute,
             handleRegisterSchedules,
             handleRegisterUser,
+            showConfetti,
             destinations,
             runningSchedules,
             vehicles,
