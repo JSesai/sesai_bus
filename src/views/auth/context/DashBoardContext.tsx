@@ -491,9 +491,9 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             const scheduleRegister = editingSchedule ? await window.electron.schedules.updateSchedule(sendSchedule) : await window.electron.schedules.addSchedule(sendSchedule);
             console.log({ scheduleRegister });
 
-            if (scheduleRegister.error) throw new ScheduleError(scheduleRegister.error.message, scheduleRegister.error.detail)
-
-            setRunningSchedules(scheduleRegister?.data);
+            if (scheduleRegister.error) throw new ScheduleError(scheduleRegister.error.message, scheduleRegister.error.detail);
+            const updateSchedules = editingSchedule ? runningSchedules.map(s => s.id === sendSchedule.id ? sendSchedule : s) : [...runningSchedules, sendSchedule];
+            setRunningSchedules(updateSchedules);
             return true;
 
 
@@ -516,8 +516,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
-
-
+    //manejador de carga de informacion del sistema
     const loadSystemInformation = async () => {
         try {
 

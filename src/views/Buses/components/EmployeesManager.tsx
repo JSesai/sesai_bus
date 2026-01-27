@@ -164,7 +164,7 @@ export default function EmployeesManager({ configInitial = false }: { configInit
                                         <UserCircle className="h-6 w-6 text-primary" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="font-semibold text-base text-balance truncate">{user.name}</h3>
+                                        <h3 className="font-semibold text-base text-balance truncate">{user.name.toUpperCase()}</h3>
                                         <p className="text-sm text-muted-foreground">{user.userName}</p>
                                     </div>
                                 </div>

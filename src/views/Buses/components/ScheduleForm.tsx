@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useLayoutEffect, useState } from "react"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { Input } from "../../components/ui/input"
@@ -42,7 +42,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
   const [searchParams, setSearchParams] = useSearchParams();
   const { agency, destinations, vehicles, driverEmployees, handleRegisterSchedules } = useDashboard();
 
-  const [formData, setFormData] = useState<Schedule>(initialData || initialDataForm)
+  const [formData, setFormData] = useState<Schedule>(initialDataForm)
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -70,8 +70,28 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
     setFormData({ ...formData, departure_time: e.target.value, arrival_time: e.target.value })
 
   }
-  console.log(formData);
 
+
+  useLayoutEffect(() => {
+
+    if (isEditing && initialData) {
+      console.log({ initialData, isEditing, vehicles, driverEmployees, destinations });
+      console.log('id del destino', destinations.find(d => d.cityName === String(initialData.route_id))?.id);
+
+      const initialDataUpdated: Schedule = {
+        ...initialData,
+        route_id: destinations.find(d => d.cityName === String(initialData.route_id))?.id || 0
+      }
+      console.log({ initialDataUpdated });
+
+
+      setFormData(initialDataUpdated)
+
+
+    }
+  }, [])
+
+  console.log(formData);
 
   return (
     <Card className="max-w-3xl mx-auto">
@@ -105,7 +125,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 Destino
               </Label>
-              <Select value={String(formData.route_id)} onValueChange={(value) => setFormData({ ...formData, route_id: +value })}>
+              <Select defaultValue={String(formData.route_id)} value={String(formData.route_id)} onValueChange={(value) => setFormData({ ...formData, route_id: +value })}>
                 <SelectTrigger id="destino" className="w-full py-5">
                   <SelectValue placeholder="Seleccionar destino" />
                 </SelectTrigger>

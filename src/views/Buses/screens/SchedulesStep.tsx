@@ -10,13 +10,13 @@ export default function SchedulesStep({ onNext, onBack }: handlerSteps) {
 
 
     const { numberRegisterSchedule } = useDashboard();
-console.log(numberRegisterSchedule);
+    console.log(numberRegisterSchedule);
 
 
     return (
         <div className="space-y-6">
 
-            <SchedulesManager configInitial={true}  />
+            <SchedulesManager configInitial={true} />
 
             <div className="flex justify-end">
 
