@@ -14,6 +14,7 @@ export const schedulesRepo = {
           s.arrival as arrival_time, 
           s.status, 
           s.created_at, 
+          s.daysOperation,
           r.cityName AS route_id,
           b.model AS bus_id,
           ud.name AS driver_id,
@@ -24,7 +25,20 @@ export const schedulesRepo = {
           JOIN users ud ON s.driver_id = ud.id 
           JOIN agencies a ON s.agency_id = a.id;
         `,
-        (err, rows) => (err ? reject(err) : resolve(rows))
+        (err, rows: any[]) => {
+          if (err) reject(err);
+          else {
+            const result = rows.map(row => {
+              return {
+                ...row,
+                daysOperation: JSON.parse(row.daysOperation)
+              }
+            })
+
+            resolve(result)
+
+          }
+        }
       );
     }),
 
@@ -38,8 +52,8 @@ export const schedulesRepo = {
   add: (schedule: Schedule) =>
     new Promise((resolve, reject) => {
       db.run(
-        `INSERT INTO schedules (route_id, bus_id,vehicle_number, driver_id, agency_id, departure_time, arrival)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO schedules (route_id, bus_id,vehicle_number, driver_id, agency_id, departure_time, arrival, daysOperation)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           schedule.route_id,
           schedule.bus_id,
@@ -48,10 +62,44 @@ export const schedulesRepo = {
           schedule.agency_id_origin,
           schedule.departure_time,
           schedule.arrival_time,
+          JSON.stringify(schedule.daysOperation)
         ],
         function (err) {
           if (err) reject(err);
-          else resolve({ id: this.lastID, ...schedule });
+          else {
+            db.get(
+              `
+                SELECT 
+                  s.id AS schedule_id, 
+                  s.vehicle_number, 
+                  s.departure_time, 
+                  s.arrival as arrival_time, 
+                  s.status, 
+                  s.created_at, 
+                  s.daysOperation,
+                  r.cityName AS route_id,
+                  b.model AS bus_id,
+                  ud.name AS driver_id,
+                  a.name AS agency_id_origin
+                  FROM schedules s
+                  JOIN routes r ON s.route_id = r.id
+                  JOIN buses b ON s.bus_id = b.id 
+                  JOIN users ud ON s.driver_id = ud.id 
+                  JOIN agencies a ON s.agency_id = a.id
+                  WHERE s.id = ?
+              `, [this.lastID],
+              (err2, rowGet: any) => {
+                if (err2) reject(err2)
+                else {
+                  const result = {
+                    ...rowGet,
+                    daysOperation: JSON.parse(rowGet.daysOperation)
+                  }
+                  resolve(result);
+                }
+              }
+            )
+          }
         }
       );
     }),

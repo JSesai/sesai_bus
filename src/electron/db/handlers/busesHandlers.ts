@@ -78,23 +78,6 @@ export function busesHandlers() {
     }
 
   });
-  ipcMain.handle("getDailyBusAssignments", async (_e, params: { terminalId: number; date: string }): Promise<ResponseElectronGeneric> => {
-    try {
-      console.log("init process getDailyBusAssignments");
-
-      const { terminalId, date } = params;
-
-      const data = await busesRepo.getDailyAssignments(terminalId, date);
-
-      return { ok: true, data, error: null }
-
-    } catch (error) {
-      console.log('error al actualizar bus ->', error);
-
-      return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible actualizar el bus" } };
-
-    }
-
-  });
+ 
   ipcMain.handle("deleteBus", (_e, id: number) => busesRepo.delete(id));
 }

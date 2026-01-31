@@ -39,9 +39,7 @@ export default function EmployeesManager({ configInitial = false }: { configInit
     const users: UserSample[] = configInitial ? driverEmployees : employees;
     const viewActiveAtEmployees = searchParams.get("viewAtEmployees") ?? "list";
 
-    console.log({ employees, driverEmployees, numberRegisteredDriver, users });
-
-
+ 
 
     // const handleAddUsuario = (newUsuario: Omit<Usuario, "id" | "fechaRegistro">) => {
     //     const id = Math.max(...usuarios.map((u) => u.id), 0) + 1

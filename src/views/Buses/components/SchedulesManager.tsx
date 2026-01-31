@@ -79,33 +79,6 @@ export default function SchedulesManager({ configInitial = false }: { configInit
   const viewActiveAtSchedule = searchParams.get("viewAtSchedule") ?? "list";
 
 
-  // const filteredHorarios = departureTimeRecords.filter(
-  //   (schedule) =>
-  //     schedule.agency_id_origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //     schedule.route_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //     schedule.vehicle_number.includes(searchTerm),
-  // )
-
-  // const handleAddHorario = (newHorario: Omit<Horario, "id">) => {
-  //   const id = Math.max(...horarios.map((h) => h.id), 0) + 1
-  //   setHorarios([...horarios, { ...newHorario, id }])
-  //   setSearchParams(prev => {
-  //     prev.set('viewAtSchedule', 'list')
-  //     return prev;
-  //   })
-  // }
-
-  // const handleEditHorario = (updatedHorario: Schedule) => {
-  //   if (editingHorario) {
-
-  //     setEditingHorario(null)
-  //     setSearchParams(prev => {
-  //       prev.set('viewAtSchedule', 'list')
-  //       return prev;
-  //     })
-  //   }
-  // }
-
   const handleDeleteHorario = (id: number) => {
     // if (confirm("¿Estás seguro de que deseas eliminar este horario?")) {
     //   setHorarios(horarios.filter((h) => h.id !== id))
@@ -239,13 +212,13 @@ export default function SchedulesManager({ configInitial = false }: { configInit
                 </div>
               </div>
 
-              {/* <div className="border-t border-border pt-3">
+              <div className="border-t border-border pt-3">
                 <div className="flex items-start gap-2 mb-2">
                   <Calendar className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                   <div className="flex-1">
                     <p className="text-xs text-muted-foreground mb-1">Días de operación:</p>
                     <div className="flex flex-wrap gap-1">
-                      {horario.diasOperacion.map((dia) => (
+                      {schedule.daysOperation.map((dia) => (
                         <Badge key={dia} variant="outline" className="text-xs">
                           {dia}
                         </Badge>
@@ -253,20 +226,7 @@ export default function SchedulesManager({ configInitial = false }: { configInit
                     </div>
                   </div>
                 </div>
-              </div> */}
-
-              {/* <div className="flex items-center justify-between pt-2 border-t border-border">
-                <div>
-                  <p className="text-xs text-muted-foreground">Precio</p>
-                  <p className="text-xl font-bold text-green-600">${horario.precio}</p>
-                </div>
-              </div> */}
-
-              {/* {schedule. && (
-                <p className="text-xs text-muted-foreground italic text-pretty border-t border-border pt-2">
-                  {horario.notas}
-                </p>
-              )} */}
+              </div>
 
               <div className="flex gap-2 pt-2">
                 <Button variant="outline" size="sm" onClick={() => startEdit(schedule)} className="flex-1 gap-2">

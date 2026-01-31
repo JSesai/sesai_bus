@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS buses (
 );
 
 -- asignacion diaria de numero de autobus
-CREATE TABLE bus_daily_assignments (
+CREATE TABLE IF NOT EXISTS bus_daily_assignments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     bus_id INTEGER NOT NULL,
     terminal_id INTEGER NOT NULL,
@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS schedules (
     arrival DATETIME NOT NULL,
     status TEXT NOT NULL DEFAULT 'active',
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    daysOperation TEXT NOT NULL,
 
     FOREIGN KEY (route_id) REFERENCES routes(id) ON DELETE CASCADE,
     FOREIGN KEY (bus_id) REFERENCES buses(id),

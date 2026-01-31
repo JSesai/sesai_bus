@@ -5,7 +5,7 @@ interface User {
   name: string;
   userName: string;
   password: string;
-  status: StatusType;
+  status: StatusTypeUser;
   role: Rol;
   phone: string;
 }
@@ -30,7 +30,7 @@ interface UsersAPI {
   getByUserName: (userName: User['userName']) => Promise<ResponseElectronUser>;
   getUsers: () => Promise<ResponseElectronGeneric>;
   addUser: (user: User) => Promise<ResponseElectronGeneric>;
-  updateUser: (user: UserSample) => Promise<ResponseElectronGeneric>;
+  updateUser: (user: User) => Promise<ResponseElectronGeneric>;
   logout: () => Promise<ResponseElectronGeneric>;
   authUser: (UserCredentials) => Promise<ResponseElectronUser>;
   checkSession: () => Promise<ResponseElectronUser>;
@@ -131,6 +131,7 @@ interface Schedule {
   arrival_time: string;   //hora de llegada
   status: StatusType;
   created_at?: string;
+  daysOperation: string[];
 }
 
 interface ScheduleAPI {
@@ -192,7 +193,7 @@ interface PaymentsAPI {
 
 
 
-type StatusType = 'registered' | 'active' | 'disabled' | 'deleted' | 'developer'
+type StatusTypeUser = 'registered' | 'active' | 'disabled' | 'deleted' | 'developer'
 type Rol = 'developer' | 'manager' | 'driver' | 'ticketSeller' | 'checkIn' | null
 
 interface ErrorApp {

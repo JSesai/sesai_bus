@@ -21,7 +21,7 @@ export async function seedInitialUser(): Promise<ResponseElectronGeneric> {
             status: "registered"
         }
 
-        const createUser: User = await userRepo.add(userAdmin);
+        const createUser: UserSample = await userRepo.add(userAdmin);
         if (!createUser) throw new RegisterUserError("Error al crear usuario", "Intentalo mas tarde");
         return { data: "Usuario manager create success!!", error: null, ok: true };
 
