@@ -1,5 +1,6 @@
 
-import { parse, addMinutes, format, addHours } from "date-fns";
+import { parse, addMinutes, format, addHours, parseISO } from "date-fns";
+import { es } from "date-fns/locale";
 
 
 // Format time
@@ -113,6 +114,16 @@ export const timestamToHHMM = (minutos: number) => {
 export const isvalidHour = (horaStr: string): boolean => {
     const regex = /^([01]\d|2[0-3]):([0-5]\d)$/;
     console.log(regex.test(horaStr));
-    
+
     return regex.test(horaStr);
 }
+
+export const getTodayDate = (): string => { return format(new Date(), "yyyy-MM-dd"); };
+
+
+export const getDayName = (dateStr: string): string => {
+    const date = parseISO(dateStr);
+    // convierte "2026-02-11" a objeto Date 
+    return format(date, "EEEE", { locale: es }); // devuelve el nombre del día en español 
+
+};

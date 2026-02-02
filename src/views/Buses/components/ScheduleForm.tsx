@@ -9,7 +9,8 @@ import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useSearchParams } from "react-router-dom"
 import { ScheduleError } from "../../../shared/errors/customError"
 import { daysOfWeek } from "../../shared/constants/constants"
-import { Checkbox } from "@radix-ui/react-checkbox"
+import { Checkbox } from "../../components/ui/checkbox"
+import { addTimeOnMinutes, sumarHorasYMinutos } from "../../../shared/utils/helpers"
 
 
 
@@ -66,11 +67,14 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
   if (!agency) throw new ScheduleError("No se encontro registro de agencia");
 
   const handleDepartureTime = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const deapureTime = e.target.value;
+    const departureTime = e.target.value;
+    const destinationSelected = destinations.find(d => d.id === formData.route_id)
+    console.log({ destinationSelected });
 
-    const arrivalTime = Number(deapureTime) + Number(destinations[0].estimatedTravelTime)
-    console.log({ deapureTime, arrivalTime });
-    setFormData({ ...formData, departure_time: e.target.value, arrival_time: e.target.value })
+
+    const arrivalTime = sumarHorasYMinutos(departureTime, String(destinationSelected?.estimatedTravelTime));
+    console.log({ departureTime, arrivalTime });
+    setFormData({ ...formData, departure_time: departureTime, arrival_time: String(arrivalTime) })
 
   }
 
@@ -235,12 +239,12 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="precio" className="flex items-center gap-2">
+              <Label htmlFor="numerVehicle" className="flex items-center gap-2">
                 <ListOrdered size={15} />
                 Número de Autobús
               </Label>
               <Input
-                id="precio"
+                id="numerVehicle"
                 type="number"
                 min="1"
                 value={formData.vehicle_number}
@@ -256,13 +260,14 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 Días de Operación
               </Label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 border border-border rounded-lg bg-muted/30">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 border border-border rounded-lg bg-muted/30">
                 {daysOfWeek.map((day) => (
                   <div key={day} className="flex items-center space-x-2">
                     <Checkbox
                       id={day}
                       checked={formData.daysOperation.includes(day)}
                       onCheckedChange={() => toggleDay(day)}
+                      disabled={formData.vehicle_number === 0}
                     />
                     <label htmlFor={day} className="text-sm font-medium cursor-pointer">
                       {day}
@@ -285,7 +290,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
             >
               Cancelar
             </Button>
-            <Button type="submit" className="flex-1 h-11" disabled={isLoading}>
+            <Button type="submit" className="flex-1 h-11" disabled={isLoading || formData.daysOperation.length === 0}>
               {isLoading ? "Guardando..." : isEditing ? "Actualizar Horario" : "Crear Horario"}
             </Button>
           </div>

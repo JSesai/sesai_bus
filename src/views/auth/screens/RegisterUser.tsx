@@ -220,10 +220,10 @@ export default function RegisterUser({ configInitial, initialData, onCancel, isE
                                 <SelectValue placeholder="Selecciona un rol" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="ticketSeller">Taquillero</SelectItem>
-                                <SelectItem value="manager">Encargado</SelectItem>
+                                <SelectItem disabled={configInitial} value="ticketSeller">Taquillero</SelectItem>
+                                <SelectItem disabled={configInitial} value="manager">Encargado</SelectItem>
                                 <SelectItem value="driver">Chofer</SelectItem>
-                                <SelectItem value="checkIn">Checador</SelectItem>
+                                <SelectItem disabled={configInitial} value="checkIn">Checador</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -238,7 +238,7 @@ export default function RegisterUser({ configInitial, initialData, onCancel, isE
                             initialData ? "Guardar cambios" : "Registrar empleado"
                         )}
                     </Button>
-                    <Button type="submit" onClick={onCancel} className="w-full h-11 text-base font-medium">
+                    <Button type="button" onClick={onCancel} className="w-full h-11 text-base font-medium">
                         Cancelar
                     </Button>
 

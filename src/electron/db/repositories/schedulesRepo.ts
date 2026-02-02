@@ -70,7 +70,7 @@ export const schedulesRepo = {
             db.get(
               `
                 SELECT 
-                  s.id AS schedule_id, 
+                  s.id AS id, 
                   s.vehicle_number, 
                   s.departure_time, 
                   s.arrival as arrival_time, 

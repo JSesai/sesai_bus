@@ -6,6 +6,8 @@ import { useAuth } from "./AuthContext";
 import { isvalidHour } from "../../../shared/utils/helpers";
 import type { ScheduleFormData } from "../../Buses/components/ScheduleForm";
 import type { UserForm } from "../screens/RegisterUser";
+import { daysInWeek } from "date-fns/constants";
+import { daysOfWeek } from "../../shared/constants/constants";
 
 
 
@@ -47,6 +49,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const [runningSchedules, setRunningSchedules] = useState<Schedule[]>([]);
     const [employees, setEmployees] = useState<UserSample[]>([]);
 
+  
 
     //mostrar confetti 
     const showConfetti = () => {
@@ -492,7 +495,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             console.log({ scheduleRegister });
 
             if (scheduleRegister.error) throw new ScheduleError(scheduleRegister.error.message, scheduleRegister.error.detail);
-            const updateSchedules = editingSchedule ? runningSchedules.map(s => s.id === sendSchedule.id ? sendSchedule : s) : [...runningSchedules, sendSchedule];
+            const updateSchedules = editingSchedule ? runningSchedules.map(s => s.id === sendSchedule.id ? scheduleRegister.data : s) : [...runningSchedules, sendSchedule];
             setRunningSchedules(updateSchedules);
             return true;
 
@@ -515,6 +518,9 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             setIsLoading(false);
         }
     }
+
+    //obtener salidas basadas en bus_daily_assignments
+
 
     //manejador de carga de informacion del sistema
     const loadSystemInformation = async () => {
@@ -539,9 +545,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
 
     const driverEmployees = useMemo(() => employees.filter(e => e.role === 'driver'), [employees]);
-    console.log({ driverEmployees });
-
-
+  
 
     // get agencia
     useEffect(() => {

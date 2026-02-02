@@ -39,38 +39,7 @@ export default function EmployeesManager({ configInitial = false }: { configInit
     const users: UserSample[] = configInitial ? driverEmployees : employees;
     const viewActiveAtEmployees = searchParams.get("viewAtEmployees") ?? "list";
 
- 
 
-    // const handleAddUsuario = (newUsuario: Omit<Usuario, "id" | "fechaRegistro">) => {
-    //     const id = Math.max(...usuarios.map((u) => u.id), 0) + 1
-    //     const fechaRegistro = new Date().toISOString().split("T")[0]
-    //     setUsuarios([...usuarios, { ...newUsuario, id, fechaRegistro }])
-    //     setView("list")
-    // }
-
-    // const handleEditUsuario = (updatedUsuario: Omit<Usuario, "id" | "fechaRegistro">) => {
-    //     if (editingUsuario) {
-    //         setUsuarios(
-    //             usuarios.map((u) =>
-    //                 u.id === editingUsuario.id
-    //                     ? { ...updatedUsuario, id: editingUsuario.id, fechaRegistro: editingUsuario.fechaRegistro }
-    //                     : u,
-    //             ),
-    //         )
-    //         setEditingUsuario(null)
-    //         setView("list")
-    //     }
-    // }
-
-    // const handleDeleteUsuario = (id: number) => {
-    //     if (confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
-    //         setUsuarios(usuarios.filter((u) => u.id !== id))
-    //     }
-    // }
-
-    // const handleToggleActivo = (id: number) => {
-    //     setUsuarios(usuarios.map((u) => (u.id === id ? { ...u, activo: !u.activo } : u)))
-    // }
 
     const startEdit = (usuario: UserSample) => {
         setEditingUsuario(usuario)
@@ -89,7 +58,7 @@ export default function EmployeesManager({ configInitial = false }: { configInit
                         prev.set('viewAtEmployees', 'list')
                         return prev;
                     })
-
+                    return;
                 }} />
             </div>
         )
@@ -109,6 +78,7 @@ export default function EmployeesManager({ configInitial = false }: { configInit
                             prev.set('viewAtEmployees', 'list')
                             return prev;
                         })
+
                     }}
 
                 />
@@ -217,7 +187,7 @@ export default function EmployeesManager({ configInitial = false }: { configInit
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
                             </div>
-                                }
+                            }
                         </CardContent>
                     </Card>
                 ))}

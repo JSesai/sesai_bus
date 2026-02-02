@@ -59,7 +59,6 @@ interface NavItemProps {
 // Component for nav items
 export function NavItem({ icon: Icon, label, path, end }: NavItemProps) {
     const { agency } = useDashboard();
-    console.log('agencyyy', agency);
 
     if (!agency) {
         return (

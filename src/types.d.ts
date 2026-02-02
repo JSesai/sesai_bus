@@ -30,7 +30,7 @@ interface UsersAPI {
   getByUserName: (userName: User['userName']) => Promise<ResponseElectronUser>;
   getUsers: () => Promise<ResponseElectronGeneric>;
   addUser: (user: User) => Promise<ResponseElectronGeneric>;
-  updateUser: (user: User) => Promise<ResponseElectronGeneric>;
+  updateUser: (user: UserSample) => Promise<ResponseElectronGeneric>;
   logout: () => Promise<ResponseElectronGeneric>;
   authUser: (UserCredentials) => Promise<ResponseElectronUser>;
   checkSession: () => Promise<ResponseElectronUser>;

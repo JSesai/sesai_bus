@@ -33,7 +33,7 @@ export function registerSchedulesHandlers() {
         try {
             console.log('init process add schedule', schedule);
             if (!schedule.route_id || !schedule.driver_id || !schedule.departure_time || !schedule.bus_id || !schedule.arrival_time || !schedule.agency_id_origin)
-                throw new ScheduleError("No se pudo agregar horario.altan datos por  completar")
+                throw new ScheduleError("No se pudo agregar horario faltan datos por  completar")
             const scheduleResponse = await schedulesRepo.add(schedule);
             console.log('schedules create ->', scheduleResponse);
 
