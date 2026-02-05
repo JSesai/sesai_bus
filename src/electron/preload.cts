@@ -22,7 +22,7 @@ const agencyAPI: AgencyAPI = {
   deleteAgency: (id: Agency['id']) => ipcRenderer.invoke("deleteAgency", id),
 }
 
-const busesAPI: BusesAPI =  {
+const busesAPI: BusesAPI = {
   getBuses: () => ipcRenderer.invoke("getBuses"),
   getBusById: (id: Bus['id']) => ipcRenderer.invoke("getBusById", id),
   addBus: (bus: Bus) => ipcRenderer.invoke("addBus", bus),
@@ -31,7 +31,7 @@ const busesAPI: BusesAPI =  {
   getDailyBusAssignments: (terminalId: number, date: string) => ipcRenderer.invoke("getDailyBusAssignments", { terminalId, date })
 }
 
-const routesTravelAPI: RouteTravelAPI ={
+const routesTravelAPI: RouteTravelAPI = {
   getRoutes: () => ipcRenderer.invoke("getRoutes"),
   getRouteById: (id: Route['id']) => ipcRenderer.invoke("getRouteById", id),
   addRoute: (routeTravel: Route) => ipcRenderer.invoke("addRoute", routeTravel),
@@ -55,7 +55,7 @@ const customerAPI: CustomersAPI = {
   deleteCustomer: (id: Customer['id']) => ipcRenderer.invoke("deleteCustomer", id)
 }
 
-const ticketAPI: TicketAPI =  {
+const ticketAPI: TicketAPI = {
   getTickets: () => ipcRenderer.invoke("getTickets"),
   getTicketById: (id: Ticket['id']) => ipcRenderer.invoke("getTicketById", id),
   addTicket: (ticket: Ticket['id']) => ipcRenderer.invoke("addTicket", ticket),
@@ -77,16 +77,17 @@ const biometricAPI: BiometricService = {
 }
 
 const appConfiAPI: appConfigAPI = {
-  getAppConfig :() => ipcRenderer.invoke("getAppConfig")
+  getAppConfig: () => ipcRenderer.invoke("getAppConfig"),
+  updateAppConfig: (data: Partial<any>) => ipcRenderer.invoke("updateAppConfig", data)
 }
 
 contextBridge.exposeInMainWorld("electron", {
   users: usersAPI,
   agency: agencyAPI,
-  buses:busesAPI,
+  buses: busesAPI,
   routesTravel: routesTravelAPI,
   schedules: schedulesAPI,
-  customers: customerAPI ,
+  customers: customerAPI,
   tickets: ticketAPI,
   payments: paymetsAPI,
   biometric: biometricAPI,

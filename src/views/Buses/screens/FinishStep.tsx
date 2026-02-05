@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { useDashboard } from "../../auth/context/DashBoardContext"
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 
 export default function FinishStep() {
 
+  const [isConfigInitialComplete, setIsConfigInitialComplete] = useState(false);
   const { showConfetti } = useDashboard();
   const navigate = useNavigate()
 
@@ -13,26 +14,38 @@ export default function FinishStep() {
   const finish = async () => navigate("/dashboard");
 
 
-  useEffect(() => {
-    // await window.electron.invoke("updateAppConfig", {
-    //   initial_setup_completed: 1
-    // })
+
+  useLayoutEffect(() => {
+    window.electron.appConfig.updateAppConfig({ initial_setup_completed: 1 }).then(data => {
+      if (data.ok) setIsConfigInitialComplete(true);
+    })
 
   }, []);
 
   return (
-    <div className="text-center space-y-6">
-      <h2 className="text-2xl font-bold text-cyan-400">
-        🎉 Configuración completa
-      </h2>
+    isConfigInitialComplete ?
+      <div className="text-center space-y-6">
 
-      <p className="text-slate-400">
-        Tu sistema está listo para operar.
-      </p>
+        <h2 className="text-2xl font-bold text-cyan-400">
+          🎉 Configuración completa
+        </h2>
 
-      <Button size="lg" onClick={finish}>
-        Ir al dashboard
-      </Button>
-    </div>
+        <p className="text-slate-400">
+          Tu sistema está listo para operar.
+        </p>
+
+        <Button size="lg" onClick={finish}>
+          Ir al dashboard
+        </Button>
+      </div>
+      :
+      <div className="text-center space-y-6">
+
+        
+        <Button size="lg" onClick={finish}>
+          Ir al dashboard
+        </Button>
+      </div>
+
   )
 }

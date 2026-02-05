@@ -39,6 +39,7 @@ interface UsersAPI {
 
 interface appConfigAPI {
   getAppConfig: () => Promise<ResponseElectronAppConfig>;
+  updateAppConfig: ( data: Partial<any>) => Promise<ResponseElectronAppConfig>;
 }
 
 interface Agency {
