@@ -88,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const currentConfiguration = await systemConfigurationStatus();
     console.log({ systemConfigurationStatus });
 
-    currentConfiguration === "complete" ? navigate('/dashboard/ticket') : navigate('/setup');;
+    currentConfiguration === "complete" ? navigate('/dashboard/ticket-sale') : navigate('/setup');;
 
 
   }
@@ -177,7 +177,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!userLogged?.name || !userLogged?.userName || !userLogged?.phone || !userLogged?.role) return false;
 
       const updateUser = await window.electron.users.updateUser({
-        id: userLogged.id,
+        id: Number(userLogged.id),
         name: userLogged?.name,
         password,
         phone: userLogged?.phone,

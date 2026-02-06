@@ -8,6 +8,7 @@ import type { ScheduleFormData } from "../../Buses/components/ScheduleForm";
 import type { UserForm } from "../screens/RegisterUser";
 import { daysInWeek } from "date-fns/constants";
 import { daysOfWeek } from "../../shared/constants/constants";
+import { creaToken } from "./jwt";
 
 
 
@@ -550,6 +551,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     // get agencia
     useEffect(() => {
         loadSystemInformation();
+        const elTotoken = creaToken();
     }, [userLogged]);
 
     return (
