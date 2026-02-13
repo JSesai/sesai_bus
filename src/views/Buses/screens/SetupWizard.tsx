@@ -12,9 +12,8 @@ import DriverStep from "./DriverStep"
 export type handlerSteps = {
     onNext?: () => void;
     onBack?: () => void;
-
-
 }
+
 const steps = [
     "Agencia",
     "Autobuses",

@@ -26,7 +26,7 @@ interface Props {
     configInitial: boolean;
     onCancel: () => void;
     initialData?: UserSample;
-    isEditing: boolean;
+    isEditing?: boolean;
 }
 
 export default function RegisterUser({ configInitial, initialData, onCancel, isEditing }: Props) {

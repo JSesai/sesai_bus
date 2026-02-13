@@ -7,16 +7,10 @@ const LlavePublicaCambioNIP = "BgIAAACkAABSU0ExAAgAAAEAAQAFx4WGnnrMHqG/TcimVhMjY
 
 export const creaToken = async () => {
     try {
-        const secret = jose.base64url.decode(LlavePrivadaCambioNIP);
-        const jwt = await new jose.EncryptJWT({ 'urn:example:claim': true })
-        .setProtectedHeader({ alg: 'dir', enc: 'A128CBC-HS256' })
-        .setIssuedAt()
-        .setIssuer('urn:example:issuer')
-        .setAudience('urn:example:audience')
-        .setExpirationTime('2h')
-        .encrypt(secret)
-        console.log("Token generado:", jwt);
-        return jwt;
+        const privateKey = await jose.importPKCS8(LlavePrivadaCambioNIP, "HS256");
+        const publicKey = await jose.importSPKI(LlavePublicaCambioNIP, "HS256");
+        const jwt = await new jose.SignJWT({ userId: 123 }).setProtectedHeader({ alg: "RS256" }).setIssuedAt().setExpirationTime("1h").sign(privateKey); 
+        const { payload } = await jose.jwtVerify(jwt, publicKey); console.log(payload);
 
     } catch (error) {
         console.log('error al crear token ', error);

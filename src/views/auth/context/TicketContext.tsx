@@ -30,7 +30,7 @@ type TicketContextType = {
 };
 
 
-type TripType = "one-way" | "round-trip"
+type travelType = "one-way" | "round-trip"
 
 type PassengerCounts = {
     adults: number;
@@ -39,7 +39,7 @@ type PassengerCounts = {
 };
 
 type TripState = {
-    tripType: TripType | null;
+    travelType: travelType | null;
     passengers: PassengerCounts;
     origin: string;
     destination: string;
@@ -54,7 +54,7 @@ type TripState = {
 };
 
 export const initialState: TripState = {
-    tripType: null,
+    travelType: null,
     passengers: { adults: 0, children: 0, inapam: 0 },
     origin: "",
     destination: "",
