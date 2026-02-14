@@ -10,6 +10,8 @@ import { useAuth } from "./AuthContext";
 import { useDashboard } from "./DashBoardContext";
 import { daysOfWeek } from "../../shared/constants/constants";
 import { getDayName, getTodayDate } from "../../../shared/utils/helpers";
+import showAlert, { type PropsModal } from "../../Modals/Modals";
+import { routeDirectory } from "../../router/routes";
 
 
 type Action =
@@ -21,12 +23,13 @@ type Action =
 type TicketContextType = {
     //data
     isLoading: boolean;
-    runningSchedulesToday: Schedule[]
+    runningSchedulesToday: Schedule[];
+    numberDeparturesToday: number;
     state: TripState;
 
     //methods
     dispatch: React.Dispatch<Action>;
-
+    showModalAlert: ({ typeAlert, message, title, btnAccept, btnCancel, callbackAcept, callbackCancel, options, }: PropsModal) => void
 };
 
 
@@ -101,16 +104,33 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(false);
 
 
-    const fechaViajeIda = getDayName(state.departureDate).toLowerCase();
-    console.log({ fechaViajeIda });
+    const travelDay = getDayName(state.departureDate).toLowerCase();
+    console.log({ travelDay });
+    console.log({ runningSchedules });
 
-    const runningSchedulesToday = runningSchedules.filter((r) => r.daysOperation.includes(fechaViajeIda))
+    const runningSchedulesToday = runningSchedules.filter((r) => r.daysOperation.includes(travelDay))
 
     console.log({ runningSchedulesToday });
 
+    const numberDeparturesToday = runningSchedulesToday.length;
+
+    const esViewTicketSale = routeDirectory.pathsLocationDashboard.ticketSale === location.pathname;
 
 
+    useEffect(()=> {
+        //si no hay salida/corrida para el la fecha de salida seleccionada
+        console.log({numberDeparturesToday: numberDeparturesToday === 0, esViewTicketSale});
+        
+        
+        if (numberDeparturesToday === 0 && esViewTicketSale) {
+            showAlert({
+                typeAlert: 'info',
+                title: `Sin salidas para el día ${travelDay}`,
+                message: `No hay salidas programadas para el ${state.departureDate} . Por favor, revisa los horarios disponibles.`,
+            })
+        }
 
+    },[travelDay, esViewTicketSale])
 
 
 
@@ -119,7 +139,9 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             state,
             isLoading,
             runningSchedulesToday,
+            numberDeparturesToday,
             dispatch,
+            showModalAlert: showAlert,
 
         }}>
             {children}

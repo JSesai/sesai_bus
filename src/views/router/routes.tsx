@@ -24,6 +24,31 @@ import { TicketProvider } from "../auth/context/TicketContext";
 import SetupWizard from "../Buses/screens/SetupWizard";
 import SetupLayout from "../shared/layouts/SetupLayout";
 
+export const routeDirectory = {
+    pathsLocationAuth: {
+        login: "/auth/login",
+        register: "/auth/register",
+        forgotPassword: "/auth/forgot-password",
+        newPassword: "/auth/new-password"
+    },
+    pathsLocationDashboard: {
+        mainDashboard: "/dashboard",
+        summary: "/dashboard/summary",
+        agency: "/dashboard/agency",
+        ticketSale: "/dashboard/ticket-sale",
+        setting: "/dashboard/setting",
+        settingBus: "/dashboard/setting-bus",
+        buses: "/dashboard/buses",
+        busDailyAssignment: "/dashboard/bus-daily-assignment",
+        addBus: "/dashboard/add-bus",
+        destinations: "/dashboard/destinations",
+        schedules: "/dashboard/schedules",
+        employees: "/dashboard/employees",
+        customers: "/dashboard/customers"
+    },
+
+
+}
 
 export function AppRouter() {
     return (
@@ -49,12 +74,12 @@ export function AppRouter() {
                                 <Route index element={<SetupWizard />} />
 
                             </Route>
-                            
+
                             <Route path="dashboard/" element={<DashBoardLayout />}>
                                 <Route index element={<MainDashboard />} />
                                 <Route path="summary" element={<Summary />} />
                                 <Route path="agency" element={<AgencieForm />} />
-                                <Route path="ticket-sale" element={<TicketSale />} />
+                                <Route path={routeDirectory.pathsLocationDashboard.ticketSale} element={<TicketSale />} />
                                 <Route path="setting" element={<Setting />} />
                                 <Route path="setting-bus" element={<BusesSetting />} />
                                 <Route path="buses" element={<Buses />} />

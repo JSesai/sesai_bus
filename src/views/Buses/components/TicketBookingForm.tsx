@@ -6,9 +6,12 @@ import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
-import { MapPin, Calendar, Users, Minus, Plus, ArrowRight, CheckCircle2, Repeat, Ticket } from "lucide-react"
+import { MapPin, Calendar, Users, Minus, Plus, ArrowRight, CheckCircle2, Repeat, Ticket, AlertCircle, Icon, Info } from "lucide-react"
 import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useTicket } from "../../auth/context/TicketContext"
+import { Alert, AlertDescription } from "../../components/ui/alert"
+import { useAuth } from "../../auth/context/AuthContext"
+import { NavLink, useLocation } from "react-router-dom"
 
 
 
@@ -21,78 +24,26 @@ interface PassengerCounts {
 export default function TicketBookingForm() {
 
     const { agency } = useDashboard();
-    const { state, dispatch, isLoading } = useTicket();
+    const { userLogged } = useAuth();
+    const { state, dispatch, isLoading, runningSchedulesToday, numberDeparturesToday } = useTicket();
 
     console.log('this is the state ticket', state);
 
 
-    // // const [tripType, setTripType] = useState<TripType | null>(null)
-    // const [passengers, setPassengers] = useState<PassengerCounts>({
-    //     adults: 1,
-    //     children: 0,
-    //     inapam: 0,
-    // })
-    // const [origin, setOrigin] = useState("")
-    // const [destination, setDestination] = useState("")
-    // const [departureDate, setDepartureDate] = useState("")
-    // const [departureTime, setDepartureTime] = useState("")
-    // const [returnDate, setReturnDate] = useState("")
-    // const [returnTime, setReturnTime] = useState("")
-    // const [isLoading, setIsLoading] = useState(false)
-    // const [success, setSuccess] = useState(false)
-    // const [bookingType, setBookingType] = useState<BookingType | null>(null)
-
-
-
     const timeSlots = ["06:00", "08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00", "22:00"]
-
-    // const handleChangeOrigin = () => {
-    //     setOrigin(destination);
-    //     setDestination(origin);
-    // }
-
-    // const updatePassengerCount = (type: keyof PassengerCounts, increment: boolean) => {
-    //     setPassengers((prev) => ({
-    //         ...prev,
-    //         [type]: increment ? prev[type] + 1 : Math.max(0, prev[type] - 1),
-    //     }))
-    // }
-
-    // const getTotalPassengers = () => {
-    //     return passengers.adults + passengers.children + passengers.inapam
-    // }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        // setIsLoading(true)
-        // setSuccess(false)
 
-        // // SimulaciΓ³n de reserva - AquΓ­ integrarΓ­as tu API
-        // setTimeout(() => {
-        //     setSuccess(true)
-        //     setIsLoading(false)
-        // }, 1500)
     }
 
-    // if (success) {
-    //     return (
-    //         <Card className="w-full max-w-3xl shadow-lg">
-    //             <CardContent className="pt-12 pb-12 text-center">
-    //                 <div className="mx-auto w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-4">
-    //                     <CheckCircle2 className="w-10 h-10 text-green-600" />
-    //                 </div>
-    //                 <h3 className="text-2xl font-semibold mb-2">Boletos reservados exitosamente</h3>
-    //                 <p className="text-muted-foreground mb-6">Los boletos han sido registrados en el sistema</p>
-    //                 <Button onClick={() => setSuccess(false)} variant="outline">
-    //                     Nueva venta
-    //                 </Button>
-    //             </CardContent>
-    //         </Card>
-    //     )
-    // }
+    const location = useLocation();
+    console.log('locayi¡on', location);
+
 
     return (
+
         <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm overflow-hidden">
             <CardHeader className="space-y-2">
                 <CardTitle className="text-2xl font-semibold text-balance">Venta de Boletos</CardTitle>
@@ -134,8 +85,8 @@ export default function TicketBookingForm() {
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 type="button"
-                                onClick={() => dispatch({ type: "SET_FIELD", field: "tripType", value: "one-way" })}
-                                className={`p-2 rounded-lg border-2 transition-all ${state.tripType === "one-way"
+                                onClick={() => dispatch({ type: "SET_FIELD", field: "travelType", value: "one-way" })}
+                                className={`p-2 rounded-lg border-2 transition-all ${state.travelType === "one-way"
                                     ? "border-cyan-500 bg-primary/5 text-primary font-medium"
                                     : "border-border hover:border-primary/50"
                                     }`}
@@ -144,8 +95,8 @@ export default function TicketBookingForm() {
                             </button>
                             <button
                                 type="button"
-                                onClick={() => dispatch({ type: "SET_FIELD", field: "tripType", value: "round-trip" })}
-                                className={`p-2 rounded-lg border-2 transition-all ${state.tripType === "round-trip"
+                                onClick={() => dispatch({ type: "SET_FIELD", field: "travelType", value: "round-trip" })}
+                                className={`p-2 rounded-lg border-2 transition-all ${state.travelType === "round-trip"
                                     ? "border-cyan-500 bg-primary/5 text-primary font-medium"
                                     : "border-border hover:border-primary/50"
                                     }`}
@@ -174,7 +125,7 @@ export default function TicketBookingForm() {
                                     min={new Date().toISOString().split("T")[0]}
                                 />
                             </div>
-                           
+
                         </div>
                     </div>
 
@@ -339,7 +290,7 @@ export default function TicketBookingForm() {
                     </div>
 
 
-                    {state.tripType === "round-trip" && (
+                    {state.travelType === "round-trip" && (
                         <div className="space-y-3 animate-in fade-in slide-in-from-top-4 duration-300">
                             <Label className="text-sm font-medium flex items-center gap-2">
                                 <ArrowRight className="h-4 w-4 text-primary" />
@@ -398,5 +349,6 @@ export default function TicketBookingForm() {
                 </form>
             </CardContent>
         </Card >
+
     )
 }
