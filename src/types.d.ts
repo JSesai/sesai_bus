@@ -135,6 +135,15 @@ interface Schedule {
   daysOperation: string[];
 }
 
+interface ScheduleData extends Schedule {
+  agency_name: string;
+  bus_model: string;
+  route_name: string;
+  driver_name: string;
+  city_origin: string;
+  city_destination: string;
+}
+
 interface ScheduleAPI {
   getSchedules: () => Promise<ResponseElectronGeneric>;
   getScheduleById: (id: Schedule['id']) => Promise<Schedule>;

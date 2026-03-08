@@ -20,7 +20,7 @@ type DashboardContextType = {
     destinations: Route[];
     numberRegisteredVehicles: number;
     numberRegisteredDestinations: number;
-    runningSchedules: Schedule[];
+    runningSchedules: ScheduleData[];
     numberRegisterSchedule: number;
     employees: UserSample[];
     driverEmployees: UserSample[];
@@ -47,7 +47,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const [agency, setAgency] = useState<Agency | null>(null);
     const [vehicles, setVehicles] = useState<Bus[]>([]);
     const [destinations, setDestinations] = useState<Route[]>([]);
-    const [runningSchedules, setRunningSchedules] = useState<Schedule[]>([]);
+    const [runningSchedules, setRunningSchedules] = useState<ScheduleData[]>([]);
     const [employees, setEmployees] = useState<UserSample[]>([]);
 
   

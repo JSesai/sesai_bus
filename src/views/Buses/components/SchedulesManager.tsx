@@ -72,7 +72,7 @@ export default function SchedulesManager({ configInitial = false }: { configInit
   const { numberRegisterSchedule, runningSchedules } = useDashboard();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [departureTimeRecords, setDepartureTimeRecords] = useState<Schedule[]>(runningSchedules)
+  const [departureTimeRecords, setDepartureTimeRecords] = useState<ScheduleData[]>(runningSchedules)
   const [searchTerm, setSearchTerm] = useState("")
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null)
 
@@ -175,7 +175,7 @@ export default function SchedulesManager({ configInitial = false }: { configInit
                   </div>
                   <div>
                     <h3 className="font-semibold text-base text-balance">
-                      {schedule.agency_id_origin} → {schedule.route_id}
+                      {schedule.city_origin} → {schedule.city_destination}
                     </h3>
                     <p className="text-sm text-muted-foreground">Salida: {schedule.arrival_time}</p>
                   </div>

@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from "react"
+import React, { useEffect, useEffectEvent, useState } from "react"
 import {
     Activity, ArrowUp01, BarChart3, Cpu, Edit, Edit2, HardDrive, LineChart, type LucideIcon, Pencil, RefreshCw, Wifi
 } from "lucide-react"
@@ -9,6 +9,7 @@ import { Progress } from "../../components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
 import { Badge } from "../../components/ui/badge"
 import { CalendarCustom } from "./CalendarCustom"
+import type { DateRange } from "react-day-picker"
 
 
 // Component for metric cards
@@ -230,6 +231,10 @@ export function BusDailyAssignment() {
         })
     }, [])
 
+    const [date, setDate] = React.useState<DateRange | Date | undefined>(undefined);
+
+    console.log({ date });
+    
 
     return (
         <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm overflow-hidden">
@@ -250,7 +255,7 @@ export function BusDailyAssignment() {
             </CardHeader>
             <CardContent className="p-6">
                 <div className="mb-4">
-                    <CalendarCustom />
+                    <CalendarCustom value={date} mode="single"onChange={setDate} />
 
                 </div>
                 {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

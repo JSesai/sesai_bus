@@ -1,16 +1,16 @@
-import { useEffect, useLayoutEffect, useState } from "react"
-import { Button } from "../../components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
-import { Input } from "../../components/ui/input"
-import { Label } from "../../components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
-import { MapPin, Bus, ListOrdered, SquareUserRound, Clock3, ClockPlus, Clock2, Calendar } from "lucide-react"
-import { useDashboard } from "../../auth/context/DashBoardContext"
-import { useSearchParams } from "react-router-dom"
-import { ScheduleError } from "../../../shared/errors/customError"
-import { daysOfWeek } from "../../shared/constants/constants"
-import { Checkbox } from "../../components/ui/checkbox"
-import { addTimeOnMinutes, sumarHorasYMinutos } from "../../../shared/utils/helpers"
+import { useLayoutEffect, useState } from "react";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
+import { MapPin, Bus, ListOrdered, SquareUserRound, Clock3, ClockPlus, Clock2, Calendar } from "lucide-react";
+import { useDashboard } from "../../auth/context/DashBoardContext";
+import { useSearchParams } from "react-router-dom";
+import { ScheduleError } from "../../../shared/errors/customError";
+import { daysOfWeek } from "../../shared/constants/constants";
+import { Checkbox } from "../../components/ui/checkbox";
+import { sumarHorasYMinutos } from "../../../shared/utils/helpers";
 
 
 
@@ -43,12 +43,12 @@ const initialDataForm: Schedule = {
 
 export default function HorarioForm({ initialData, onCancel, isEditing = false }: HorarioFormProps) {
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [_, setSearchParams] = useSearchParams();
   const { agency, destinations, vehicles, driverEmployees, handleRegisterSchedules } = useDashboard();
 
   const [formData, setFormData] = useState<Schedule>(initialDataForm)
 
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -69,11 +69,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
   const handleDepartureTime = (e: React.ChangeEvent<HTMLInputElement>) => {
     const departureTime = e.target.value;
     const destinationSelected = destinations.find(d => d.id === formData.route_id)
-    console.log({ destinationSelected });
-
-
     const arrivalTime = sumarHorasYMinutos(departureTime, String(destinationSelected?.estimatedTravelTime));
-    console.log({ departureTime, arrivalTime });
     setFormData({ ...formData, departure_time: departureTime, arrival_time: String(arrivalTime) })
 
   }
@@ -85,30 +81,26 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
         ? prev.daysOperation.filter((d) => d !== day)
         : [...prev.daysOperation, day],
     }))
-  }
-
-
+  };
 
   useLayoutEffect(() => {
 
-    if (isEditing && initialData) {
-      console.log({ initialData, isEditing, vehicles, driverEmployees, destinations });
-      console.log('id del destino', destinations.find(d => d.cityName === String(initialData.route_id))?.id);
-
-      const initialDataUpdated: Schedule = {
-        ...initialData,
-        route_id: destinations.find(d => d.cityName === String(initialData.route_id))?.id || 0
-      }
-      console.log({ initialDataUpdated });
-
-
-      setFormData(initialDataUpdated)
+    // if (isEditing && initialData) {
+   
+    //   const initialDataUpdated: Schedule = {
+    //     ...initialData,
+    //     route_id: destinations.find(d => d.cityName === String(initialData.route_id))?.id || 0
+    //     , bus_id: vehicles.find(v => v.plate === String(initialData.bus_id))?.id || 0
+    //   }
+     
+    //   setFormData(initialDataUpdated)
 
 
-    }
-  }, [])
+    // }
+    
+    if (isEditing && initialData) { setFormData(initialData) }
+  }, [initialData]);
 
-  console.log(formData);
 
   return (
     <Card className="max-w-3xl mx-auto">
@@ -208,7 +200,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
                 <SelectContent>
                   {vehicles.map((vehicle) => (
                     <SelectItem key={vehicle.id} value={String(vehicle.id)}>
-                      {vehicle.model.toUpperCase()} {' '}{vehicle.year}
+                      {vehicle.model.toUpperCase()} {' # '}{vehicle.plate.toUpperCase()}
                     </SelectItem>
                   ))}
                 </SelectContent>
