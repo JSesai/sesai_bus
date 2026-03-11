@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
@@ -33,12 +33,12 @@ const initialDataForm: Schedule = {
   route_id: 0,
   bus_id: 0,
   driver_id: 0,
-  agency_id_origin: 1,
+  agency_id_origin: 0,
   vehicle_number: 0,
   departure_time: '',
   arrival_time: '',
-  status: 'active',
-  daysOperation: []
+  status: 'disabled',
+  daysOperation: [],
 }
 
 export default function HorarioForm({ initialData, onCancel, isEditing = false }: HorarioFormProps) {
@@ -46,7 +46,9 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
   const [_, setSearchParams] = useSearchParams();
   const { agency, destinations, vehicles, driverEmployees, handleRegisterSchedules } = useDashboard();
 
-  const [formData, setFormData] = useState<Schedule>(initialDataForm)
+  const [formData, setFormData] = useState<Schedule>(
+    isEditing && initialData ? initialData : initialDataForm
+  );
 
   const [isLoading] = useState(false)
 
@@ -83,23 +85,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
     }))
   };
 
-  useLayoutEffect(() => {
-
-    // if (isEditing && initialData) {
-   
-    //   const initialDataUpdated: Schedule = {
-    //     ...initialData,
-    //     route_id: destinations.find(d => d.cityName === String(initialData.route_id))?.id || 0
-    //     , bus_id: vehicles.find(v => v.plate === String(initialData.bus_id))?.id || 0
-    //   }
-     
-    //   setFormData(initialDataUpdated)
-
-
-    // }
-    
-    if (isEditing && initialData) { setFormData(initialData) }
-  }, [initialData]);
+  console.log({ formData, initialData, isEditing });
 
 
   return (

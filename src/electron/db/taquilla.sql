@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS app_config (
     routes_configured INTEGER DEFAULT 0,
     schedules_configured INTEGER DEFAULT 0,
     initial_setup_completed INTEGER DEFAULT 0,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP, 
     status TEXT NOT NULL DEFAULT 'active'
 
 );

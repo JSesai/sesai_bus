@@ -1,78 +1,20 @@
-"use client"
-
 import { useState } from "react"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Badge } from "../../components/ui/badge"
 import { Input } from "../../components/ui/input"
-import { Clock, Plus, Search, Edit, Trash2, ArrowLeft, Bus, MapPin, Calendar } from "lucide-react"
+import { Clock, Plus, Search, Edit, Trash2, Bus, MapPin, Calendar, Contact } from "lucide-react"
 import ScheduleForm from "./ScheduleForm"
 import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useSearchParams } from "react-router-dom"
+import { toCapitalCase } from "../../shared/utils/helpers"
 
-// Datos de ejemplo - reemplazar con datos de tu base de datos
-const initialHorarios = [
-  {
-    id: 1,
-    origen: "Ciudad de MΓ©xico",
-    destino: "Guadalajara",
-    horaSalida: "08:00",
-    horaLlegada: "15:30",
-    numeroAutobus: "101",
-    diasOperacion: ["Lunes", "MiΓ©rcoles", "Viernes"],
-    precio: 850,
-    activo: true,
-    notas: "Servicio ejecutivo con Wi-Fi",
-  },
-  {
-    id: 2,
-    origen: "Ciudad de MΓ©xico",
-    destino: "Monterrey",
-    horaSalida: "22:00",
-    horaLlegada: "09:00",
-    numeroAutobus: "205",
-    diasOperacion: ["Lunes", "Martes", "MiΓ©rcoles", "Jueves", "Viernes"],
-    precio: 1200,
-    activo: true,
-    notas: "Servicio nocturno",
-  },
-  {
-    id: 3,
-    origen: "Guadalajara",
-    destino: "Ciudad de MΓ©xico",
-    horaSalida: "14:00",
-    horaLlegada: "21:30",
-    numeroAutobus: "102",
-    diasOperacion: ["Martes", "Jueves", "SΓ'bado"],
-    precio: 850,
-    activo: true,
-    notas: "",
-  },
-  {
-    id: 4,
-    origen: "Ciudad de MΓ©xico",
-    destino: "Puebla",
-    horaSalida: "10:00",
-    horaLlegada: "12:00",
-    numeroAutobus: "310",
-    diasOperacion: ["SΓ'bado", "Domingo"],
-    precio: 250,
-    activo: false,
-    notas: "Temporalmente suspendido",
-  },
-]
-
-type Horario = (typeof initialHorarios)[0]
-
-
-// poner search params para manejar las vista activa
 
 
 export default function SchedulesManager({ configInitial = false }: { configInitial?: boolean }) {
   const { numberRegisterSchedule, runningSchedules } = useDashboard();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [departureTimeRecords, setDepartureTimeRecords] = useState<ScheduleData[]>(runningSchedules)
   const [searchTerm, setSearchTerm] = useState("")
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null)
 
@@ -80,13 +22,9 @@ export default function SchedulesManager({ configInitial = false }: { configInit
 
 
   const handleDeleteHorario = (id: number) => {
-    // if (confirm("¿Estás seguro de que deseas eliminar este horario?")) {
-    //   setHorarios(horarios.filter((h) => h.id !== id))
-    // }
   }
 
   const handleToggleActivo = (id: number) => {
-    // setHorarios(horarios.map((h) => (h.id === id ? { ...h, activo: !h.activo } : h)))
   }
 
   const startEdit = (horario: Schedule) => {
@@ -165,7 +103,7 @@ export default function SchedulesManager({ configInitial = false }: { configInit
       }
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {departureTimeRecords.map((schedule) => (
+        {runningSchedules.map((schedule) => (
           <Card key={schedule.id} className={`transition-all hover:shadow-md ${schedule.status === 'disabled' ? "opacity-60" : ""}`}>
             <CardContent className="p-5 space-y-4">
               <div className="flex items-start justify-between">
@@ -177,7 +115,7 @@ export default function SchedulesManager({ configInitial = false }: { configInit
                     <h3 className="font-semibold text-base text-balance">
                       {schedule.city_origin} → {schedule.city_destination}
                     </h3>
-                    <p className="text-sm text-muted-foreground">Salida: {schedule.arrival_time}</p>
+                    <p className="text-sm text-muted-foreground">Salida: {schedule.departure_time}</p>
                   </div>
                 </div>
                 <Badge variant={schedule.status === "active" ? "default" : "secondary"} className="text-xs">
@@ -189,19 +127,25 @@ export default function SchedulesManager({ configInitial = false }: { configInit
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="text-muted-foreground">
-                    Origen: <span className="font-medium text-foreground">{schedule.agency_id_origin}</span>
+                    Origen: <span className="font-medium text-foreground">{schedule.agency_name}</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="text-muted-foreground">
-                    Destino: <span className="font-medium text-foreground">{schedule.route_id}</span>
+                    Destino: <span className="font-medium text-foreground">{schedule.terminal_destination}</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Bus className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="text-muted-foreground">
                     Autobús: <span className="font-medium text-foreground">#{schedule.vehicle_number}</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Contact className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="text-muted-foreground">
+                    Conductor: <span className="font-medium text-foreground">{toCapitalCase(schedule?.driver_name ?? '')}</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">

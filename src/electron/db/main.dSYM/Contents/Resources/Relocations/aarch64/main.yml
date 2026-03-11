@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/js/Documents/js-code/busProyect/localBusJS/taquilla-sesai/src/electron/db/main'
+relocations:     []
+...

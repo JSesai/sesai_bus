@@ -142,6 +142,7 @@ interface ScheduleData extends Schedule {
   driver_name: string;
   city_origin: string;
   city_destination: string;
+  terminal_destination: string;
 }
 
 interface ScheduleAPI {
