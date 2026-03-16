@@ -3,6 +3,8 @@ import fs from "fs";
 import path from "path";
 import { userRepo } from "../db/repositories/userRepo.js";
 
+const nameCompany = "MyCompany";
+
 export function normalizeUserName(name: string) {
     return name
         .toLowerCase()
@@ -22,7 +24,7 @@ export async function generateUniqueUserName(name: User['userName']) {
         counter++;
     }
 
-    return userName;
+    return `${userName}@${nameCompany.toLowerCase()}`;
 }
 
 

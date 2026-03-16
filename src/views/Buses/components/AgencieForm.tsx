@@ -16,7 +16,8 @@ const initialStateAgency: Agency = {
     location: "",
     name: "",
     phone: "",
-    city: ""
+    city: "",
+    isCurrent: false
 }
 
 export default function AgencieForm({ editingAgency, configInitial = false }: { editingAgency?: boolean, configInitial?: boolean }) {
@@ -29,7 +30,7 @@ export default function AgencieForm({ editingAgency, configInitial = false }: { 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        await handleRegisterAgency(formData, editingAgency, configInitial);
+        await handleRegisterAgency({ ...formData, isCurrent: configInitial ? true : false }, editingAgency, configInitial);
 
     }
 
@@ -44,7 +45,8 @@ export default function AgencieForm({ editingAgency, configInitial = false }: { 
                 name: 'Agencia - develop',
                 location: 'En desarrollo',
                 phone: '5522552255',
-                city: 'Oax'
+                city: 'Oax',
+                isCurrent: configInitial ? true : false
             })
         }
 

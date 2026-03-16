@@ -47,13 +47,14 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
   const { agency, destinations, vehicles, driverEmployees, handleRegisterSchedules } = useDashboard();
 
   const [formData, setFormData] = useState<Schedule>(
-    isEditing && initialData ? initialData : initialDataForm
+    isEditing && initialData ? initialData : { ...initialDataForm, agency_id_origin: agency?.id || 0 }
   );
 
   const [isLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
+
 
     const successRegister = await handleRegisterSchedules(formData, isEditing);
     if (!successRegister) return;

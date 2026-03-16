@@ -15,11 +15,12 @@ const usersAPI: UsersAPI = {
 }
 
 const agencyAPI: AgencyAPI = {
-  getAgency: () => ipcRenderer.invoke('getAgency'),
+  getAgencies: () => ipcRenderer.invoke('getAgencies'),
   getAgencyById: (id: Agency['id']) => ipcRenderer.invoke("getAgencyById", id),
   addAgency: (agency: Agency) => ipcRenderer.invoke("addAgency", agency),
   updateAgency: (agency: Agency) => ipcRenderer.invoke("updateAgency", agency),
   deleteAgency: (id: Agency['id']) => ipcRenderer.invoke("deleteAgency", id),
+  getAgencyLocal: () => ipcRenderer.invoke("getAgencyLocal"),
 }
 
 const busesAPI: BusesAPI = {
@@ -92,6 +93,4 @@ contextBridge.exposeInMainWorld("electron", {
   payments: paymetsAPI,
   biometric: biometricAPI,
   appConfig: appConfiAPI
-
-
 });

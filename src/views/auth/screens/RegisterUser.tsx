@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Bus, User as UserIcon, Phone, UserCircle } from "lucide-react"
 import { useSearchParams } from "react-router-dom"
 import { useDashboard } from "../context/DashBoardContext"
+import { toCapitalCase } from "../../shared/utils/helpers"
 
 export type UserForm = Omit<User, 'password'>
 
@@ -44,7 +45,7 @@ export default function RegisterUser({ configInitial, initialData, onCancel, isE
         e.preventDefault()
 
 
-        const resp = await handleRegisterUser(formData, configInitial, isEditing);
+        const resp = await handleRegisterUser(formData, configInitial, isEditing ?? false);
         if (!resp) return;
         setSearchParams(prev => {
             prev.set('viewAtEmployees', 'list')
@@ -104,7 +105,7 @@ export default function RegisterUser({ configInitial, initialData, onCancel, isE
                                 type="text"
                                 placeholder="Ingresa nombre completo"
                                 value={formData.name}
-                                onChange={(e) => handleChange("name", e.target.value)}
+                                onChange={(e) => handleChange("name", toCapitalCase(e.target.value))}
                                 minLength={10}
                                 className="pl-10"
                                 required

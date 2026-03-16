@@ -8,6 +8,8 @@ import { MapPin, MapIcon, Phone, DollarSign, Clock } from "lucide-react"
 import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useAuth } from "../../auth/context/AuthContext"
 import { useSearchParams } from "react-router-dom"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
+import { estadosMexico } from "../../shared/constants/constants"
 
 
 
@@ -30,7 +32,7 @@ const initialStateForm: Route = {
   estimatedTravelTime: "",
   remarks: "",
   origin: "",
-  status:"active"
+  status: "active"
 }
 
 export default function DestinoForm({ initialData, onCancel, isEditing = false, configInitial = false }: DestinoFormProps) {
@@ -75,7 +77,7 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
         estimatedTravelTime: '08:22',
         terminalName: 'terminal periferico',
         remarks: 'Inicia servicio de atención a las 11:00 am',
-        status:'active'
+        status: 'active'
       })
     }
 
@@ -120,7 +122,7 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
               </div>
             </div>
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="estado" className="text-sm font-medium">
                 Estado / Región del destino <span className="text-destructive">*</span>
               </Label>
@@ -133,7 +135,26 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
                 required
                 disabled={isLoading}
               />
+            </div> */}
+            <div className="space-y-2">
+              <Label htmlFor="destino" className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                Estado del destino
+              </Label>
+              <Select defaultValue={String(formData.cityName)} value={String(formData.cityName)} onValueChange={(value) => setFormData({ ...formData, cityName: value })}>
+                <SelectTrigger id="destino" className="w-full py-5">
+                  <SelectValue placeholder="Estado destino" />
+                </SelectTrigger>
+                <SelectContent>
+                  {estadosMexico.map((edo) => (
+                    <SelectItem key={edo.id} value={String(edo.name)}>
+                      {edo.name.toUpperCase()}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+
           </div>
 
           <div className="space-y-2">
@@ -188,7 +209,7 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
                 type="number"
                 placeholder="550"
                 value={formData.distanceFromOriginKm}
-                onChange={(e) => handleChange("distanceFromOriginKm",  Number.parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleChange("distanceFromOriginKm", Number.parseFloat(e.target.value) || 0)}
                 required
                 disabled={isLoading}
                 min="0"

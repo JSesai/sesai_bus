@@ -3,9 +3,9 @@ import { getDB } from "../connection.js";
 const db = getDB();
 
 export const agenciesRepo = {
-  getAgency: () =>
+  getAgencies: () =>
     new Promise((resolve, reject) => {
-      db.get("SELECT * FROM agencies", (err, rows) => (err ? reject(err) : resolve(rows)));
+      db.all("SELECT * FROM agencies", (err, rows) => (err ? reject(err) : resolve(rows)));
     }),
 
   getById: (id: number) =>
@@ -14,12 +14,18 @@ export const agenciesRepo = {
         err ? reject(err) : resolve(row)
       );
     }),
+  getCurrent: () =>
+    new Promise((resolve, reject) => {
+      db.get("SELECT * FROM agencies WHERE is_current = 1", (err, row) =>
+        err ? reject(err) : resolve(row)
+      );
+    }),
 
   add: (agency: Agency) =>
     new Promise((resolve, reject) => {
       db.run(
-        "INSERT INTO agencies (name, location, phone, city) VALUES (?, ?, ?, ?)",
-        [agency.name, agency.location, agency.phone, agency.city],
+        "INSERT INTO agencies (name, location, phone, city, is_current ) VALUES (?, ?, ?, ?, ?)",
+        [agency.name, agency.location, agency.phone, agency.city, agency.isCurrent ? 1 : 0],
         function (err) {
           if (err) reject(err);
           else resolve({ id: this.lastID, ...agency });

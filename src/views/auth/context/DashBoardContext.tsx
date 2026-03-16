@@ -4,10 +4,7 @@ import { toast } from 'sonner';
 import { AgencyError, AppError, BusError, DestinationRouteError, ScheduleError, ValidationError } from "../../../shared/errors/customError";
 import { useAuth } from "./AuthContext";
 import { isvalidHour } from "../../../shared/utils/helpers";
-import type { ScheduleFormData } from "../../Buses/components/ScheduleForm";
 import type { UserForm } from "../screens/RegisterUser";
-import { daysInWeek } from "date-fns/constants";
-import { daysOfWeek } from "../../shared/constants/constants";
 import { creaToken } from "./jwt";
 
 
@@ -16,6 +13,7 @@ type DashboardContextType = {
     //data
     isLoading: boolean;
     agency: Agency | null;
+    agencies: Agency[] | null;
     vehicles: Bus[];
     destinations: Route[];
     numberRegisteredVehicles: number;
@@ -45,12 +43,13 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const { userLogged } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [agency, setAgency] = useState<Agency | null>(null);
+    const [agencies, setAgencies] = useState<Agency[] | null>(null);
     const [vehicles, setVehicles] = useState<Bus[]>([]);
     const [destinations, setDestinations] = useState<Route[]>([]);
     const [runningSchedules, setRunningSchedules] = useState<ScheduleData[]>([]);
     const [employees, setEmployees] = useState<UserSample[]>([]);
 
-  
+
 
     //mostrar confetti 
     const showConfetti = () => {
@@ -192,15 +191,31 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
     }
 
-    //obtener agencia
+    //obtener agencia local
     const getAgency = async () => {
         try {
-            const agencyData = await window.electron.agency.getAgency();
+            const agencyData = await window.electron.agency.getAgencyLocal();
             console.log(agencyData);
 
             if (!agencyData.ok) throw new AgencyError("Error al obtener información", "valida existencia")
 
             setAgency(agencyData.data);
+
+        } catch (error) {
+            console.log('error al obtener agencia', error);
+
+        }
+
+    }
+    //obtener todas las agencias registradas
+    const getAgencies = async () => {
+        try {
+            const agencyData = await window.electron.agency.getAgencies();
+            console.log(agencyData);
+
+            if (!agencyData.ok) throw new AgencyError("Error al obtener información", "valida existencia")
+
+            setAgencies(agencyData.data);
 
         } catch (error) {
             console.log('error al obtener agencia', error);
@@ -528,7 +543,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         try {
 
             //multiples peticiones para traer informacion del sistema busesm horarios, clientes, ventas, etc...
-            const results = await Promise.allSettled([getAgency(), handleGetBuses(), handleGetRoutes(), handleGetSchedules(), getEmployees()]);
+            const results = await Promise.allSettled([getAgency(), handleGetBuses(), handleGetRoutes(), handleGetSchedules(), getEmployees(),getAgencies()]);
             results.forEach((result, index) => {
                 if (result.status === "fulfilled") {
                     console.log(`Petición ${index} OK:`, result.value);
@@ -546,7 +561,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
 
     const driverEmployees = useMemo(() => employees.filter(e => e.role === 'driver'), [employees]);
-  
+
 
     // get agencia
     useEffect(() => {
@@ -570,6 +585,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             employees,
             isLoading,
             agency,
+            agencies,
             numberRegisteredVehicles: vehicles.length,
             numberRegisteredDestinations: destinations.length,
             numberRegisterSchedule: runningSchedules.length,

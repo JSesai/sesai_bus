@@ -48,10 +48,12 @@ interface Agency {
   city: string;
   location: string;
   phone: string;
+  isCurrent: boolean ;
 }
 
 interface AgencyAPI {
-  getAgency: () => Promise<ResponseElectronGeneric>;
+  getAgencies: () => Promise<ResponseElectronGeneric>;
+  getAgencyLocal: () => Promise<ResponseElectronGeneric>;
   getAgencyById: (id: Agency['id']) => Promise<Agency>;
   addAgency: (agency: Agency) => Promise<ResponseElectronAgencie>;
   updateAgency: (agency: Agency) => Promise<ResponseElectronAgencie>;

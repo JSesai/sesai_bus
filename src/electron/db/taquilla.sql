@@ -13,15 +13,23 @@ CREATE TABLE IF NOT EXISTS app_config (
 
 
 -- 1. AGENCIES (Sucursales)
+-- CREATE TABLE IF NOT EXISTS agencies (
+--     id INTEGER PRIMARY KEY CHECK (id = 1),
+--     name TEXT NOT NULL,
+--     location TEXT,
+--     phone TEXT,
+--     city TEXT
+    
+--     dynamic_bus_numbering INTEGER NOT NULL DEFAULT 0 -- 0 = fijo, 1 = dinámico
+
+-- );
 CREATE TABLE IF NOT EXISTS agencies (
-    id INTEGER PRIMARY KEY CHECK (id = 1),
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     location TEXT,
     phone TEXT,
-    city TEXT
-    
-    dynamic_bus_numbering INTEGER NOT NULL DEFAULT 0 -- 0 = fijo, 1 = dinámico
-
+    city TEXT,
+    is_current INTEGER NOT NULL DEFAULT 0 -- 0 = no actual, 1 = actual
 );
 
 
