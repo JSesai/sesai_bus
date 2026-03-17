@@ -138,6 +138,7 @@ export const schedulesRepo = {
               s.daysOperation,
               s.route_id,
               r.cityName AS city_destination,
+              r.origin AS city_origin,
               s.bus_id,
               b.plate AS bus_plate,
               b.model AS bus_model,
