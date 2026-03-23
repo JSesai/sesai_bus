@@ -62,7 +62,7 @@ export function NavItem({ icon: Icon, label, path, end }: NavItemProps) {
 
     if (!agency) {
         return (
-            <Button disabled variant="ghost" className="w-full justify-start text-slate-400" >
+            <Button disabled variant="ghost" className="w-full justify-start text-slate-700 dark:text-slate-400" >
                 <Icon className="mr-2 h-4 w-4" /> {label}
             </Button>
         );
@@ -75,7 +75,7 @@ export function NavItem({ icon: Icon, label, path, end }: NavItemProps) {
                     variant="ghost"
                     className={`w-full justify-start ${isActive
                         ? "bg-slate-800/70 text-cyan-400"
-                        : "text-slate-400 hover:text-slate-100"
+                        : "text-slate-700 dark:text-slate-400 hover:text-slate-300"
                         }`}
                 >
                     <Icon className="mr-2 h-4 w-4" />
@@ -106,8 +106,8 @@ function StatusItem({ label, value, color }: { label: string; value: number; col
     return (
         <div>
             <div className="flex items-center justify-between mb-1">
-                <div className="text-xs text-slate-400">{label}</div>
-                <div className="text-xs text-slate-400">{value}%</div>
+                <div className="text-xs text-slate-700 dark:text-slate-400">{label}</div>
+                <div className="text-xs text-slate-700 dark:text-slate-400">{value}%</div>
             </div>
             <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
                 <div className={`h-full bg-gradient-to-r ${getColor()} rounded-full`} style={{ width: `${value}%` }}></div>
@@ -132,7 +132,9 @@ function DashboardSidebar() {
 
     return (
         <div className="col-span-12 md:col-span-3 lg:col-span-2">
-            <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm h-full">
+            {/* <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm h-full"> */}
+            <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors h-screen">
+
                 <CardContent className="p-4">
                     <nav className="space-y-2">
                         {

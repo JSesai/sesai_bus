@@ -46,7 +46,7 @@ export default function RegisterBus({ editingBus }: { editingBus?: Bus | null })
 
 
     return (
-        <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm overflow-hidden">
+        <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden">
             <CardHeader className="space-y-3 text-center pb-6">
 
                 <div className="space-y-1">

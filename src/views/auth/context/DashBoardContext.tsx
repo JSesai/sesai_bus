@@ -23,8 +23,10 @@ type DashboardContextType = {
     employees: UserSample[];
     driverEmployees: UserSample[];
     numberRegisteredDriver: number;
+    theme: Theme;
 
     //methods
+    setTheme: (theme: 'light' | 'dark' | 'system') => void;
     handleRegisterBus: (dataBus: Bus, editingBus?: boolean, configInitial?: boolean) => Promise<boolean>;
     handleUpdateStatus: (dataBus: Bus, configInitial?: boolean) => Promise<boolean>;
     handleGetBuses: () => Promise<void>
@@ -48,6 +50,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const [destinations, setDestinations] = useState<Route[]>([]);
     const [runningSchedules, setRunningSchedules] = useState<ScheduleData[]>([]);
     const [employees, setEmployees] = useState<UserSample[]>([]);
+    const [theme, setTheme] = useState<Theme>("dark");
 
 
 
@@ -241,7 +244,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     }
 
     //registrar o actualizar agencia
-    const handleRegisterAgency = async (agencyForm: Agency, editingAgency: boolean = false, configInitial = false): Promise<boolean> => {
+    const handleRegisterAgency = async (agencyForm: Agency, configInitial = false): Promise<boolean> => {
 
         try {
             console.log('hay agencia??', agency);
@@ -512,6 +515,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
             if (scheduleRegister.error) throw new ScheduleError(scheduleRegister.error.message, scheduleRegister.error.detail);
             const updateSchedules = editingSchedule ? runningSchedules.map(s => s.id === sendSchedule.id ? scheduleRegister.data : s) : [...runningSchedules, sendSchedule];
+            console.log({ updateSchedules });
+
             setRunningSchedules(updateSchedules);
             return true;
 
@@ -543,7 +548,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         try {
 
             //multiples peticiones para traer informacion del sistema busesm horarios, clientes, ventas, etc...
-            const results = await Promise.allSettled([getAgency(), handleGetBuses(), handleGetRoutes(), handleGetSchedules(), getEmployees(),getAgencies()]);
+            const results = await Promise.allSettled([getAgency(), handleGetBuses(), handleGetRoutes(), handleGetSchedules(), getEmployees(), getAgencies()]);
             results.forEach((result, index) => {
                 if (result.status === "fulfilled") {
                     console.log(`Petición ${index} OK:`, result.value);
@@ -566,7 +571,6 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     // get agencia
     useEffect(() => {
         loadSystemInformation();
-        const elTotoken = creaToken();
     }, [userLogged]);
 
     return (
@@ -579,6 +583,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             handleRegisterSchedules,
             handleRegisterUser,
             showConfetti,
+            theme,
+            setTheme,
             destinations,
             runningSchedules,
             vehicles,

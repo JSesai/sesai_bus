@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Phone, HousePlus, MapPinHouse, Map } from "lucide-react"
 import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useAuth } from "../../auth/context/AuthContext"
+import Loader from "./Loader"
 
 
 
@@ -17,20 +18,27 @@ const initialStateAgency: Agency = {
     name: "",
     phone: "",
     city: "",
-    isCurrent: false
+    isCurrent: 0
 }
 
-export default function AgencieForm({ editingAgency, configInitial = false }: { editingAgency?: boolean, configInitial?: boolean }) {
+interface Props {
+    editingAgency?: Agency | null;
+    onCancel?: () => void;
+    configInitial?: boolean;
+}
+export default function AgencieForm({ editingAgency, onCancel, configInitial = false }: Props) {
 
     const { userLogged } = useAuth();
     const { isLoading, handleRegisterAgency, agency } = useDashboard();
-    const [formData, setFormData] = useState<Agency>(agency ?? initialStateAgency)
-
-
+    const [formData, setFormData] = useState<Agency>(() => {
+        if (configInitial && agency) return agency;
+        if (editingAgency) return editingAgency;
+        return initialStateAgency;
+    });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        await handleRegisterAgency({ ...formData, isCurrent: configInitial ? true : false }, editingAgency, configInitial);
+        await handleRegisterAgency({ ...formData, isCurrent: configInitial ? 1 : 0 }, configInitial);
 
     }
 
@@ -38,25 +46,11 @@ export default function AgencieForm({ editingAgency, configInitial = false }: { 
         setFormData((prev) => ({ ...prev, [field]: value }))
     }
 
-    useEffect(() => {
 
-        if (userLogged?.role === 'developer' && !agency) {
-            setFormData({
-                name: 'Agencia - develop',
-                location: 'En desarrollo',
-                phone: '5522552255',
-                city: 'Oax',
-                isCurrent: configInitial ? true : false
-            })
-        }
-
-        if (agency) setFormData(agency);
-
-    }, [])
 
 
     return (
-        <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm overflow-hidden">
+        <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden">
             <CardHeader className="space-y-2">
                 <CardTitle className="text-2xl font-semibold text-balance">Configuración de agencia</CardTitle>
                 <CardDescription className="text-base text-balance">
@@ -124,22 +118,23 @@ export default function AgencieForm({ editingAgency, configInitial = false }: { 
                         />
                     </div>
 
-
-
-                    <Button
-                        type="submit"
-                        className="w-full h-12 text-base font-medium"
-                        disabled={isLoading || Object.values(formData).includes('')}
-                    >
-                        {isLoading ? (
-                            <span className="flex items-center gap-2">
-                                <span className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                                Procesando reserva...
-                            </span>
-                        ) : (
-                            editingAgency ? "Guardar cambios" : "Enviar"
-                        )}
-                    </Button>
+                    <div className="flex gap-3 pt-4">
+                        {onCancel && <Button
+                            type="button"
+                            variant="outline"
+                            onClick={onCancel}
+                            className="flex-1 h-11 bg-transparent"
+                            disabled={isLoading}
+                        >
+                            Cancelar
+                        </Button>
+                        }
+                        <Button type="submit" className="flex-1 h-11" disabled={isLoading || Object.values(formData).includes('')}>
+                            {isLoading ?
+                                <Loader message="Estamos guardando la información de la agencia" />
+                                : editingAgency ? "Guardar cambios" : "Registrar"}
+                        </Button>
+                    </div>
                 </form>
             </CardContent>
         </Card>

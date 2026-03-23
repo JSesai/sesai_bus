@@ -53,7 +53,7 @@ function AlertItem({
                     <div className="text-sm font-medium text-slate-200">{title}</div>
                     <div className="ml-2 text-xs text-slate-500">{time}</div>
                 </div>
-                <div className="text-xs text-slate-400">{description}</div>
+                <div className="text-xs text-slate-700 dark:text-slate-400">{description}</div>
             </div>
         </div>
     )
@@ -84,7 +84,7 @@ function CommunicationItem({
                     <div className="text-sm font-medium text-slate-200">{sender}</div>
                     <div className="text-xs text-slate-500">{time}</div>
                 </div>
-                <div className="text-xs text-slate-400 mt-1">{message}</div>
+                <div className="text-xs text-slate-700 dark:text-slate-400 mt-1">{message}</div>
             </div>
             {unread && (
                 <div className="flex-shrink-0 self-center">
@@ -117,7 +117,7 @@ export default function MainDashboard() {
 
             {/* Security & Alerts */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+                <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-slate-100 flex items-center text-base">
                             <Shield className="mr-2 h-5 w-5 text-green-500" />
@@ -127,19 +127,19 @@ export default function MainDashboard() {
                     <CardContent>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <div className="text-sm text-slate-400">Firewall</div>
+                                <div className="text-sm text-slate-700 dark:text-slate-400">Firewall</div>
                                 <Badge className="bg-green-500/20 text-green-400 border-green-500/50">Active</Badge>
                             </div>
                             <div className="flex items-center justify-between">
-                                <div className="text-sm text-slate-400">Intrusion Detection</div>
+                                <div className="text-sm text-slate-700 dark:text-slate-400">Intrusion Detection</div>
                                 <Badge className="bg-green-500/20 text-green-400 border-green-500/50">Active</Badge>
                             </div>
                             <div className="flex items-center justify-between">
-                                <div className="text-sm text-slate-400">Encryption</div>
+                                <div className="text-sm text-slate-700 dark:text-slate-400">Encryption</div>
                                 <Badge className="bg-green-500/20 text-green-400 border-green-500/50">Active</Badge>
                             </div>
                             <div className="flex items-center justify-between">
-                                <div className="text-sm text-slate-400">Threat Database</div>
+                                <div className="text-sm text-slate-700 dark:text-slate-400">Threat Database</div>
                                 <div className="text-sm text-cyan-400">
                                     Updated <span className="text-slate-500">12 min ago</span>
                                 </div>
@@ -161,7 +161,7 @@ export default function MainDashboard() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+                <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-slate-100 flex items-center text-base">
                             <AlertCircle className="mr-2 h-5 w-5 text-amber-500" />
@@ -200,7 +200,7 @@ export default function MainDashboard() {
             </div>
 
             {/* Communications */}
-            <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+            <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors">
                 <CardHeader className="pb-2 flex flex-row items-center justify-between">
                     <CardTitle className="text-slate-100 flex items-center text-base">
                         <MessageSquare className="mr-2 h-5 w-5 text-blue-500" />

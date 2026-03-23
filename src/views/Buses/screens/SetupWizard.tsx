@@ -42,7 +42,7 @@ export default function SetupWizard() {
                     </h1>
 
                 </div>
-                <p className="text-slate-400 text-sm">
+                <p className="text-slate-700 dark:text-slate-400 text-sm">
                     Paso {step + 1} de {steps.length} — {steps[step]}
                 </p>
             </div>

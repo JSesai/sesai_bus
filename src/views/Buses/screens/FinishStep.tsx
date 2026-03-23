@@ -30,7 +30,7 @@ export default function FinishStep() {
           🎉 Configuración completa
         </h2>
 
-        <p className="text-slate-400">
+        <p className="text-slate-700 dark:text-slate-400">
           Tu sistema está listo para operar.
         </p>
 

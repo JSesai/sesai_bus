@@ -18,7 +18,7 @@ export default function BusesStep({ onNext, onBack }: handlerSteps) {
           Cantidad de vehículos registrados en el sistema: <span className="font-bold text-lg">{numberRegisteredVehicles}</span>
         </p>
         :
-        <p className="text-slate-400 text-md">
+        <p className="text-slate-700 dark:text-slate-400 text-md">
           Puedes agregar varios vehículos. Al menos uno es obligatorio.
         </p>
 

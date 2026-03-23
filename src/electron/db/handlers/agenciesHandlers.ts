@@ -1,5 +1,7 @@
 import { ipcMain } from "electron";
 import { agenciesRepo } from "../repositories/agenciesRepo.js";
+import { isCurrentAgency, isSuperUser } from "../../utils/helpers.js";
+import { AgencyError } from "../../../shared/errors/customError.js";
 
 export function registerAgenciesHandlers() {
   ipcMain.handle("getAgencies", async (_e): Promise<ResponseElectronGeneric> => {
@@ -40,7 +42,8 @@ export function registerAgenciesHandlers() {
   ipcMain.handle("addAgency", async(_, agency: Agency): Promise<ResponseElectronAgencie> => {
     try {
       console.log("init process add agency");
-      
+      const isAgencyLocal = await isCurrentAgency(agency.id ?? 0);
+      if (!isAgencyLocal && !isSuperUser()) throw new AgencyError("No pudes agregar agencias.", "No tienes permisos para agregar mas agencias.");
       
       const data = await agenciesRepo.add(agency) as Agency;
       

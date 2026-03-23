@@ -237,7 +237,7 @@ export function BusDailyAssignment() {
     
 
     return (
-        <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm overflow-hidden">
+        <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden">
             <CardHeader className="border-b border-slate-700/50 pb-3">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-slate-100 flex items-center text-2xl">

@@ -14,10 +14,10 @@ export const agenciesRepo = {
         err ? reject(err) : resolve(row)
       );
     }),
-  getCurrent: () =>
+  getCurrent: (): Promise<Agency> =>
     new Promise((resolve, reject) => {
       db.get("SELECT * FROM agencies WHERE is_current = 1", (err, row) =>
-        err ? reject(err) : resolve(row)
+        err ? reject(err) : resolve(row as Agency)
       );
     }),
 

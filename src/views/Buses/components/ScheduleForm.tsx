@@ -11,6 +11,7 @@ import { ScheduleError } from "../../../shared/errors/customError";
 import { daysOfWeek } from "../../shared/constants/constants";
 import { Checkbox } from "../../components/ui/checkbox";
 import { sumarHorasYMinutos } from "../../../shared/utils/helpers";
+import { useAuth } from "../../auth/context/AuthContext";
 
 
 
@@ -44,7 +45,8 @@ const initialDataForm: Schedule = {
 export default function HorarioForm({ initialData, onCancel, isEditing = false }: HorarioFormProps) {
 
   const [_, setSearchParams] = useSearchParams();
-  const { agency, destinations, vehicles, driverEmployees, handleRegisterSchedules } = useDashboard();
+  const { agency, agencies, destinations, vehicles, driverEmployees, handleRegisterSchedules } = useDashboard();
+  const { isSuperUser } = useAuth();
 
   const [formData, setFormData] = useState<Schedule>(
     isEditing && initialData ? initialData : { ...initialDataForm, agency_id_origin: agency?.id || 0 }
@@ -100,20 +102,42 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-6 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="horaSalida" className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                Origen
-              </Label>
-              <Input
-                id="horaSalida"
-                type="text"
-                value={`${agency.city.toUpperCase()} - ${agency.name.toUpperCase()}`}
-                className="h-11"
-                required
-                disabled
-              />
-            </div>
+            {isSuperUser ?
+              <div className="space-y-2">
+                <Label htmlFor="destino" className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  Origen
+                </Label>
+                <Select defaultValue={String(formData.agency_id_origin)} value={String(formData.agency_id_origin)} onValueChange={(value) => setFormData({ ...formData, agency_id_origin: +value })}>
+                  <SelectTrigger id="destino" className="w-full py-5">
+                    <SelectValue placeholder="Seleccionar destino" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {agencies?.map((agency) => (
+                      <SelectItem key={agency.id} value={String(agency.id)}>
+                        {agency.city.toUpperCase()}{' - '}{agency.name.toUpperCase()}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              :
+              <div className="space-y-2">
+                <Label htmlFor="horaSalida" className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  Origen
+                </Label>
+                <Input
+                  id="horaSalida"
+                  type="text"
+                  value={`${agency.city.toUpperCase()} - ${agency.name.toUpperCase()}`}
+                  className="h-11"
+                  required
+                  disabled
+                />
+              </div>
+
+            }
 
 
             <div className="space-y-2">

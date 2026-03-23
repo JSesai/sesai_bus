@@ -2,6 +2,9 @@ import { app } from "electron";
 import fs from "fs";
 import path from "path";
 import { userRepo } from "../db/repositories/userRepo.js";
+import { agenciesRepo } from "../db/repositories/agenciesRepo.js";
+import { sessionStore } from "../security/store-sesion.js";
+import { verifyToken } from "../security/jwt.js";
 
 const nameCompany = "MyCompany";
 
@@ -29,9 +32,25 @@ export async function generateUniqueUserName(name: User['userName']) {
 
 
 export function getAppMetadata() {
-  const appPath = app.getAppPath();
-  const packageJsonPath = path.join(appPath, "package.json");
+    const appPath = app.getAppPath();
+    const packageJsonPath = path.join(appPath, "package.json");
 
-  const raw = fs.readFileSync(packageJsonPath, "utf-8");
-  return JSON.parse(raw);
+    const raw = fs.readFileSync(packageJsonPath, "utf-8");
+    return JSON.parse(raw);
+}
+
+export const isCurrentAgency = async (agencyId: number) => {
+    const agencyCurrent = await agenciesRepo.getCurrent();
+    return agencyCurrent.isCurrent === agencyId ? true : false;
+}
+
+export const isSuperUser = () => {
+    const token = sessionStore.getToken();
+    if (!token) {
+        console.error("Sesión invalida", "Debes iniciar nueva sesión.");
+        return false;
+    }
+    const payload = verifyToken(token);
+    return payload.role === 'manager' || payload.role === 'developer';
+
 }

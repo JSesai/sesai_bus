@@ -22,10 +22,9 @@ import { useAuth } from "../../auth/context/AuthContext"
 
 
 function DashBoardLayout() {
-    const [theme, setTheme] = useState<"dark" | "light">("dark")
 
     const [currentTime, setCurrentTime] = useState(new Date())
-    const { isLoading } = useDashboard();
+    const { isLoading, theme } = useDashboard();
 
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -121,7 +120,8 @@ function DashBoardLayout() {
 
 
     return (
-        <div className={`${theme} mx-auto min-h-screen bg-gradient-to-br from-black to-slate-900 text-slate-100 relative overflow-hidden`} >
+        // <div className={`${theme} mx-auto min-h-screen bg-gradient-to-br from-black to-slate-900 text-slate-100 relative overflow-hidden`} >
+        <div className={`${theme} ${theme === 'light' ? 'mx-auto min-h-screen from-white to-slate-100  text-slate-900 relative overflow-hidden' : 'mx-auto min-h-screen bg-gradient-to-br from-black to-slate-900 text-slate-100 relative overflow-hidden'}`}>
 
             {/* Background particle effect */}
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-30" />
@@ -147,13 +147,15 @@ function DashBoardLayout() {
                     <div className="col-span-12 lg:col-span-2">
                         <div className="grid gap-6">
                             {/* System time */}
-                            <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm overflow-hidden">
+                            {/* <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm overflow-hidden"> */}
+                            <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors">
+
                                 <CardContent className="p-0">
                                     <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-6 border-b border-slate-700/50">
                                         <div className="text-center">
                                             <div className="text-xs text-slate-500 mb-1 font-mono">Hora del sistema</div>
                                             <div className="text-3xl font-mono text-cyan-400 mb-1">{formatTime(currentTime)}</div>
-                                            <div className="text-sm text-slate-400">{formatDate(currentTime)}</div>
+                                            <div className="text-slate-700 dark:text-slate-400">{formatDate(currentTime)}</div>
                                         </div>
                                     </div>
                                     <div className="p-4">
@@ -172,7 +174,9 @@ function DashBoardLayout() {
                             </Card>
 
                             {/* Quick actions */}
-                            <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+                            {/* <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm"> */}
+                            <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors">
+
                                 <CardHeader className="pb-2">
                                     <CardTitle className="text-slate-100 text-base">Quick Actions</CardTitle>
                                 </CardHeader>
@@ -188,7 +192,9 @@ function DashBoardLayout() {
                             </Card>
 
                             {/* Resource allocation */}
-                            <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+                            {/* <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm"> */}
+                            <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors">
+
                                 <CardHeader className="pb-2">
                                     <CardTitle className="text-slate-100 text-base">Resource Allocation</CardTitle>
                                 </CardHeader>
@@ -196,7 +202,7 @@ function DashBoardLayout() {
                                     <div className="space-y-4">
                                         <div>
                                             <div className="flex items-center justify-between mb-1">
-                                                <div className="text-sm text-slate-400">Processing Power</div>
+                                                <div className="text-sm text-slate-700 dark:text-slate-400">Processing Power</div>
                                                 <div className="text-xs text-cyan-400">42% allocated</div>
                                             </div>
                                             <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
@@ -209,7 +215,7 @@ function DashBoardLayout() {
 
                                         <div>
                                             <div className="flex items-center justify-between mb-1">
-                                                <div className="text-sm text-slate-400">Memory Allocation</div>
+                                                <div className="text-sm text-slate-700 dark:text-slate-400">Memory Allocation</div>
                                                 <div className="text-xs text-purple-400">68% allocated</div>
                                             </div>
                                             <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
@@ -222,7 +228,7 @@ function DashBoardLayout() {
 
                                         <div>
                                             <div className="flex items-center justify-between mb-1">
-                                                <div className="text-sm text-slate-400">Network Bandwidth</div>
+                                                <div className="text-sm text-slate-700 dark:text-slate-400">Network Bandwidth</div>
                                                 <div className="text-xs text-blue-400">35% allocated</div>
                                             </div>
                                             <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
@@ -235,7 +241,7 @@ function DashBoardLayout() {
 
                                         <div className="pt-2 border-t border-slate-700/50">
                                             <div className="flex items-center justify-between text-sm">
-                                                <div className="text-slate-400">Priority Level</div>
+                                                <div className="text-slate-700 dark:text-slate-400">Priority Level</div>
                                                 <div className="flex items-center">
                                                     <Slider defaultValue={[3]} max={5} step={1} className="w-24 mr-2" />
                                                     <span className="text-cyan-400">3/5</span>
@@ -247,7 +253,9 @@ function DashBoardLayout() {
                             </Card>
 
                             {/* Environment controls */}
-                            <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+                            {/* <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm"> */}
+                            <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors">
+
                                 <CardHeader className="pb-2">
                                     <CardTitle className="text-slate-100 text-base">Environment Controls</CardTitle>
                                 </CardHeader>
@@ -256,7 +264,7 @@ function DashBoardLayout() {
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center">
                                                 <Radio className="text-cyan-500 mr-2 h-4 w-4" />
-                                                <Label className="text-sm text-slate-400">Power Management</Label>
+                                                <Label className="text-sm text-slate-700 dark:text-slate-400">Power Management</Label>
                                             </div>
                                             <Switch />
                                         </div>
@@ -264,7 +272,7 @@ function DashBoardLayout() {
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center">
                                                 <Lock className="text-cyan-500 mr-2 h-4 w-4" />
-                                                <Label className="text-sm text-slate-400">Security Protocol</Label>
+                                                <Label className="text-sm text-slate-700 dark:text-slate-400">Security Protocol</Label>
                                             </div>
                                             <Switch defaultChecked />
                                         </div>
@@ -272,7 +280,7 @@ function DashBoardLayout() {
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center">
                                                 <Zap className="text-cyan-500 mr-2 h-4 w-4" />
-                                                <Label className="text-sm text-slate-400">Power Saving Mode</Label>
+                                                <Label className="text-sm text-slate-700 dark:text-slate-400">Power Saving Mode</Label>
                                             </div>
                                             <Switch />
                                         </div>
@@ -280,7 +288,7 @@ function DashBoardLayout() {
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center">
                                                 <CircleOff className="text-cyan-500 mr-2 h-4 w-4" />
-                                                <Label className="text-sm text-slate-400">Auto Shutdown</Label>
+                                                <Label className="text-sm text-slate-700 dark:text-slate-400">Auto Shutdown</Label>
                                             </div>
                                             <Switch defaultChecked />
                                         </div>

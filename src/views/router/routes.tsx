@@ -23,6 +23,7 @@ import AgencieForm from "../Buses/components/AgencieForm";
 import { TicketProvider } from "../auth/context/TicketContext";
 import SetupWizard from "../Buses/screens/SetupWizard";
 import SetupLayout from "../shared/layouts/SetupLayout";
+import Agencies from "../Buses/screens/Agencies";
 
 export const routeDirectory = {
     pathsLocationAuth: {
@@ -89,6 +90,7 @@ export function AppRouter() {
                                 <Route path="schedules" element={<Schedules />} />
                                 <Route path="employees" element={<Employees />} />
                                 <Route path="customers" element={<Customers />} />
+                                <Route path="agencies" element={<Agencies />} />
                             </Route>
 
                         </Routes>

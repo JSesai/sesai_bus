@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
 import { AppError, ValidationError } from "../../../shared/errors/customError";
-import type { UserForm } from "../screens/RegisterUser";
 
 type AuthContextType = {
   userLogged: UserResponseAuth | null;
   loading: boolean;
+  isSuperUser: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>
   login: (user: UserCredentials) => Promise<void>;
   logout: () => Promise<void>;
@@ -260,6 +260,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // user,
       userLogged,
       loading,
+      isSuperUser: userLogged?.role === 'manager' || userLogged?.role === 'developer',
       setLoading,
       login,
       logout,

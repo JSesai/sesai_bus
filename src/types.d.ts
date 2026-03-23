@@ -1,4 +1,4 @@
-
+type Theme ='light' | 'dark' | 'system';
 
 interface User {
   id?: number;
@@ -48,7 +48,7 @@ interface Agency {
   city: string;
   location: string;
   phone: string;
-  isCurrent: boolean ;
+  isCurrent: number ;
 }
 
 interface AgencyAPI {

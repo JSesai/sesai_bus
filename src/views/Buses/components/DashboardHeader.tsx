@@ -6,14 +6,15 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../
 import { useState } from "react"
 import { useAuth } from "../../auth/context/AuthContext"
 import { getInitials, translateRole } from "../../../shared/utils/helpers"
+import { useDashboard } from "../../auth/context/DashBoardContext";
 
 export default function DashboardHeader() {
   const { userLogged, logout } = useAuth();
-  
-  const [theme, setTheme] = useState<"dark" | "light">("dark")
+
+  const { theme, setTheme } = useDashboard();
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark")
+    setTheme(theme === "dark" ? "light" : "dark");
   }
 
   const handleLogout = async () => {
@@ -33,8 +34,8 @@ export default function DashboardHeader() {
       {/* Right */}
       <div className="flex items-center space-x-6">
         {/* Search */}
-        <div className="hidden md:flex items-center space-x-1 bg-slate-800/50 rounded-full px-3 py-1.5 border border-slate-700/50 backdrop-blur-sm">
-          <Search className="h-4 w-4 text-slate-400" />
+        <div className="hidden md:flex items-center space-x-1 rounded-full px-3 py-1.5 border  bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+          <Search className="h-4 w-4 text-slate-700 dark:text-slate-400" />
           <input
             type="text"
             placeholder="Search systems..."
@@ -47,13 +48,13 @@ export default function DashboardHeader() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative text-slate-400 hover:text-slate-100">
+                <Button variant="ghost" size="icon" className="relative text-slate-700 dark:text-slate-400 hover:text-slate-100">
                   <Bell className="h-5 w-5" />
                   <span className="absolute -top-1 -right-1 h-2 w-2 bg-cyan-500 rounded-full animate-pulse"></span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Notifications</p>
+                <p>Notificaciones</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -66,13 +67,13 @@ export default function DashboardHeader() {
                   variant="ghost"
                   size="icon"
                   onClick={toggleTheme}
-                  className="text-slate-400 hover:text-slate-100"
+                  className="text-slate-700 dark:text-slate-400 hover:text-slate-300"
                 >
                   {theme === "dark" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Toggle theme</p>
+                <p>Cambiar tema</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -94,7 +95,7 @@ export default function DashboardHeader() {
               <DropdownMenuLabel>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">{userLogged?.name}</span>
-                  <span className="text-xs text-slate-400">{translateRole(userLogged?.role)}</span>
+                  <span className="text-xs text-slate-700 dark:text-slate-400">{translateRole(userLogged?.role)}</span>
                 </div>
               </DropdownMenuLabel>
 
