@@ -41,8 +41,8 @@ export function registerAgenciesHandlers() {
   });
   ipcMain.handle("addAgency", async(_, agency: Agency): Promise<ResponseElectronAgencie> => {
     try {
-      console.log("init process add agency");
       const isAgencyLocal = await isCurrentAgency(agency.id ?? 0);
+      console.log({"init process add agency": agency});
       if (!isAgencyLocal && !isSuperUser()) throw new AgencyError("No pudes agregar agencias.", "No tienes permisos para agregar mas agencias.");
       
       const data = await agenciesRepo.add(agency) as Agency;
@@ -51,9 +51,9 @@ export function registerAgenciesHandlers() {
       return { ok: true, data, error: null }
     
     } catch (error) {
-      console.log('error al obtener agencie ->', error);
+      console.log('error al agregar agency ->', error);
 
-      return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible crear información agency" } };
+      return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible guardar información de la agencia" } };
 
     }
   });

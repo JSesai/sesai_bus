@@ -5,36 +5,36 @@ import { AgencyError, AppError, BusError, DestinationRouteError, ScheduleError, 
 import { useAuth } from "./AuthContext";
 import { isvalidHour } from "../../../shared/utils/helpers";
 import type { UserForm } from "../screens/RegisterUser";
-import { creaToken } from "./jwt";
 
 
 
 type DashboardContextType = {
-    //data
-    isLoading: boolean;
-    agency: Agency | null;
-    agencies: Agency[] | null;
-    vehicles: Bus[];
-    destinations: Route[];
-    numberRegisteredVehicles: number;
-    numberRegisteredDestinations: number;
-    runningSchedules: ScheduleData[];
-    numberRegisterSchedule: number;
-    employees: UserSample[];
-    driverEmployees: UserSample[];
-    numberRegisteredDriver: number;
-    theme: Theme;
+  //data
+  isLoading: boolean;
+  agency: Agency | null;
+  agencies: Agency[] | null;
+  vehicles: Bus[];
+  destinations: Route[];
+  numberRegisteredVehicles: number;
+  numberRegisteredDestinations: number;
+  runningSchedules: ScheduleData[];
+  numberRegisterSchedule: number;
+  employees: UserSample[];
+  driverEmployees: UserSample[];
+  numberRegisteredDriver: number;
+  theme: Theme;
 
-    //methods
-    setTheme: (theme: 'light' | 'dark' | 'system') => void;
-    handleRegisterBus: (dataBus: Bus, editingBus?: boolean, configInitial?: boolean) => Promise<boolean>;
-    handleUpdateStatus: (dataBus: Bus, configInitial?: boolean) => Promise<boolean>;
-    handleGetBuses: () => Promise<void>
-    handleRegisterAgency: (agency: Agency, editingAgency?: boolean, configInitial?: boolean) => Promise<boolean>;
-    handleRegisterRoute: (dataRoute: Route, editingRoute?: boolean, configInitial?: boolean) => Promise<boolean>;
-    handleRegisterSchedules: (schedule: Schedule, editingSchedule?: boolean, configInitial?: boolean) => Promise<boolean>;
-    handleRegisterUser: (user: UserForm, configInitial: boolean, isEditing: boolean) => Promise<boolean>;
-    showConfetti: () => void;
+  //methods
+  loadSystemInformation: () => Promise<void>;
+  setTheme: (theme: 'light' | 'dark' | 'system') => void;
+  handleRegisterBus: (dataBus: Bus, editingBus?: boolean, configInitial?: boolean) => Promise<boolean>;
+  handleUpdateStatus: (dataBus: Bus, configInitial?: boolean) => Promise<boolean>;
+  handleGetBuses: () => Promise<void>
+  handleRegisterAgency: (agency: Agency, editingAgency?: boolean, configInitial?: boolean) => Promise<boolean>;
+  handleRegisterRoute: (dataRoute: Route, editingRoute?: boolean, configInitial?: boolean) => Promise<boolean>;
+  handleRegisterSchedules: (schedule: Schedule, editingSchedule?: boolean, configInitial?: boolean) => Promise<boolean>;
+  handleRegisterUser: (user: UserForm, configInitial: boolean, isEditing: boolean) => Promise<boolean>;
+  showConfetti: () => void;
 
 };
 
@@ -42,573 +42,587 @@ export const DashboardContext = createContext<DashboardContextType | undefined>(
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
-    const { userLogged } = useAuth();
-    const [isLoading, setIsLoading] = useState(false);
-    const [agency, setAgency] = useState<Agency | null>(null);
-    const [agencies, setAgencies] = useState<Agency[] | null>(null);
-    const [vehicles, setVehicles] = useState<Bus[]>([]);
-    const [destinations, setDestinations] = useState<Route[]>([]);
-    const [runningSchedules, setRunningSchedules] = useState<ScheduleData[]>([]);
-    const [employees, setEmployees] = useState<UserSample[]>([]);
-    const [theme, setTheme] = useState<Theme>("dark");
+  const { userLogged } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [agency, setAgency] = useState<Agency | null>(null);
+  const [agencies, setAgencies] = useState<Agency[] | null>(null);
+  const [vehicles, setVehicles] = useState<Bus[]>([]);
+  const [destinations, setDestinations] = useState<Route[]>([]);
+  const [runningSchedules, setRunningSchedules] = useState<ScheduleData[]>([]);
+  const [employees, setEmployees] = useState<UserSample[]>([]);
+  const [theme, setTheme] = useState<Theme>("dark");
 
 
 
-    //mostrar confetti 
-    const showConfetti = () => {
-        confetti({
-            particleCount: 100,
-            spread: 120,
-            origin: { y: 0.6 }
+  //mostrar confetti 
+  const showConfetti = () => {
+    confetti({
+      particleCount: 100,
+      spread: 120,
+      origin: { y: 0.6 }
+    });
+  }
+
+  //manejador para obtener buses
+  const handleGetBuses = async (): Promise<void> => {
+
+    try {
+      setIsLoading(true);
+      const buses = await window.electron.buses.getBuses();
+
+      console.log(buses);
+      if (!buses.ok) {
+        setVehicles([]);
+        return;
+      }
+
+      setVehicles(buses.data);
+
+
+
+    } catch (e) {
+      if (e instanceof AppError) {
+
+        toast.error(e.message, {
+          richColors: true,
+          description: e.details,
+          duration: 10_000,
+          position: 'top-center'
         });
+        return
+      }
+
+    } finally {
+      setIsLoading(false)
     }
 
-    //manejador para obtener buses
-    const handleGetBuses = async (): Promise<void> => {
-
-        try {
-            setIsLoading(true);
-            const buses = await window.electron.buses.getBuses();
-
-            console.log(buses);
-            if (!buses.ok) {
-                setVehicles([]);
-                return;
-            }
-
-            setVehicles(buses.data);
 
 
+  }
+  //manejador para cambio de estatus de autobus 
+  const handleUpdateStatus = async (bus: Bus): Promise<boolean> => {
 
-        } catch (e) {
-            if (e instanceof AppError) {
+    try {
+      setIsLoading(true);
+      const resp = await window.electron.buses.updateBus(bus);
 
-                toast.error(e.message, {
-                    richColors: true,
-                    description: e.details,
-                    duration: 10_000,
-                    position: 'top-center'
-                });
-                return
-            }
+      console.log(resp);
+      if (resp.ok) {
 
-        } finally {
-            setIsLoading(false)
-        }
+        toast.success('Acción exitosa!!', {
+          richColors: true,
+          duration: 5_000,
+          position: 'top-center'
+        })
 
+        return true;
+      }
 
+      if (resp.error) throw new BusError(resp.error.message, resp.error.detail);
 
-    }
-    //manejador para cambio de estatus de autobus 
-    const handleUpdateStatus = async (bus: Bus): Promise<boolean> => {
+    } catch (e) {
+      if (e instanceof AppError) {
 
-        try {
-            setIsLoading(true);
-            const resp = await window.electron.buses.updateBus(bus);
-
-            console.log(resp);
-            if (resp.ok) {
-
-                toast.success('Acción exitosa!!', {
-                    richColors: true,
-                    duration: 5_000,
-                    position: 'top-center'
-                })
-
-                return true;
-            }
-
-            if (resp.error) throw new BusError(resp.error.message, resp.error.detail);
-
-        } catch (e) {
-            if (e instanceof AppError) {
-
-                toast.error(e.message, {
-                    richColors: true,
-                    description: e.details,
-                    duration: 10_000,
-                    position: 'top-center'
-                });
-                return false;
-            }
-
-        } finally {
-            setIsLoading(false)
-        }
-
+        toast.error(e.message, {
+          richColors: true,
+          description: e.details,
+          duration: 10_000,
+          position: 'top-center'
+        });
         return false;
+      }
 
+    } finally {
+      setIsLoading(false)
     }
-    //manejador para registro de autobus 
-    const handleRegisterBus = async (bus: Bus, editingBus: boolean = false, configInitial = false): Promise<boolean> => {
 
-        try {
+    return false;
 
-            // Validaciones
-            if (Object.values(bus).includes('')) throw new ValidationError("Ingresa todos los datos", "Hay campos obligatorios vacíos");
+  }
+  //manejador para registro de autobus 
+  const handleRegisterBus = async (bus: Bus, editingBus: boolean = false, configInitial = false): Promise<boolean> => {
 
-            if (bus.seatingCapacity <= 0) throw new BusError("Error", "La capacidad de asientos debe ser un número válido mayor a 0");
+    try {
 
-            const year = Number.parseInt(bus.year);
-            const currentYear = new Date().getFullYear();
-            if (isNaN(year) || year > currentYear + 1) throw new BusError("Año incorrecto", "El año no puede ser superior a 1 año de la fecha actual");
+      // Validaciones
+      if (Object.values(bus).includes('')) throw new ValidationError("Ingresa todos los datos", "Hay campos obligatorios vacíos");
+
+      if (bus.seatingCapacity <= 0) throw new BusError("Error", "La capacidad de asientos debe ser un número válido mayor a 0");
+
+      const year = Number.parseInt(bus.year);
+      const currentYear = new Date().getFullYear();
+      if (isNaN(year) || year > currentYear + 1) throw new BusError("Año incorrecto", "El año no puede ser superior a 1 año de la fecha actual");
 
 
-            setIsLoading(true);
-            const resp = editingBus ? await window.electron.buses.updateBus(bus) : await window.electron.buses.addBus(bus);
+      setIsLoading(true);
+      const resp = editingBus ? await window.electron.buses.updateBus(bus) : await window.electron.buses.addBus(bus);
 
-            console.log(resp);
-            if (resp.ok) {
-                configInitial ?? showConfetti();
+      console.log(resp);
+      if (resp.ok) {
+        configInitial ?? showConfetti();
 
-                toast.success(editingBus ? 'Cambios guardados' : 'Registro exitoso.', {
-                    description: editingBus ? 'Automobil editado correctamente' : 'Autobús agregado al sistema.',
-                    richColors: true,
-                    duration: 10_000,
-                    position: 'top-center'
-                })
-                const vehiclesUpdate = editingBus ? vehicles.map(v => v.id === bus.id ? bus : v) : [...vehicles, resp.data];
-                setVehicles(vehiclesUpdate);
-                return true;
-            }
+        toast.success(editingBus ? 'Cambios guardados' : 'Registro exitoso.', {
+          description: editingBus ? 'Automobil editado correctamente' : 'Autobús agregado al sistema.',
+          richColors: true,
+          duration: 10_000,
+          position: 'top-center'
+        })
+        const vehiclesUpdate = editingBus ? vehicles.map(v => v.id === bus.id ? bus : v) : [...vehicles, resp.data];
+        setVehicles(vehiclesUpdate);
+        return true;
+      }
 
-            if (resp.error) throw new BusError(resp.error.message, resp.error.detail);
+      if (resp.error) throw new BusError(resp.error.message, resp.error.detail);
 
-        } catch (e) {
-            if (e instanceof AppError) {
+    } catch (e) {
+      if (e instanceof AppError) {
 
-                toast.error(e.message, {
-                    richColors: true,
-                    description: e.details,
-                    duration: 10_000,
-                    position: 'top-center'
-                });
-                return false;
-            }
-
-        } finally {
-            setIsLoading(false)
-        }
-
+        toast.error(e.message, {
+          richColors: true,
+          description: e.details,
+          duration: 10_000,
+          position: 'top-center'
+        });
         return false;
+      }
+
+    } finally {
+      setIsLoading(false)
+    }
+
+    return false;
+
+  }
+
+  //obtener agencia local
+  const getAgency = async () => {
+    try {
+      const agencyData = await window.electron.agency.getAgencyLocal();
+      console.log(agencyData);
+
+      if (!agencyData.ok) throw new AgencyError("Error al obtener información", "valida existencia")
+
+      setAgency(agencyData.data);
+
+    } catch (error) {
+      console.log('error al obtener agencia', error);
 
     }
 
-    //obtener agencia local
-    const getAgency = async () => {
-        try {
-            const agencyData = await window.electron.agency.getAgencyLocal();
-            console.log(agencyData);
+  }
+  //obtener todas las agencias registradas
+  const getAgencies = async () => {
+    try {
+      const agencyData = await window.electron.agency.getAgencies();
+      console.log(agencyData);
 
-            if (!agencyData.ok) throw new AgencyError("Error al obtener información", "valida existencia")
+      if (!agencyData.ok) throw new AgencyError("Error al obtener información", "valida existencia")
 
-            setAgency(agencyData.data);
+      setAgencies(agencyData.data);
 
-        } catch (error) {
-            console.log('error al obtener agencia', error);
-
-        }
-
-    }
-    //obtener todas las agencias registradas
-    const getAgencies = async () => {
-        try {
-            const agencyData = await window.electron.agency.getAgencies();
-            console.log(agencyData);
-
-            if (!agencyData.ok) throw new AgencyError("Error al obtener información", "valida existencia")
-
-            setAgencies(agencyData.data);
-
-        } catch (error) {
-            console.log('error al obtener agencia', error);
-
-        }
-
-    }
-    //obtener empleados
-    const getEmployees = async () => {
-        try {
-            const employees = await window.electron.users.getUsers();
-            console.log({ employees });
-
-            if (!employees.ok) throw new AgencyError("Error al obtener empleados", "valida existencia")
-
-            setEmployees(employees.data);
-
-        } catch (error) {
-            console.log('error al obtener agencia', error);
-
-        }
+    } catch (error) {
+      console.log('error al obtener agencia', error);
 
     }
 
-    //registrar o actualizar agencia
-    const handleRegisterAgency = async (agencyForm: Agency, configInitial = false): Promise<boolean> => {
+  }
+  //obtener empleados
+  const getEmployees = async () => {
+    try {
+      const employees = await window.electron.users.getUsers();
+      console.log({ employees });
 
-        try {
-            console.log('hay agencia??', agency);
+      if (!employees.ok) throw new AgencyError("Error al obtener empleados", "valida existencia")
 
-            // Validaciones
-            if (Object.values(agencyForm).includes('')) throw new ValidationError("Ingresa todos los datos", "Hay campos obligatorios vacíos");
+      setEmployees(employees.data);
 
-            if (agencyForm.name.length <= 3) throw new AgencyError("Error", "El nombre es demasiado corto");
+    } catch (error) {
+      console.log('error al obtener agencia', error);
 
-            setIsLoading(true);
-            const registerAgency = agency ? await window.electron.agency.updateAgency(agencyForm) : await window.electron.agency.addAgency(agencyForm);
-            console.log(registerAgency);
-            if (registerAgency.error) throw new AgencyError(registerAgency.error.message, registerAgency.error.detail);
+    }
 
-            if (!registerAgency.ok) throw new AgencyError("Error inesperado", "Valida el registro de la agencia en el sistema");
+  }
 
-            configInitial ?? showConfetti();
+  //registrar o actualizar agencia
+  const handleRegisterAgency = async (agencyForm: Agency, configInitial = false): Promise<boolean> => {
 
-            toast.success(agency ? 'Cambios guardados' : 'Registro exitoso.', {
-                description: agency ? 'Agencia editada correctamente' : 'Agencia agregada al sistema.',
-                richColors: true,
-                duration: 5_000,
-                position: 'top-center',
+    try {
+      console.log('hay agencia??', agency);
 
-            })
+      // Validaciones
+      if (Object.values(agencyForm).includes('')) throw new ValidationError("Ingresa todos los datos", "Hay campos obligatorios vacíos");
 
-            setAgency(registerAgency.data);
-            return true;
+      if (agencyForm.name.length <= 3) throw new AgencyError("Error", "El nombre es demasiado corto");
 
-        } catch (e) {
-            if (e instanceof AppError) {
+      setIsLoading(true);
+      const registerAgency = agencyForm?.id ? await window.electron.agency.updateAgency(agencyForm) : await window.electron.agency.addAgency(agencyForm);
+      console.log(registerAgency);
+      if (registerAgency.error) throw new AgencyError(registerAgency.error.message, registerAgency.error.detail);
 
-                toast.error(e.message, {
-                    richColors: true,
-                    description: e.details,
-                    duration: 10_000,
-                    position: 'top-center'
-                });
-                return false;
-            }
+      if (!registerAgency.ok) throw new AgencyError("Error inesperado", "Valida el registro de la agencia en el sistema");
 
-        } finally {
-            setIsLoading(false)
-        }
+      configInitial ?? showConfetti();
 
+      toast.success(agency ? 'Cambios guardados' : 'Registro exitoso.', {
+        description: agency ? 'Agencia editada correctamente' : 'Agencia agregada al sistema.',
+        richColors: true,
+        duration: 5_000,
+        position: 'top-center',
+
+      })
+
+      setAgency(registerAgency.data?.isCurrent === 1 ? registerAgency.data : agency);
+
+      const updateAgencies = agencies?.map(agency =>
+        registerAgency.data && agency.id === registerAgency.data.id
+          ? registerAgency.data
+          : agency
+      );
+      console.log({ updateAgencies });
+      
+      setAgencies(updateAgencies ?? agencies);
+
+      return true;
+
+    } catch (e) {
+      if (e instanceof AppError) {
+
+        toast.error(e.message, {
+          richColors: true,
+          description: e.details,
+          duration: 10_000,
+          position: 'top-center'
+        });
         return false;
+      }
 
+    } finally {
+      setIsLoading(false)
     }
 
-    //manejador para registro de autobus 
-    const handleRegisterRoute = async (destination: Route, editingRoute: boolean = false, configInitial = false): Promise<boolean> => {
+    return false;
 
-        try {
-            console.log('init proces register route', destination);
-            console.log({ editingRoute });
+  }
 
-            const { terminalName, cityName, address, contactPhone, estimatedTravelTime } = destination;
-            // Validaciones
-            if (!terminalName || !cityName || !address || !contactPhone || !estimatedTravelTime) throw new DestinationRouteError("Por favor completa todos los campos obligatorios");
-            if (!isvalidHour(String(destination.estimatedTravelTime))) throw new DestinationRouteError("Tiempo estimado hacia el destino es invalido", "El formato requerido es HH:MM");
+  //manejador para registro de autobus 
+  const handleRegisterRoute = async (destination: Route, editingRoute: boolean = false, configInitial = false): Promise<boolean> => {
 
-            const SendDestination = {
-                ...destination,
-                origin: agency?.city ?? ''
-            };
+    try {
+      console.log('init proces register route', destination);
+      console.log({ editingRoute });
 
-            setIsLoading(true);
-            const resp = editingRoute ? await window.electron.routesTravel.updateRoute(SendDestination) : await window.electron.routesTravel.addRoute(SendDestination);
+      const { terminalName, cityName, address, contactPhone, estimatedTravelTime } = destination;
+      // Validaciones
+      if (!terminalName || !cityName || !address || !contactPhone || !estimatedTravelTime) throw new DestinationRouteError("Por favor completa todos los campos obligatorios");
+      if (!isvalidHour(String(destination.estimatedTravelTime))) throw new DestinationRouteError("Tiempo estimado hacia el destino es invalido", "El formato requerido es HH:MM");
 
-            console.log(resp);
-            if (resp.ok) {
-                configInitial ?? showConfetti();
+      const SendDestination = {
+        ...destination,
+        origin: agency?.city ?? ''
+      };
 
-                toast.success(editingRoute ? 'Cambios guardados' : 'Registro exitoso.', {
-                    description: editingRoute ? 'Destino editado correctamente' : 'Destino agregado al sistema.',
-                    richColors: true,
-                    duration: 10_000,
-                    position: 'top-center'
-                })
+      setIsLoading(true);
+      const resp = editingRoute ? await window.electron.routesTravel.updateRoute(SendDestination) : await window.electron.routesTravel.addRoute(SendDestination);
 
-                const updateDestinations = editingRoute ? destinations.map(d => d.id === destination.id ? destination : d) : [...destinations, resp.data];
-                setDestinations(updateDestinations);
-                return true;
-            }
+      console.log(resp);
+      if (resp.ok) {
+        configInitial ?? showConfetti();
 
-            if (resp.error) throw new DestinationRouteError(resp.error.message, resp.error?.detail);
+        toast.success(editingRoute ? 'Cambios guardados' : 'Registro exitoso.', {
+          description: editingRoute ? 'Destino editado correctamente' : 'Destino agregado al sistema.',
+          richColors: true,
+          duration: 10_000,
+          position: 'top-center'
+        })
 
-        } catch (e) {
-            console.log('error al agregar destino / route', e);
+        const updateDestinations = editingRoute ? destinations.map(d => d.id === destination.id ? destination : d) : [...destinations, resp.data];
+        setDestinations(updateDestinations);
+        return true;
+      }
 
-            if (e instanceof AppError) {
+      if (resp.error) throw new DestinationRouteError(resp.error.message, resp.error?.detail);
 
-                toast.error(e.message, {
-                    richColors: true,
-                    description: e.details,
-                    duration: 10_000,
-                    position: 'top-center'
-                });
-                return false;
-            }
+    } catch (e) {
+      console.log('error al agregar destino / route', e);
 
-        } finally {
-            setIsLoading(false)
-        }
+      if (e instanceof AppError) {
 
+        toast.error(e.message, {
+          richColors: true,
+          description: e.details,
+          duration: 10_000,
+          position: 'top-center'
+        });
         return false;
+      }
 
+    } finally {
+      setIsLoading(false)
     }
 
-    //manejador para obtener buses
-    const handleGetRoutes = async (): Promise<void> => {
+    return false;
 
-        try {
-            setIsLoading(true);
-            const destinatios = await window.electron.routesTravel.getRoutes();
-            console.log(destinatios);
-            if (!destinatios.ok) {
-                setDestinations([]);
-                return;
-            }
+  }
 
-            setDestinations(destinatios?.data);
+  //manejador para obtener buses
+  const handleGetRoutes = async (): Promise<void> => {
 
-        } catch (e) {
-            console.log('ocurrio un error al obtener los destinos', e);
+    try {
+      setIsLoading(true);
+      const destinatios = await window.electron.routesTravel.getRoutes();
+      console.log(destinatios);
+      if (!destinatios.ok) {
+        setDestinations([]);
+        return;
+      }
 
-            if (e instanceof AppError) {
+      setDestinations(destinatios?.data);
 
-                toast.error(e.message, {
-                    richColors: true,
-                    description: e.details,
-                    duration: 10_000,
-                    position: 'top-center'
-                });
-                return
-            }
+    } catch (e) {
+      console.log('ocurrio un error al obtener los destinos', e);
 
-        } finally {
-            setIsLoading(false)
-        }
+      if (e instanceof AppError) {
 
+        toast.error(e.message, {
+          richColors: true,
+          description: e.details,
+          duration: 10_000,
+          position: 'top-center'
+        });
+        return
+      }
+
+    } finally {
+      setIsLoading(false)
     }
 
-    //manejador para obtener horariosde  salidas
-    const handleGetSchedules = async (): Promise<void> => {
+  }
 
-        try {
-            setIsLoading(true);
-            const schedules = await window.electron.schedules.getSchedules();
-            console.log({ schedules });
-            if (!schedules.ok) {
-                setRunningSchedules([]);
-                return;
-            }
+  //manejador para obtener horariosde  salidas
+  const handleGetSchedules = async (): Promise<void> => {
 
-            setRunningSchedules(schedules?.data);
+    try {
+      setIsLoading(true);
+      const schedules = await window.electron.schedules.getSchedules();
+      console.log({ schedules });
+      if (!schedules.ok) {
+        setRunningSchedules([]);
+        return;
+      }
 
-        } catch (e) {
-            console.log('ocurrio un error al obtener los horarios', e);
+      setRunningSchedules(schedules?.data);
 
-            if (e instanceof AppError) {
+    } catch (e) {
+      console.log('ocurrio un error al obtener los horarios', e);
 
-                toast.error(e.message, {
-                    richColors: true,
-                    description: e.details,
-                    duration: 10_000,
-                    position: 'top-center'
-                });
-                return
-            }
+      if (e instanceof AppError) {
 
-        } finally {
-            setIsLoading(false)
-        }
+        toast.error(e.message, {
+          richColors: true,
+          description: e.details,
+          duration: 10_000,
+          position: 'top-center'
+        });
+        return
+      }
 
+    } finally {
+      setIsLoading(false)
     }
 
-    //Registro/acualizacion de usuario employee
-    const handleRegisterUser = async (userAdd: UserForm, configInitial: boolean, isEditing: boolean): Promise<boolean> => {
-        const { name, phone, role, userName } = userAdd;
+  }
 
-        // Validaciones
-        if (!name || !userName || !phone || !role) {
-            toast.error("Por favor completa todos los campos", {
-                richColors: true,
-                duration: 10_000,
-                position: 'top-center'
-            })
-            setIsLoading(false)
-            return false;
-        }
+  //Registro/acualizacion de usuario employee
+  const handleRegisterUser = async (userAdd: UserForm, configInitial: boolean, isEditing: boolean): Promise<boolean> => {
+    const { name, phone, role, userName } = userAdd;
 
-        if (name.length < 8) {
-            toast.error("El nombre del usuario es muy corto", {
-                richColors: true,
-                duration: 10_000,
-                position: 'top-center'
-            })
-            setIsLoading(false)
-            return false;
-        }
-
-        if (phone.length < 10) {
-            toast.error("El número de teléfono debe tener al menos 10 dígitos", {
-                richColors: true,
-                duration: 10_000,
-                position: 'top-center'
-            })
-            setIsLoading(false)
-            return false
-        }
-
-        try {
-            const resp = isEditing ?
-                await window.electron.users.updateUser({ ...userAdd, id: Number(userAdd.id) })
-                :
-                await window.electron.users.addUser({ ...userAdd, password: 'temporal123', })
-
-            console.log(resp);
-            if (resp.ok) {
-                configInitial ?? showConfetti();
-
-                toast.success('Registro exitoso.', {
-                    description: isEditing ? 'Cuenta actualizada correctamente' : 'La cuenta ha sido creada correctamente',
-                    richColors: true,
-                    duration: 20_000,
-                    position: 'top-center'
-                })
-                const employeesUpdated = isEditing ? employees.map(emp => emp.id === userAdd.id ? userAdd : emp) : [...employees, resp.data];
-                console.log({ employeesUpdated });
-
-
-                setEmployees(employeesUpdated);
-                return true;
-
-            }
-
-            if (resp.error) {
-
-                toast.error(resp.error.message, {
-                    description: resp.error.detail,
-                    richColors: true,
-                    duration: 10_000,
-                    position: 'top-center'
-                })
-
-            }
-
-        } catch (e) {
-            console.log(e);
-
-        } finally {
-            setIsLoading(false)
-        }
-
-        return false;
-
+    // Validaciones
+    if (!name || !userName || !phone || !role) {
+      toast.error("Por favor completa todos los campos", {
+        richColors: true,
+        duration: 10_000,
+        position: 'top-center'
+      })
+      setIsLoading(false)
+      return false;
     }
 
-
-    //manejador para crear/actualizar horarios
-    const handleRegisterSchedules = async (sendSchedule: Schedule, editingSchedule: boolean = false, configInitial = false): Promise<boolean> => {
-
-        try {
-            setIsLoading(true);
-            const scheduleRegister = editingSchedule ? await window.electron.schedules.updateSchedule(sendSchedule) : await window.electron.schedules.addSchedule(sendSchedule);
-            console.log({ scheduleRegister });
-
-            if (scheduleRegister.error) throw new ScheduleError(scheduleRegister.error.message, scheduleRegister.error.detail);
-            const updateSchedules = editingSchedule ? runningSchedules.map(s => s.id === sendSchedule.id ? scheduleRegister.data : s) : [...runningSchedules, sendSchedule];
-            console.log({ updateSchedules });
-
-            setRunningSchedules(updateSchedules);
-            return true;
-
-
-        } catch (e) {
-            console.log('ocurrio un error al obtener los horarios', e);
-
-            if (e instanceof AppError) {
-
-                toast.error(e.message, {
-                    richColors: true,
-                    description: e.details,
-                    duration: 10_000,
-                    position: 'top-center'
-                });
-            }
-            return false;
-
-        } finally {
-            setIsLoading(false);
-        }
+    if (name.length < 8) {
+      toast.error("El nombre del usuario es muy corto", {
+        richColors: true,
+        duration: 10_000,
+        position: 'top-center'
+      })
+      setIsLoading(false)
+      return false;
     }
 
-    //obtener salidas basadas en bus_daily_assignments
-
-
-    //manejador de carga de informacion del sistema
-    const loadSystemInformation = async () => {
-        try {
-
-            //multiples peticiones para traer informacion del sistema busesm horarios, clientes, ventas, etc...
-            const results = await Promise.allSettled([getAgency(), handleGetBuses(), handleGetRoutes(), handleGetSchedules(), getEmployees(), getAgencies()]);
-            results.forEach((result, index) => {
-                if (result.status === "fulfilled") {
-                    console.log(`Petición ${index} OK:`, result.value);
-                } else {
-                    console.error(`Petición ${index} falló:`, result.reason);
-                }
-            });
-
-        } catch (error) {
-            console.log('error al obtener data system', error);
-
-        }
-
+    if (phone.length < 10) {
+      toast.error("El número de teléfono debe tener al menos 10 dígitos", {
+        richColors: true,
+        duration: 10_000,
+        position: 'top-center'
+      })
+      setIsLoading(false)
+      return false
     }
 
+    try {
+      const resp = isEditing ?
+        await window.electron.users.updateUser({ ...userAdd, id: Number(userAdd.id) })
+        :
+        await window.electron.users.addUser({ ...userAdd, password: 'temporal123', })
 
-    const driverEmployees = useMemo(() => employees.filter(e => e.role === 'driver'), [employees]);
+      console.log(resp);
+      if (resp.ok) {
+        configInitial ?? showConfetti();
 
-
-    // get agencia
-    useEffect(() => {
-        loadSystemInformation();
-    }, [userLogged]);
-
-    return (
-        <DashboardContext.Provider value={{
-            handleRegisterBus,
-            handleUpdateStatus,
-            handleGetBuses,
-            handleRegisterAgency,
-            handleRegisterRoute,
-            handleRegisterSchedules,
-            handleRegisterUser,
-            showConfetti,
-            theme,
-            setTheme,
-            destinations,
-            runningSchedules,
-            vehicles,
-            employees,
-            isLoading,
-            agency,
-            agencies,
-            numberRegisteredVehicles: vehicles.length,
-            numberRegisteredDestinations: destinations.length,
-            numberRegisterSchedule: runningSchedules.length,
-            driverEmployees,
-            numberRegisteredDriver: driverEmployees.length
+        toast.success('Registro exitoso.', {
+          description: isEditing ? 'Cuenta actualizada correctamente' : 'La cuenta ha sido creada correctamente',
+          richColors: true,
+          duration: 20_000,
+          position: 'top-center'
+        })
+        const employeesUpdated = isEditing ? employees.map(emp => emp.id === userAdd.id ? userAdd : emp) : [...employees, resp.data];
+        console.log({ employeesUpdated });
 
 
-        }}>
-            {children}
-        </DashboardContext.Provider>
-    );
+        setEmployees(employeesUpdated);
+        return true;
+
+      }
+
+      if (resp.error) {
+
+        toast.error(resp.error.message, {
+          description: resp.error.detail,
+          richColors: true,
+          duration: 10_000,
+          position: 'top-center'
+        })
+
+      }
+
+    } catch (e) {
+      console.log(e);
+
+    } finally {
+      setIsLoading(false)
+    }
+
+    return false;
+
+  }
+
+
+  //manejador para crear/actualizar horarios
+  const handleRegisterSchedules = async (sendSchedule: Schedule, editingSchedule: boolean = false, configInitial = false): Promise<boolean> => {
+
+    try {
+      setIsLoading(true);
+      const scheduleRegister = editingSchedule ? await window.electron.schedules.updateSchedule(sendSchedule) : await window.electron.schedules.addSchedule(sendSchedule);
+      console.log({ scheduleRegister });
+
+      if (scheduleRegister.error) throw new ScheduleError(scheduleRegister.error.message, scheduleRegister.error.detail);
+      const updateSchedules = editingSchedule ? runningSchedules.map(s => s.id === sendSchedule.id ? scheduleRegister.data : s) : [...runningSchedules, sendSchedule];
+      console.log({ updateSchedules });
+
+      setRunningSchedules(updateSchedules);
+      return true;
+
+
+    } catch (e) {
+      console.log('ocurrio un error al obtener los horarios', e);
+
+      if (e instanceof AppError) {
+
+        toast.error(e.message, {
+          richColors: true,
+          description: e.details,
+          duration: 10_000,
+          position: 'top-center'
+        });
+      }
+      return false;
+
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  //obtener salidas basadas en bus_daily_assignments
+
+
+  //manejador de carga de informacion del sistema
+  const loadSystemInformation = async () => {
+    try {
+      setIsLoading(true);
+      //multiples peticiones para traer informacion del sistema busesm horarios, clientes, ventas, etc...
+      const results = await Promise.allSettled([getAgency(), handleGetBuses(), handleGetRoutes(), handleGetSchedules(), getEmployees(), getAgencies()]);
+      results.forEach((result, index) => {
+
+        if (result.status === "fulfilled") {
+          console.log(`Petición ${index} OK:`);
+        } else {
+          console.error(`Petición ${index} falló:`, result.reason);
+        }
+      });
+
+    } catch (error) {
+      console.log('error al obtener data system', error);
+
+    } finally {
+      setIsLoading(false);
+    }
+
+  }
+
+
+  const driverEmployees = useMemo(() => employees.filter(e => e.role === 'driver'), [employees]);
+
+
+  // get agencia
+  useEffect(() => {
+    loadSystemInformation();
+  }, [userLogged]);
+
+  return (
+    <DashboardContext.Provider value={{
+      loadSystemInformation,
+      handleRegisterBus,
+      handleUpdateStatus,
+      handleGetBuses,
+      handleRegisterAgency,
+      handleRegisterRoute,
+      handleRegisterSchedules,
+      handleRegisterUser,
+      showConfetti,
+      setTheme,
+      theme,
+      destinations,
+      runningSchedules,
+      vehicles,
+      employees,
+      isLoading,
+      agency,
+      agencies,
+      numberRegisteredVehicles: vehicles.length,
+      numberRegisteredDestinations: destinations.length,
+      numberRegisterSchedule: runningSchedules.length,
+      driverEmployees,
+      numberRegisteredDriver: driverEmployees.length
+
+
+    }}>
+      {children}
+    </DashboardContext.Provider>
+  );
 }
 
 export function useDashboard() {
-    const ctx = useContext(DashboardContext);
-    if (!ctx) {
-        throw new Error("No hay context Auth");
-    }
-    return ctx;
+  const ctx = useContext(DashboardContext);
+  if (!ctx) {
+    throw new Error("No hay context Auth");
+  }
+  return ctx;
 }

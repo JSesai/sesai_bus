@@ -1,17 +1,15 @@
 
 import type React from "react"
-import { useReducer, useState } from "react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
-import { MapPin, Calendar, Users, Minus, Plus, ArrowRight, CheckCircle2, Repeat, Ticket, AlertCircle, Icon, Info } from "lucide-react"
+import { MapPin, Calendar, Users, Minus, Plus, ArrowRight, Repeat, Ticket } from "lucide-react"
 import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useTicket } from "../../auth/context/TicketContext"
-import { Alert, AlertDescription } from "../../components/ui/alert"
 import { useAuth } from "../../auth/context/AuthContext"
-import { NavLink, useLocation } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 
 
 

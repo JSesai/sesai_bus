@@ -23,10 +23,10 @@ export default function AgenciesManager() {
     const viewActiveAtAgencies = searchParams.get(viewCurrent) ?? "list";
 
 
-    const handleDeleteHorario = (id: number) => {
-    }
+   
 
     const handleToggleActivo = (id: number) => {
+        
     }
 
     const startEdit = (agency: Agency) => {

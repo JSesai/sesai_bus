@@ -1,14 +1,16 @@
 
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
-import { Phone, HousePlus, MapPinHouse, Map } from "lucide-react"
+import { Phone, HousePlus, MapPinHouse } from "lucide-react"
 import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useAuth } from "../../auth/context/AuthContext"
 import Loader from "./Loader"
+import { estadosMexico } from "../../shared/constants/constants"
 
 
 
@@ -28,7 +30,6 @@ interface Props {
 }
 export default function AgencieForm({ editingAgency, onCancel, configInitial = false }: Props) {
 
-    const { userLogged } = useAuth();
     const { isLoading, handleRegisterAgency, agency } = useDashboard();
     const [formData, setFormData] = useState<Agency>(() => {
         if (configInitial && agency) return agency;
@@ -46,6 +47,7 @@ export default function AgencieForm({ editingAgency, onCancel, configInitial = f
         setFormData((prev) => ({ ...prev, [field]: value }))
     }
 
+console.log('agencieForm',formData);
 
 
 
@@ -75,19 +77,24 @@ export default function AgencieForm({ editingAgency, onCancel, configInitial = f
                             maxLength={80}
                         />
                     </div>
-                    <div className="space-y-3">
-                        <Label htmlFor="location">
-                            <Map size={15} />
-                            Ciudad <span className="text-destructive">*</span>
+                  
+                    <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                            <MapPinHouse className="h-4 w-4 text-primary" />
+                            Ciudad
                         </Label>
-                        <Input
-                            id="city"
-                            type="tel"
-                            placeholder="ej: CDMX"
-                            value={formData.city}
-                            onChange={(e) => handleChange('city', e.target.value)}
-                            maxLength={200}
-                        />
+                        <Select value={formData.city} onValueChange={(value) => handleChange('city', value)} required>
+                            <SelectTrigger className="h-11 w-full">
+                                <SelectValue placeholder="Selecciona ubicación de la agencia" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {estadosMexico.map((city) => (
+                                    <SelectItem key={city.id} value={city.name}>
+                                        {city.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div className="space-y-3">
                         <Label htmlFor="location">
@@ -97,7 +104,7 @@ export default function AgencieForm({ editingAgency, onCancel, configInitial = f
                         <Input
                             id="location"
                             type="tel"
-                            placeholder="ej: 5512345678"
+                            placeholder="ej: calle Allende 22, Col. Centro"
                             value={formData.location}
                             onChange={(e) => handleChange('location', e.target.value)}
                             maxLength={200}

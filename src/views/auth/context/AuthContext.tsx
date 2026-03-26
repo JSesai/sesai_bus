@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('haciendo login', userData);
       const validateUser = await window.electron.users.authUser(userData);
 
-      if (validateUser.data && validateUser.data.status === 'registered') {
+      if (validateUser.data && validateUser.data.statusConfirmed === 'unconfirmed') {
         toast.warning('Acción requerida', {
           description: 'Debes de actualizar tu contraseña',
           richColors: true,
@@ -184,6 +184,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         role: userLogged?.role,
         status: userLogged?.status,
         userName: userLogged?.userName,
+        statusConfirmed: 'confirmed'        
       });
 
 

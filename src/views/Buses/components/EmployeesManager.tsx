@@ -6,8 +6,9 @@ import { Input } from "../../components/ui/input"
 import { Users, Plus, Search, Edit, Trash2, ArrowLeft, Phone, UserCircle } from "lucide-react"
 import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useSearchParams } from "react-router-dom"
-import RegisterUser from "../../auth/screens/RegisterUser"
+import RegisterUser, { type UserForm } from "../../auth/screens/RegisterUser"
 import { translateRole } from "../../../shared/utils/helpers"
+import { listaSuperUsers } from "../../shared/constants/constants"
 
 
 
@@ -20,18 +21,10 @@ const rolColors: Record<Exclude<Rol, null>, string> = {
     ticketSeller: "bg-orange-500/10 text-orange-700 dark:text-cyan-400",
 }
 
-// const rolLabels: Record< Rol, string > = {
-//     : "Taquillero",
-//     encargado: "Encargado",
-//     chofer: "Chofer",
-//     checador: "Checador",
-// }
-
-
 
 export default function EmployeesManager({ configInitial = false }: { configInitial: boolean }) {
 
-    const { employees, driverEmployees, numberRegisteredDriver } = useDashboard();
+    const { employees, driverEmployees, numberRegisteredDriver, handleRegisterUser } = useDashboard();
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchTerm, setSearchTerm] = useState("")
     const [editingUsuario, setEditingUsuario] = useState<UserSample | null>(null)
@@ -39,6 +32,9 @@ export default function EmployeesManager({ configInitial = false }: { configInit
     const users: UserSample[] = configInitial ? driverEmployees : employees;
     const viewActiveAtEmployees = searchParams.get("viewAtEmployees") ?? "list";
 
+    const filteredUsers = users.filter(user => !listaSuperUsers.includes(user.role));
+
+    const handleToggleActivo = async (employee: UserForm) => await handleRegisterUser({ ...employee, status: employee.status === 'active' ? 'disabled' : 'active' }, false, true);
 
 
     const startEdit = (usuario: UserSample) => {
@@ -123,26 +119,31 @@ export default function EmployeesManager({ configInitial = false }: { configInit
             }
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {users.map((user) => (
+                {filteredUsers.map((user) => (
                     <Card key={user.id} className={`transition-all hover:shadow-md ${user.status === 'disabled' ? "opacity-60" : ""}`}>
                         <CardContent className="p-5 space-y-4">
                             <div className="flex items-start justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                                         <UserCircle className="h-6 w-6 text-primary" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="font-semibold text-base text-balance truncate">{user.name.toUpperCase()}</h3>
-                                        <p className="text-sm text-muted-foreground">{user.userName}</p>
+                                        <h3 className="font-semibold text-base truncate">
+                                            {user.name.toUpperCase()}
+                                        </h3>
+                                        <p className="text-sm text-muted-foreground truncate">
+                                            {user.userName}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
+
 
                             <div className="flex items-center gap-2">
                                 <Badge className={rolColors[user.role as keyof typeof rolColors]} variant="secondary">
                                     {translateRole(user.role)}
                                 </Badge>
-                                <Badge variant={user.status === "active" ? "default" : "secondary"} className="text-xs">
+                                <Badge variant={user.status === "active" ? "default" : "destructive"} className="text-xs">
                                     {user.status === "active" ? "Activo" : "Inactivo"}
                                 </Badge>
                             </div>
@@ -151,12 +152,12 @@ export default function EmployeesManager({ configInitial = false }: { configInit
                                 <div className="flex items-center gap-2">
                                     <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
                                     <span className="text-muted-foreground">
-                                        Teléfono: <span className="font-medium text-foreground">{user.phone}</span>
+                                        Teléfono: <span className="font-medium text-foreground ">{user.phone}</span>
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 wrap-break-word">
                                     <UserCircle className="h-4 w-4 text-muted-foreground shrink-0" />
-                                    <span className="text-muted-foreground">
+                                    <span className="text-muted-foreground truncate">
                                         Usuario: <span className="font-medium text-foreground">{user.userName}</span>
                                     </span>
                                 </div>
@@ -168,26 +169,18 @@ export default function EmployeesManager({ configInitial = false }: { configInit
                                 </p>
                             </div>
 
-                            {configInitial ?? <div className="flex gap-2 pt-2">
+                            <div className="flex gap-2 pt-2">
                                 <Button variant="outline" size="sm" onClick={() => startEdit(user)} className="flex-1 gap-2">
                                     <Edit className="h-4 w-4" />
                                     Editar
                                 </Button>
                                 <Button variant="outline" size="sm"
-                                    // onClick={() => handleToggleActivo(user.id)}
+                                    onClick={() => handleToggleActivo(user)}
                                     className="flex-1">
                                     {user.status === 'active' ? "Desactivar" : "Activar"}
                                 </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    // onClick={() => handleDeleteUsuario(usuario.id)}
-                                    className="text-destructive hover:text-destructive"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
+
                             </div>
-                            }
                         </CardContent>
                     </Card>
                 ))}

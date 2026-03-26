@@ -13,16 +13,6 @@ CREATE TABLE IF NOT EXISTS app_config (
 
 
 -- 1. AGENCIES (Sucursales)
--- CREATE TABLE IF NOT EXISTS agencies (
---     id INTEGER PRIMARY KEY CHECK (id = 1),
---     name TEXT NOT NULL,
---     location TEXT,
---     phone TEXT,
---     city TEXT
-    
---     dynamic_bus_numbering INTEGER NOT NULL DEFAULT 0 -- 0 = fijo, 1 = dinámico
-
--- );
 CREATE TABLE IF NOT EXISTS agencies (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -115,7 +105,6 @@ CREATE TABLE IF NOT EXISTS schedules (
 
 
 -- 6. CUSTOMERS (Clientes)
-
 CREATE TABLE IF NOT EXISTS customers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -128,7 +117,6 @@ CREATE TABLE IF NOT EXISTS customers (
 
 
 -- 7. TICKETS (Boletos)
-
 CREATE TABLE IF NOT EXISTS tickets (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     schedule_id INTEGER NOT NULL,
@@ -166,6 +154,7 @@ CREATE TABLE IF NOT EXISTS users (
     userName TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     status TEXT NOT NULL,
+    statusConfirmed TEXT NOT NULL,
     phone TEXT NOT NULL UNIQUE,
     role TEXT NOT NULL,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP

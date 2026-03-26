@@ -24,7 +24,7 @@ import { useAuth } from "../../auth/context/AuthContext"
 function DashBoardLayout() {
 
     const [currentTime, setCurrentTime] = useState(new Date())
-    const { isLoading, theme } = useDashboard();
+    const { isLoading, theme, loadSystemInformation } = useDashboard();
 
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -151,20 +151,20 @@ function DashBoardLayout() {
                             <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors">
 
                                 <CardContent className="p-0">
-                                    <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-6 border-b border-slate-700/50">
+                                    <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 border-b border-slate-200 dark:border-slate-700/50 transition-colors">
                                         <div className="text-center">
-                                            <div className="text-xs text-slate-500 mb-1 font-mono">Hora del sistema</div>
-                                            <div className="text-3xl font-mono text-cyan-400 mb-1">{formatTime(currentTime)}</div>
-                                            <div className="text-slate-700 dark:text-slate-400">{formatDate(currentTime)}</div>
+                                            <div className="text-xs text-slate-600 dark:text-slate-500 mb-1 font-mono">Hora del sistema</div>
+                                            <div className="text-3xl font-mono text-cyan-600 dark:text-cyan-400 mb-1">{formatTime(currentTime)}</div>
+                                            <div className="text-sm text-slate-500 dark:text-slate-400">{formatDate(currentTime)}</div>
                                         </div>
                                     </div>
                                     <div className="p-4">
                                         <div className="grid grid-cols-2 gap-3">
-                                            <div className="bg-slate-800/50 rounded-md p-3 border border-slate-700/50">
+                                            <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors rounded-md p-3 border border-slate-700/50">
                                                 <div className="text-xs text-slate-500 mb-1">Uptime</div>
                                                 <div className="text-sm font-mono text-slate-200">14d 06:42:18</div>
                                             </div>
-                                            <div className="bg-slate-800/50 rounded-md p-3 border border-slate-700/50">
+                                            <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors rounded-md p-3 border border-slate-700/50">
                                                 <div className="text-xs text-slate-500 mb-1">Time Zone</div>
                                                 <div className="text-sm font-mono text-slate-200">UTC-08:00</div>
                                             </div>
@@ -175,15 +175,15 @@ function DashBoardLayout() {
 
                             {/* Quick actions */}
                             {/* <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm"> */}
-                            <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors">
+                            <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors duration-300">
 
                                 <CardHeader className="pb-2">
-                                    <CardTitle className="text-slate-100 text-base">Quick Actions</CardTitle>
+                                    <CardTitle className="text-slate-900 dark:text-slate-100 text-base">Quick Actions</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="grid grid-cols-2 gap-3">
                                         <ActionButton icon={Shield} label="Security Scan" />
-                                        <ActionButton icon={RefreshCw} label="Sync Data" />
+                                        <ActionButton icon={RefreshCw} label="Recargar" onClick={loadSystemInformation} />
                                         <ActionButton icon={Download} label="Backup" />
                                         <ActionButton icon={Terminal} label="Console" />
 
@@ -196,7 +196,7 @@ function DashBoardLayout() {
                             <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors">
 
                                 <CardHeader className="pb-2">
-                                    <CardTitle className="text-slate-100 text-base">Resource Allocation</CardTitle>
+                                    <CardTitle className="text-slate-900 dark:text-slate-100 text-base">Resource Allocation</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="space-y-4">
@@ -257,7 +257,7 @@ function DashBoardLayout() {
                             <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors">
 
                                 <CardHeader className="pb-2">
-                                    <CardTitle className="text-slate-100 text-base">Environment Controls</CardTitle>
+                                    <CardTitle className="text-slate-900 dark:text-slate-100 text-base">Environment Controls</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="space-y-4">

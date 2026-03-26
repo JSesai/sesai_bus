@@ -17,10 +17,10 @@ export const userRepo = {
   add: (user: User): Promise<UserSample> =>
 
     new Promise((resolve, reject) => {
-      db.run("INSERT INTO users (name, userName, password, status, phone, role) VALUES (?, ?, ?, ?, ?, ?)", [user.name, user.userName, user.password, user.status, user.phone, user.role], function (err) {
+      db.run("INSERT INTO users (name, userName, password, status, phone, role, statusConfirmed) VALUES (?, ?, ?, ?, ?, ?, ?)", [user.name, user.userName, user.password, user.status, user.phone, user.role, user.statusConfirmed ?? "unconfirmed"], function (err) {
         if (err) reject(err);
         else {
-          db.get(`SELECT id, name, userName, status, phone, role, date(created_at) as created_at FROM users WHERE id = ?`,
+          db.get(`SELECT id, name, userName, status, phone, role, statusConfirmed, date(created_at) as created_at FROM users WHERE id = ?`,
             [this.lastID],
             (err2, rowGet) => {
               if (err2) reject(err2);
@@ -31,6 +31,8 @@ export const userRepo = {
     }),
   update: (user: User) =>
     new Promise((resolve, reject) => {
+      console.log('user to update repo', user);
+      
       db.run(
         `
           UPDATE users SET
@@ -39,7 +41,8 @@ export const userRepo = {
             phone    = COALESCE(?, phone),
             status   = COALESCE(?, status),
             role     = COALESCE(?, role),
-            password = COALESCE(?, password)
+            password = COALESCE(?, password),
+            statusConfirmed   = COALESCE(?, statusConfirmed)
           WHERE id = ?
           `,
         [
@@ -49,6 +52,7 @@ export const userRepo = {
           user.status,
           user.role,
           user.password,
+          user.statusConfirmed,
           user.id
         ],
         function (err) {

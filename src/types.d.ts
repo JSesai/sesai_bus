@@ -1,16 +1,22 @@
-type Theme ='light' | 'dark' | 'system';
+type Theme = 'light' | 'dark' | 'system';
 
 interface User {
   id?: number;
   name: string;
   userName: string;
-  password: string;
+  password?: string;
   status: StatusTypeUser;
+  statusConfirmed?: 'confirmed' | 'unconfirmed';
   role: Rol;
   phone: string;
 }
 
 type UserSample = Omit<User, 'password'> & { id: number, created_at?: string };
+type UserUpdatePass = Omit<User, "id" | "created_at"> & {
+  id: number;
+  created_at?: string;
+};
+
 
 interface UserCredentials {
   userName: string;
@@ -30,7 +36,7 @@ interface UsersAPI {
   getByUserName: (userName: User['userName']) => Promise<ResponseElectronUser>;
   getUsers: () => Promise<ResponseElectronGeneric>;
   addUser: (user: User) => Promise<ResponseElectronGeneric>;
-  updateUser: (user: UserSample) => Promise<ResponseElectronGeneric>;
+  updateUser: (user: UserUpdatePass) => Promise<ResponseElectronGeneric>;
   logout: () => Promise<ResponseElectronGeneric>;
   authUser: (UserCredentials) => Promise<ResponseElectronUser>;
   checkSession: () => Promise<ResponseElectronUser>;
@@ -39,7 +45,7 @@ interface UsersAPI {
 
 interface appConfigAPI {
   getAppConfig: () => Promise<ResponseElectronAppConfig>;
-  updateAppConfig: ( data: Partial<any>) => Promise<ResponseElectronAppConfig>;
+  updateAppConfig: (data: Partial<any>) => Promise<ResponseElectronAppConfig>;
 }
 
 interface Agency {
@@ -48,7 +54,7 @@ interface Agency {
   city: string;
   location: string;
   phone: string;
-  isCurrent: number ;
+  isCurrent: number;
 }
 
 interface AgencyAPI {

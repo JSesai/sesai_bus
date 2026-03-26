@@ -63,7 +63,7 @@ export function registerUserHandlers() {
 
         try {
 
-            if (!user.password || !user.phone || !user.role || !user.name || !user.status || !user.userName)
+            if (!user.password || !user.phone || !user.role || !user.name || !user.status || !user.userName )
                 throw new RegisterUserError("Ingresa la informacion completa.", "Faltan datos para poder realizar el registro del usuario.");
 
             user.password = await hashPassword(user.password);
@@ -97,12 +97,19 @@ export function registerUserHandlers() {
     });
     ipcMain.handle("updateUser", async (_event, user: User): Promise<ResponseElectronGeneric> => {
         try {
-            if (user.password){
+
+            console.log('user to update', user);
+            
+            if (user.password) {
                 user.password = await hashPassword(user.password);
                 user.status = 'active';
-            } 
-            // throw new ValidationError('Falta de datos', 'El password a actualizar es obligatorio');
+            }
 
+
+            const token = sessionStore.getToken();
+            const { id: idUserLogedd } = verifyToken(token ?? '');
+            console.log('idUserLogedd', idUserLogedd);
+            
             const userUpdate = await userRepo.update({
                 name: user.name,
                 userName: user.userName,
@@ -110,7 +117,8 @@ export function registerUserHandlers() {
                 status: 'active',
                 role: user.role,
                 password: user.password,
-                id: user.id
+                id: user.id,
+                statusConfirmed: idUserLogedd == user?.id ? 'confirmed' : 'unconfirmed'
             });
 
             sessionStore.clear(); //limpia session
@@ -118,6 +126,8 @@ export function registerUserHandlers() {
 
 
         } catch (error) {
+            console.log('error update user', error);
+            
             if (error instanceof AppError) {
                 return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
             }
@@ -138,7 +148,7 @@ export function registerUserHandlers() {
 
             if (!user) throw new AuthError("Usuario no encontrado.", "valida tu información ingresada.")
 
-            const passworValidate = await comparePassword(credentials.password, user.password)
+            const passworValidate = await comparePassword(credentials.password, user?.password ?? '');
             console.log('passworValidate', passworValidate);
 
             if (!passworValidate) throw new AuthError("Contraseña incorrecta", "valida tu información ingresada.")

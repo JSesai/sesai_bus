@@ -27,7 +27,7 @@ export default function DashboardHeader() {
       <div className="flex items-center space-x-2">
         <BusFront className="h-8 w-8 text-cyan-500" />
         <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-          Taquilla Xpress
+          Taquilla Demo
         </span>
       </div>
 

@@ -23,9 +23,11 @@ export const agenciesRepo = {
 
   add: (agency: Agency) =>
     new Promise((resolve, reject) => {
+      console.log("agenciesRepo add ->", agency);
+      
       db.run(
         "INSERT INTO agencies (name, location, phone, city, is_current ) VALUES (?, ?, ?, ?, ?)",
-        [agency.name, agency.location, agency.phone, agency.city, agency.isCurrent ? 1 : 0],
+        [agency.name, agency.location, agency.phone, agency.city, agency.isCurrent],
         function (err) {
           if (err) reject(err);
           else resolve({ id: this.lastID, ...agency });

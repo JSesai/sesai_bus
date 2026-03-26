@@ -21,7 +21,6 @@ export default function Buses({ configInitial = false }: { configInitial?: boole
 
 
     const activeView = searchParams.get('view') ?? 'list';
-    console.log({ activeView });
 
 
     useEffect(() => {
@@ -30,7 +29,7 @@ export default function Buses({ configInitial = false }: { configInitial?: boole
 
 
     const handleDeletebuses = async (bus: Bus) => {
-        
+
         if (confirm("Estas seguro de que deseas eliminar este automovil?")) {
             const updateBus: Bus = {
                 ...bus,
@@ -141,17 +140,20 @@ export default function Buses({ configInitial = false }: { configInitial?: boole
                 {buses.map((buses) => (
                     <Card key={buses.id} className={`transition-all hover:shadow-md ${buses.status === 'disabled' ? "opacity-60" : ""}`}>
                         <CardContent className="p-5 space-y-4">
-                            <div className="mt-2">
-                                <Button
-                                    aria-description="eliminar"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleDeletebuses(buses)}
-                                    className="text-destructive hover:text-destructive hover:cursor-pointer"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            </div>
+                            {
+                                configInitial &&
+                                <div className="mt-2">
+                                    <Button
+                                        aria-description="eliminar"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleDeletebuses(buses)}
+                                        className="text-destructive hover:text-destructive hover:cursor-pointer"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            }
 
                             <div className="flex items-start justify-between">
                                 <div className="flex items-center gap-3">

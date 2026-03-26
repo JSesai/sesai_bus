@@ -41,7 +41,7 @@ export function getAppMetadata() {
 
 export const isCurrentAgency = async (agencyId: number) => {
     const agencyCurrent = await agenciesRepo.getCurrent();
-    return agencyCurrent.isCurrent === agencyId ? true : false;
+    return agencyCurrent?.isCurrent === agencyId ? true : false;
 }
 
 export const isSuperUser = () => {
