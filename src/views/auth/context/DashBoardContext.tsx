@@ -271,16 +271,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
       })
 
-      setAgency(registerAgency.data?.isCurrent === 1 ? registerAgency.data : agency);
-
-      const updateAgencies = agencies?.map(agency =>
-        registerAgency.data && agency.id === registerAgency.data.id
-          ? registerAgency.data
-          : agency
-      );
-      console.log({ updateAgencies });
-      
-      setAgencies(updateAgencies ?? agencies);
+      await getAgency();
+      await getAgencies();
 
       return true;
 
