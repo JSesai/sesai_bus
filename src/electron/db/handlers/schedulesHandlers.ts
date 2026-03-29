@@ -28,7 +28,7 @@ export function registerSchedulesHandlers() {
 
     });
 
-    // ipcMain.handle("getScheduleById", async(_, id: Schedule['id']) => schedulesRepo.getById(id));
+    // ipcMain.handle("getScheduleById", async(_, id: Schedule['id']) => schedulesRepo.getById(id)); este es un camnbio
     ipcMain.handle("addSchedule", async (_, schedule: Schedule) => {
 
         try {
