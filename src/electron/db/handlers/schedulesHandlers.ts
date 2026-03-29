@@ -51,11 +51,11 @@ export function registerSchedulesHandlers() {
                 return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
             }
 
-            // if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('routes.terminalName')) {
-            //     return { ok: false, data: null, error: { message: 'La terminal destino ya se encuentra registrada', detail: 'Cambia el nombre de la terminal destino' } };
-            // }
+            if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('schedules.vehicle_number')) {
+                return { ok: false, data: null, error: { message: 'El número de vehiculo ya se encuentra asignado a otra salida', detail: 'Cambia el el numero de vehiculo' } };
+            }
             console.log('error en addSchedule', error);
-            return { ok: false, data: null, error: { message: "Error interno no esperado", detail: "No fue posible agregar schedule - horario" } };
+            return { ok: false, data: null, error: { message: "Error interno no esperado", detail: "No fue posible agregar horario" } };
         }
 
 

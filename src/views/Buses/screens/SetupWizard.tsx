@@ -32,9 +32,9 @@ export default function SetupWizard() {
     const back = () => setStep((s) => Math.max(s - 1, 0))
 
     return (
-        <>
+        <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden p-4">
             {/* Header */}
-            <div className="mb-6">
+            <div className="mb-6 ">
                 <div>
                     <h1 className="text-2xl font-bold text-cyan-400 flex items-center gap-2">
                         <MonitorCog />
@@ -65,6 +65,6 @@ export default function SetupWizard() {
             {step === 3 && <DriverStep onNext={next} onBack={back} />}
             {step === 4 && <SchedulesStep onNext={next} onBack={back} />}
             {step === 5 && <FinishStep />}
-        </>
+        </div>
     )
 }

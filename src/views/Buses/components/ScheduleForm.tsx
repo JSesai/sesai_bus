@@ -96,7 +96,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
       <CardHeader>
         <CardTitle className="text-2xl flex items-center gap-2">
           <ClockPlus size={30} className="text-cyan-500" />
-          {isEditing ? "Editar Horario" : "Agregar Nuevo Horario"}
+          {isEditing ? "Editar horario de salida" : "Nuevo horario de salida"}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -198,7 +198,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
             <div className="space-y-2">
               <Label htmlFor="autobus" className="flex items-center gap-2">
                 <Bus className="h-4 w-4 text-muted-foreground" />
-                Autobús
+                Vehículo
               </Label>
               <Select
                 disabled={formData.arrival_time === ""}
@@ -244,7 +244,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
             <div className="space-y-2">
               <Label htmlFor="numerVehicle" className="flex items-center gap-2">
                 <ListOrdered size={15} />
-                Número de Autobús
+                Número de vehículo
               </Label>
               <Input
                 id="numerVehicle"

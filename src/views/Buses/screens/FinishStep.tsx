@@ -24,7 +24,7 @@ export default function FinishStep() {
 
   return (
     isConfigInitialComplete ?
-      <div className="text-center space-y-6">
+      <div className="text-center space-y-6 ">
 
         <h2 className="text-2xl font-bold text-cyan-400">
           🎉 Configuración completa

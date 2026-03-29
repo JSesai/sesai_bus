@@ -519,9 +519,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       const updateSchedules = editingSchedule ? runningSchedules.map(s => s.id === sendSchedule.id ? scheduleRegister.data : s) : [...runningSchedules, sendSchedule];
       console.log({ updateSchedules });
 
-      setRunningSchedules(updateSchedules);
+      await handleGetSchedules();
       return true;
-
 
     } catch (e) {
       console.log('ocurrio un error al obtener los horarios', e);
