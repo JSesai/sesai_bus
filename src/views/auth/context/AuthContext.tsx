@@ -102,11 +102,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         toast.warning('Acción requerida', {
           description: 'Debes de actualizar tu contraseña',
           richColors: true,
-          duration: 10_000,
+          duration: 5_000,
           position: 'top-center'
         })
         setUserLogged(validateUser.data)
         navigate('/auth/new-password');
+        return;
+      }
+      if (validateUser.data && validateUser.data.status === 'disabled') {
+        toast.warning('Acceso denegado!!', {
+          description: 'Tu usuario ha sido desactivado. Contacta al administrador.',
+          richColors: true,
+          duration: 5_000,
+          position: 'top-center'
+        })
+        await logout();
         return;
       }
 
