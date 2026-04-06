@@ -253,6 +253,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       if (Object.values(agencyForm).includes('')) throw new ValidationError("Ingresa todos los datos", "Hay campos obligatorios vacíos");
 
       if (agencyForm.name.length <= 3) throw new AgencyError("Error", "El nombre es demasiado corto");
+      if (agencyForm.phone.length < 10) throw new AgencyError("Télefono invalido", "Debes ingresar 10 digitos");
 
       setIsLoading(true);
       const registerAgency = agencyForm?.id ? await window.electron.agency.updateAgency(agencyForm) : await window.electron.agency.addAgency(agencyForm);

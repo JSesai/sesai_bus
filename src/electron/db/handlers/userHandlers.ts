@@ -102,28 +102,10 @@ export function registerUserHandlers() {
             
             if (user.password) {
                 user.password = await hashPassword(user.password);
-                user.status = 'active';
             }
 
-
-            const token = sessionStore.getToken();
-            const { id: idUserLogedd } = verifyToken(token ?? '');
-            console.log('idUserLogedd', idUserLogedd);
-            
-            const userUpdate = await userRepo.update({
-                name: user.name,
-                userName: user.userName,
-                phone: user.phone,
-                status: 'active',
-                role: user.role,
-                password: user.password,
-                id: user.id,
-                statusConfirmed: idUserLogedd == user?.id ? 'confirmed' : 'unconfirmed'
-            });
-
-            sessionStore.clear(); //limpia session
+            const userUpdate = await userRepo.update(user);          
             return { ok: true, error: null, data: userUpdate }
-
 
         } catch (error) {
             console.log('error update user', error);

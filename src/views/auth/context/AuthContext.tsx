@@ -98,6 +98,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('haciendo login', userData);
       const validateUser = await window.electron.users.authUser(userData);
 
+      if (validateUser.data && validateUser.data.status === 'disabled') {
+        toast.warning('Acceso denegado!!', {
+          description: 'Tu usuario ha sido desactivado. Contacta al administrador.',
+          richColors: true,
+          duration: 5_000,
+          position: 'top-center'
+        })
+        await logout();
+        return;
+      }
+
       if (validateUser.data && validateUser.data.statusConfirmed === 'unconfirmed') {
         toast.warning('Acción requerida', {
           description: 'Debes de actualizar tu contraseña',
@@ -107,16 +118,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
         setUserLogged(validateUser.data)
         navigate('/auth/new-password');
-        return;
-      }
-      if (validateUser.data && validateUser.data.status === 'disabled') {
-        toast.warning('Acceso denegado!!', {
-          description: 'Tu usuario ha sido desactivado. Contacta al administrador.',
-          richColors: true,
-          duration: 5_000,
-          position: 'top-center'
-        })
-        await logout();
         return;
       }
 
@@ -194,13 +195,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         role: userLogged?.role,
         status: userLogged?.status,
         userName: userLogged?.userName,
-        statusConfirmed: 'confirmed'        
+        statusConfirmed: 'confirmed'
       });
 
 
 
       console.log('updatePassword', updateUser);
-      if (!updateUser.ok) throw new ValidationError("Error iesperado", "La contraseña no fue actualizada");
+      if (!updateUser.ok) throw new ValidationError("Error inesperado", "La contraseña no fue actualizada");
 
       toast.success("Contraseña actualizada correctamete", {
         richColors: true,

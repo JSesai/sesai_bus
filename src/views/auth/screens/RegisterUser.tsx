@@ -45,7 +45,7 @@ export default function RegisterUser({ configInitial, initialData, onCancel, isE
         e.preventDefault()
 
 
-        const resp = await handleRegisterUser(formData, configInitial, isEditing ?? false);
+        const resp = await handleRegisterUser({...formData, status: configInitial ? 'active' : 'registered'}, configInitial, isEditing ?? false);
         if (!resp) return;
         setSearchParams(prev => {
             prev.set('viewAtEmployees', 'list')

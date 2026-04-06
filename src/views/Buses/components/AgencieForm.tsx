@@ -120,8 +120,13 @@ console.log('agencieForm',formData);
                             type="tel"
                             placeholder="ej: 5512345678"
                             value={formData.phone}
-                            onChange={(e) => handleChange('phone', e.target.value)}
+                            // onChange={(e) => handleChange('phone', e.target.value)}
+                            onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, "")
+                                handleChange("phone", value)
+                            }}
                             maxLength={10}
+                            
                         />
                     </div>
 
