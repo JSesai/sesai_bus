@@ -10,6 +10,7 @@ import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useTicket } from "../../auth/context/TicketContext"
 import { useAuth } from "../../auth/context/AuthContext"
 import { useLocation } from "react-router-dom"
+import { minDate } from "../../../shared/utils/helpers"
 
 
 
@@ -19,7 +20,11 @@ interface PassengerCounts {
     inapam: number
 }
 
+const fechaActual: string = minDate();
+
 export default function TicketBookingForm() {
+    console.log(fechaActual)
+    console.log(new Date().toISOString().split("T")[0]);
 
     const { agency } = useDashboard();
     const { userLogged } = useAuth();
@@ -32,8 +37,6 @@ export default function TicketBookingForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-
-
     }
 
     const location = useLocation();
@@ -120,9 +123,10 @@ export default function TicketBookingForm() {
                                     onChange={(e) => dispatch({ type: "SET_FIELD", field: "departureDate", value: e.target.value })}
                                     className="h-11"
                                     required
-                                    min={new Date().toISOString().split("T")[0]}
+                                    min={fechaActual}
                                 />
                             </div>
+
 
                         </div>
                     </div>

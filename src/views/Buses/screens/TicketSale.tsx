@@ -11,7 +11,7 @@ export type handlerSteps = {
 
 
 enum stepsTicketOffice {
-    dataTravel = 0,
+    selectTravelType = 0,
     seatSelection = 1,
     pay = 2,
     PrintTicket = 3,
@@ -21,10 +21,10 @@ enum stepsTicketOffice {
 export function TicketSale() {
 
     const { isLoading } = useTicket();
-    const [step, setStep] = useState<stepsTicketOffice>(stepsTicketOffice.dataTravel)
+    const [step, setStep] = useState<stepsTicketOffice>(stepsTicketOffice.selectTravelType)
 
     const next = () => setStep((s) => Math.min(s + 1, stepsTicketOffice.PrintTicket));
-    const back = () => setStep((s) => Math.max(s - 1, stepsTicketOffice.dataTravel));
+    const back = () => setStep((s) => Math.max(s - 1, stepsTicketOffice.selectTravelType));
 
 
 
@@ -33,11 +33,11 @@ export function TicketSale() {
         <>
 
             {
-                step === stepsTicketOffice['dataTravel'] &&  < TicketBookingForm />
+                step === stepsTicketOffice['selectTravelType'] && < TicketBookingForm />
 
             }
 
-           
+
 
 
         </>

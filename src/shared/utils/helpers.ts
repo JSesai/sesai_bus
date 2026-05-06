@@ -1,5 +1,5 @@
 
-import { parse, addMinutes, format, addHours, parseISO } from "date-fns";
+import { parse, addMinutes, format, addHours, parseISO, startOfDay } from "date-fns";
 import { es } from "date-fns/locale";
 
 
@@ -127,3 +127,10 @@ export const getDayName = (dateStr: string): string => {
     return format(date, "EEEE", { locale: es }); // devuelve el nombre del día en español 
 
 };
+
+export const minDate = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const minDate = today.toISOString().split("T")[0];
+    return minDate;
+} 
