@@ -128,9 +128,51 @@ export const getDayName = (dateStr: string): string => {
 
 };
 
-export const minDate = () => {
+export const minDateToday = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const minDate = today.toISOString().split("T")[0];
     return minDate;
-} 
+}
+
+export const oneMontFromToday = () => {
+    const today = new Date();
+    const oneMonthLater = addHours(today, 24 * 30);
+    return oneMonthLater.toISOString().split("T")[0];
+}
+
+export const oneWeekFromToday = () => {
+    const today = new Date();
+    const oneWeekLater = addHours(today, 24 * 7);
+    return oneWeekLater.toISOString().split("T")[0];
+}
+
+/**
+ * Convierte una fecha en formato ISO (YYYY-MM-DD) a un formato legible para UI día/mes/año.
+ *
+ * @param {string} dateString - La fecha en formato ISO (ej. "2026-05-08").
+ * @returns {string} La fecha formateada en formato DD/MM/YYYY.
+ *
+ * @example
+ * formatDateDisplay("2026-05-08"); //salida::: "08/05/2026"
+ */
+export const formatDateDisplay = (dateString: string): string => {
+    const date = parseISO(dateString);
+    return format(date, "dd/MM/yyyy", { locale: es });
+}
+
+    ;
+
+/**
+ * Convierte una fecha ISO (YYYY-MM-DD) a formato día/mes (DD/MM).
+ *
+ * @param {string} dateString - Fecha en formato ISO (ej. "2026-05-08").
+ * @returns {string} Fecha formateada como "08/05".
+ *
+ * @example
+ * formatDayMonth("2026-05-08"); // "08/05"
+ */
+export const formatDayMonth = (dateString: string): string => {
+    const date = parseISO(dateString);
+    return format(date, "dd/MM", { locale: es });
+};

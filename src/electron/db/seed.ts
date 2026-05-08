@@ -8,7 +8,7 @@ export async function seedInitialUser(): Promise<ResponseElectronGeneric> {
     try {
         console.log('start process creacion usuario inicial');
         const usersQuantity = await userRepo.countUsers();
-        
+
         if (usersQuantity > 0) return { data: "Ya existe usuario manager", error: null, ok: true };
 
         const hashedPassword = await hashPassword("admin123");
@@ -18,7 +18,7 @@ export async function seedInitialUser(): Promise<ResponseElectronGeneric> {
             password: hashedPassword,
             phone: "5555555555",
             role: "developer",//todo cambia a manager el role
-            status: "registered"
+            status: "active"
         }
 
         const createUser: UserSample = await userRepo.add(userAdmin);
@@ -43,10 +43,10 @@ export async function seedAppConfig() {
 
     try {
         console.log('start process creacion config app inicial');
-       
+
         const config = await appConfigRepo.getConfig();
         if (!config) {
-          await appConfigRepo.createDefault();
+            await appConfigRepo.createDefault();
         }
 
     } catch (error: any) {
@@ -57,5 +57,5 @@ export async function seedAppConfig() {
         if (error?.code === "SQLITE_CONSTRAINT") return { ok: true, data: "Configuracion table exist", error: null };
         return { ok: false, data: null, error: { message: "Error interno", detail: "error no esperado" } };
     }
-    
+
 }

@@ -47,7 +47,7 @@ export function busesHandlers() {
       if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('buses.serialNumber')) {
         return { ok: false, data: null, error: { message: 'Número de serie ya registrado', detail: 'El número de serie ya está asociado a otro autobus' } };
       }
-   
+
 
 
       return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible agregar el bus" } };
@@ -71,13 +71,16 @@ export function busesHandlers() {
       if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('buses.serialNumber')) {
         return { ok: false, data: null, error: { message: 'Número de serie ya registrado', detail: 'El número de serie ya está asociado a otro autobus' } };
       }
-      
+
 
       return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible actualizar el bus" } };
 
     }
 
   });
- 
+
   ipcMain.handle("deleteBus", (_e, id: number) => busesRepo.delete(id));
+
+
+
 }

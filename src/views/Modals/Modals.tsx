@@ -4,6 +4,7 @@ import withReactContent from 'sweetalert2-react-content';
 type TtypeAlertInModal = | 'loading' | 'success' | 'error' | 'info' | 'selectOption' | 'closeAlert' | 'loaderBackground' | 'confirm';
 
 export interface PropsModal {
+    duration?: number;
     typeAlert: TtypeAlertInModal;
     message?: string;
     title?: string;
@@ -59,9 +60,15 @@ export default function showAlert({
                 title: title || 'Oops...',
                 text: message || 'Ocurrió un error',
                 confirmButtonColor: '#3085d6',
+                showCancelButton: true,
+                allowOutsideClick: false,
                 confirmButtonText: btnAccept,
+                cancelButtonText: btnCancel,
+
             }).then((result: any) => {
                 if (result.isConfirmed && callbackAcept) callbackAcept();
+                if (!result.isConfirmed && callbackCancel) callbackCancel();
+
             });
             break;
 

@@ -159,6 +159,8 @@ interface ScheduleAPI {
   addSchedule: (schedule: Schedule) => Promise<ResponseElectronGeneric>;
   updateSchedule: (schedule: Schedule) => Promise<ResponseElectronGeneric>;
   deleteSchedule: (id: Schedule['id']) => Promise<void>;
+  getVehicleSeatStatus: (idSchedule: Schedule['id']) => Promise<ResponseElectronGeneric>;
+
 }
 
 interface Customer {
@@ -269,6 +271,11 @@ interface AppConfig {
   schedules_configured: number;
   initial_setup_completed: number;
   created_at: string;
+}
+
+interface SeatData {
+  seat_number: number;              // número de asiento
+  status: "available" | "occupied" | "selected";
 }
 
 

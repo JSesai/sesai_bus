@@ -89,4 +89,22 @@ export function registerSchedulesHandlers() {
     });
     // ipcMain.handle("updateSchedule", (_, schedule) => schedulesRepo.update(schedule));
     ipcMain.handle("deleteSchedule", (_, id: number) => schedulesRepo.delete(id));
+
+
+    ipcMain.handle("getVehicleSeatStatus", async (_e, bus): Promise<ResponseElectronGeneric> => {
+        try {
+            console.log("init process getVehicleSeatStatus");
+
+            const response = await schedulesRepo.getVehicleSeatStatus(bus);
+
+            return { ok: true, error: null, data: response }
+
+        } catch (error: any) {
+            console.log('error al obtner status de asientos ->', error);
+            return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible consultar el status de los asientos del vehículo" } };
+
+        }
+
+    });
+
 }

@@ -12,6 +12,7 @@ import { daysOfWeek } from "../../shared/constants/constants";
 import { Checkbox } from "../../components/ui/checkbox";
 import { sumarHorasYMinutos } from "../../../shared/utils/helpers";
 import { useAuth } from "../../auth/context/AuthContext";
+import SelectorsOriginDestination from "./SelectorsOriginDestination";
 
 
 
@@ -102,7 +103,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-6 sm:grid-cols-2">
-            {isSuperUser ?
+            {/* {isSuperUser ?
               <div className="space-y-2">
                 <Label htmlFor="destino" className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
@@ -157,7 +158,15 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
+
+            <SelectorsOriginDestination
+              agencyID={formData.agency_id_origin}
+              routeID={formData.route_id}
+              handlerChangeOrigin={(value) => setFormData({ ...formData, agency_id_origin: +value })}
+              handlerChangeDestination={(value) => setFormData({ ...formData, route_id: +value })}
+
+            />
 
             <div className="space-y-2">
               <Label htmlFor="horaSalida" className="flex items-center gap-2">

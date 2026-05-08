@@ -29,7 +29,7 @@ const busesAPI: BusesAPI = {
   addBus: (bus: Bus) => ipcRenderer.invoke("addBus", bus),
   deleteBus: (id: Bus['id']) => ipcRenderer.invoke("deleteBus", id),
   updateBus: (bus: Bus) => ipcRenderer.invoke("updateBus", bus),
-  getDailyBusAssignments: (terminalId: number, date: string) => ipcRenderer.invoke("getDailyBusAssignments", { terminalId, date })
+  getDailyBusAssignments: (terminalId: number, date: string) => ipcRenderer.invoke("getDailyBusAssignments", { terminalId, date }),
 }
 
 const routesTravelAPI: RouteTravelAPI = {
@@ -46,6 +46,8 @@ const schedulesAPI: ScheduleAPI = {
   addSchedule: (schedule: Schedule) => ipcRenderer.invoke("addSchedule", schedule),
   updateSchedule: (schedule: Schedule) => ipcRenderer.invoke("updateSchedule", schedule),
   deleteSchedule: (id: Schedule['id']) => ipcRenderer.invoke("deleteSchedule", id),
+  getVehicleSeatStatus: (scheduleId: Schedule['id']) => ipcRenderer.invoke("getVehicleSeatStatus", scheduleId),
+
 }
 
 const customerAPI: CustomersAPI = {

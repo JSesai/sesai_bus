@@ -278,4 +278,39 @@ export const schedulesRepo = {
         else resolve({ changes: this.changes });
       });
     }),
+
+  getVehicleSeatStatus: (scheduleId: number) =>
+    new Promise((resolve, reject) => {
+      db.all(
+        `
+            WITH RECURSIVE seat_numbers(seat_number) AS (
+              SELECT 1
+              UNION ALL
+              SELECT seat_number + 1
+              FROM seat_numbers
+              WHERE seat_number < (
+                SELECT b.seatingCapacity
+                FROM buses b
+                JOIN schedules s ON s.bus_id = b.id
+                WHERE s.id = ?
+              )
+            )
+            SELECT sn.seat_number,
+                   CASE 
+                     WHEN t.id IS NOT NULL THEN 'occupied'
+                     ELSE 'available'
+                   END AS status
+            FROM seat_numbers sn
+            LEFT JOIN tickets t 
+              ON t.schedule_id = ? 
+             AND t.seat_number = sn.seat_number
+            ORDER BY sn.seat_number;
+            `,
+        [scheduleId, scheduleId], // parámetros para los dos "?"
+        (err, rows) => {
+          if (err) reject(err);
+          else resolve(rows);
+        }
+      );
+    }),
 };

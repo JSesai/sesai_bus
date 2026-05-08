@@ -129,7 +129,9 @@ CREATE TABLE IF NOT EXISTS tickets (
     FOREIGN KEY (schedule_id) REFERENCES schedules(id),
     FOREIGN KEY (customer_id) REFERENCES customers(id)
 );
-
+-- Índice único para evitar duplicados de asiento en un mismo viaje
+CREATE UNIQUE INDEX idx_unique_seat_per_schedule
+ON tickets(schedule_id, seat_number);
 
 -- 8. PAYMENTS (Pagos del boleto)
 

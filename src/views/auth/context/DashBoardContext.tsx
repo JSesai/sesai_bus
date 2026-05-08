@@ -23,6 +23,7 @@ type DashboardContextType = {
   driverEmployees: UserSample[];
   numberRegisteredDriver: number;
   theme: Theme;
+  backgrounDynamic: string;
 
   //methods
   loadSystemInformation: () => Promise<void>;
@@ -591,6 +592,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       showConfetti,
       setTheme,
       theme,
+      backgrounDynamic: 'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 border-b border-slate-200 dark:border-slate-700/50 transition-colors',
       destinations,
       runningSchedules,
       vehicles,
