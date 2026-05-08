@@ -16,6 +16,12 @@ export const customersRepo = {
         err ? reject(err) : resolve(row)
       );
     }),
+  getByPhone: (phone: string) =>
+    new Promise((resolve, reject) => {
+      db.get(`SELECT * FROM customers WHERE phone = ?`, [phone], (err, row) =>
+        err ? reject(err) : resolve(row)
+      );
+    }),
 
   add: (customer: {
     name: string;

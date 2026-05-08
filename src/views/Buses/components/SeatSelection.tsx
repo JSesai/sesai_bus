@@ -1,38 +1,28 @@
 import { useState, useLayoutEffect } from "react"
 import { BusLayout } from "../BusLayout/BusLayout"
 import { SeatLegend } from "./SeatLegend"
-import { BusConfigurator } from "./BusConfigurator"
-import { stepsTicketOffice, useTicket } from "../../auth/context/TicketContext"
+import { useTicket } from "../../auth/context/TicketContext"
 import { Card } from "../../components/ui/card"
+import { OrderSummary } from "./OrderSummary"
+import { formatDateDisplay } from "../../../shared/utils/helpers"
 
 export function SeatSelection() {
 
-    const { handleSeatSelect, vehicleForTripe, backgrounTiketSale, getSeatStatus, seats, state, currentStep } = useTicket();
-    const [totalSeats, setTotalSeats] = useState(seats.length || 0);
-    const [seatsPerRow, setSeatsPerRow] = useState(4)
-    const [occupancyRate, setOccupancyRate] = useState(30)
+    const { handleSeatSelect, backgrounTiketSale, getSeatStatus, seats, state,
+        cityOrigin, cityDestination, destinationSelected
+    } = useTicket();
+    const [totalSeats] = useState(seats.length || 0);
+    const [seatsPerRow] = useState(4)
 
-    console.log({ totalSeats, seatsPerRow, occupancyRate, seats });
+    console.log({ totalSeats, seats });
 
     useLayoutEffect(() => {
         //obtener los asientos disponibles con el query de la base de datos
         getSeatStatus()
+        console.log('me ejecute');
 
-    }, [currentStep])
 
-
-    const handleTotalSeatsChange = (value: number) => {
-        // Ensure total seats is divisible by seats per row
-        const adjustedValue = Math.round(value / seatsPerRow) * seatsPerRow
-        setTotalSeats(Math.max(adjustedValue, seatsPerRow))
-    }
-
-    const handleSeatsPerRowChange = (value: number) => {
-        setSeatsPerRow(value)
-        // Adjust total seats to be divisible by new seats per row
-        const adjustedTotal = Math.round(totalSeats / value) * value
-        setTotalSeats(Math.max(adjustedTotal, value))
-    }
+    }, [])
 
 
     return (
@@ -77,20 +67,25 @@ export function SeatSelection() {
                         </div>
                     </div>
 
-                    <BusConfigurator
+                    {/* <BusConfigurator
                         totalSeats={totalSeats}
                         seatsPerRow={seatsPerRow}
                         occupancyRate={occupancyRate}
                         onTotalSeatsChange={handleTotalSeatsChange}
                         onSeatsPerRowChange={handleSeatsPerRowChange}
                         onOccupancyRateChange={setOccupancyRate}
-                    />
-
-                    {/* <OrderSummary
-                        selectedSeats={selectedSeats}
-                        pricePerSeat={450}
-                        tripInfo={tripInfo}
                     /> */}
+
+                    <OrderSummary
+                        selectedSeats={seats.filter((s) => s.status === "selected").map((s) => s.seat_number)}
+                        pricePerSeat={Number(destinationSelected?.baseFare) || 0}
+                        tripInfo={{
+                            origin: cityOrigin,
+                            destination: cityDestination,
+                            date: formatDateDisplay(state.departureDate),
+                            time: state.departureTime
+                        }}
+                    />
                 </div>
             </div>
 

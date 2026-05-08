@@ -15,9 +15,9 @@ export enum stepsTicketOffice {
     originAndDestinationSelection = 0,
     selectTravelTypeAndBookingType = 1,
     datesSelection = 2,
-    passengersSelection = 3,
-    seatSelection = 4,
-    infoCustomer = 5,
+    infoCustomer = 3,
+    passengersSelection = 4,
+    seatSelection = 5,
     pay = 6,
     PrintTicket = 7,
 }
@@ -47,6 +47,7 @@ type TicketContextType = {
     cityDestination: string;
     vehicleForTripe: Bus | null;
     seats: SeatData[];
+    selectedSchedule: Schedule | null;
 
     //methods
     resetSteps: () => void;
@@ -88,15 +89,16 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     const descriptionTravelTypeAndBookingType = stepCompletedTravelTypeAndBookingType ? isRoundTrip ? "Redondo" : "Sencillo" : "";
     const descriptionDateSelected = stepCompletedSelectedDates ?
         `${formatDayMonth(state.departureDate)}` + (isRoundTrip ? `↔ ${formatDayMonth(state.returnDate)}` : "") : "";
+    const descriptionSeatselection = state.seats.length > 0 ? state.seats.map((s) => s.seat_number) : undefined
 
 
     const stepsTicketSale = useMemo<Step[]>(() => [
         { id: stepsTicketOffice.originAndDestinationSelection, label: "Origen/Destino", icon: UnfoldHorizontal, description: descriptionDestinationOrigin },
         { id: stepsTicketOffice.selectTravelTypeAndBookingType, label: "Tipo de viaje", icon: BookOpenCheck, description: descriptionTravelTypeAndBookingType },
         { id: stepsTicketOffice.datesSelection, label: "Fecha", icon: Calendars, description: descriptionDateSelected },
-        { id: stepsTicketOffice.passengersSelection, label: "Pasajeros", icon: Users, description: stepCompletedPassengersSelection ? String(totalPassengers) : '' },
-        { id: stepsTicketOffice.seatSelection, label: "Asientos", icon: Armchair },
         { id: stepsTicketOffice.infoCustomer, label: "Cliente", icon: Contact },
+        { id: stepsTicketOffice.passengersSelection, label: "Pasajeros", icon: Users, description: stepCompletedPassengersSelection ? String(totalPassengers) : '' },
+        { id: stepsTicketOffice.seatSelection, label: "Asientos", icon: Armchair, description: JSON.stringify(descriptionSeatselection) },
         { id: stepsTicketOffice.pay, label: "Pago", icon: HandCoins, disabled: state.bookingType === "reserve" },
         { id: stepsTicketOffice.PrintTicket, label: "Impresión", icon: TicketsPlane },
     ], [state]);
@@ -174,9 +176,30 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     const getSeatStatus = async () => {
         const seatStatus = await window.electron.schedules.getVehicleSeatStatus(state.idSchedule);
         console.log({ seatStatus });
-        if (seatStatus.ok && seatStatus.data) {
-            setSeats(seatStatus.data);
+
+        if (!seatStatus.ok) {
+            showNofification({
+                typeAlert: 'error',
+                title: 'Error al obtener asientos',
+                message: seatStatus.error?.message || 'No fue posible obtener el estado de los asientos, intenta nuevamente'
+            })
+            return
         }
+
+        if (state.seats.length > 0) {
+            //si ya hay asientos seleccionados, conservar esa seleccion en el nuevo estado de los asientos obtenido de la base de datos
+            const updatedSeats = seatStatus.data.map((seat: SeatData) => {
+                const isSelected = state.seats.some((s) => s.seat_number === seat.seat_number && s.status === 'selected');
+                return isSelected ? { ...seat, status: 'selected' } : seat;
+            });
+            setSeats(updatedSeats);
+            return;
+        }
+
+        setSeats(seatStatus.data);
+
+
+
     }
 
     //maneja la seleccion de asientos, actualizando el estado local de los asientos y la lista de asientos seleccionados en el estado global del tripReducer
@@ -196,17 +219,44 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
                 return;
             }
         }
-        setSeats((prevSeats) =>
-            prevSeats.map((seat) =>
-                seat.seat_number === seatId ? { ...seat, status: seat.status === 'selected' ? "available" : "selected" } : seat
-            )
+        const updatedSeats: SeatData[] = seats.map((seat) => seat.seat_number === seatId ?
+            { ...seat, status: seat.status === 'selected' ? "available" : "selected" }
+            : seat
         );
 
-        dispatch({ type: "SET_FIELD", field: "seats", value: seatsSelected });
+        setSeats(updatedSeats);
+
+        console.log({ seatsSelected });
+
+        // Actualizar el estado global
+        dispatch({
+            type: "SET_FIELD",
+            field: "seats",
+            value: updatedSeats.filter((seat) => seat.status === "selected")
+        });
 
     };
 
 
+    //obtiene nombre de customer 
+    const handleRegisterCustomer = async (userName: User['phone']): Promise<Customer> => {
+
+        const customerNameToRegister = await window.electron.customers.getCustomerByPhone(userName);
+        console.log({ customerNameToRegister });
+
+        if (!customerNameToRegister.ok) {
+
+            showNofification({
+                typeAlert: 'error',
+                title: 'Error al obtener cliente',
+                message: customerNameToRegister.error?.message || 'No fue posible obtener la información del cliente, intenta nuevamente'
+            })
+            return { name: '', phone: userName };
+        }
+
+
+
+    }
 
     const backgrounTiketSale = 'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 border-b border-slate-200 dark:border-slate-700/50 transition-colors';
     return (
@@ -232,6 +282,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             cityDestination,
             vehicleForTripe,
             seats,
+            selectedSchedule,
 
             dispatch,
             showModalAlert: showAlert,

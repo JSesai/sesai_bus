@@ -22,7 +22,7 @@ export type TripState = {
     success: boolean;
     bookingType: BookingType | null;
     totalPassengers: number;
-    seats: number[];
+    seats: SeatData[];
     customerData: Customer | null
 };
 

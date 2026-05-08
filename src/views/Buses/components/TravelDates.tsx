@@ -6,7 +6,6 @@ import { useTicket } from "../../auth/context/TicketContext";
 import { Input } from "../../components/ui/input";
 import { formatDateDisplay, getDayName, minDateToday, oneMontFromToday, oneWeekFromToday } from "../../../shared/utils/helpers";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
-import { log } from "console";
 import { useEffect } from "react";
 
 

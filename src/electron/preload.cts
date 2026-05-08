@@ -53,6 +53,7 @@ const schedulesAPI: ScheduleAPI = {
 const customerAPI: CustomersAPI = {
   getCustomers: () => ipcRenderer.invoke("getCustomers"),
   getCustomerById: (id: Customer['id']) => ipcRenderer.invoke("getCustomerById", id),
+  getCustomerByPhone: (phone: Customer['phone']) => ipcRenderer.invoke("getCustomerByPhone", phone),
   addCustomer: (customer: Customer) => ipcRenderer.invoke("addCustomer", customer),
   updateCustomer: (customer: Customer) => ipcRenderer.invoke("updateCustomer", customer),
   deleteCustomer: (id: Customer['id']) => ipcRenderer.invoke("deleteCustomer", id)

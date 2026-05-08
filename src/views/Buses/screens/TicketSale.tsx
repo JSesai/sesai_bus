@@ -7,6 +7,7 @@ import PairButtons from "../components/PairButtons";
 import OrigenAndDestination from "../components/OrigenAndDestination";
 import Passengers from "../components/Passengers";
 import { SeatSelection } from "../components/SeatSelection";
+import InfoCustomer from "../components/InfoCustomer";
 
 
 export type handlerSteps = {
@@ -24,7 +25,7 @@ export function TicketSale() {
     } = useTicket();
 
 
-    console.log({ stepCompletedTravelTypeAndBookingType });
+    console.log('::;;;', state);
 
     //construir ejecutor de validaciones
     const isBlockedAdvance = (): boolean => {
@@ -51,6 +52,7 @@ export function TicketSale() {
                 {currentStep === stepsTicketOffice['originAndDestinationSelection'] && < OrigenAndDestination />}
                 {currentStep === stepsTicketOffice['selectTravelTypeAndBookingType'] && < TravelTypeAndBookingType />}
                 {currentStep === stepsTicketOffice['datesSelection'] && <TravelDates resetSteps={resetSteps} />}
+                {currentStep === stepsTicketOffice['infoCustomer'] && <InfoCustomer />}
                 {currentStep === stepsTicketOffice['passengersSelection'] && <Passengers />}
                 {currentStep === stepsTicketOffice['seatSelection'] && <SeatSelection />}
 
