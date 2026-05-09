@@ -10,6 +10,7 @@ import type { Step } from "../../Buses/components/Steper";
 import { toast } from "sonner";
 import { initialStateTrip, tripReducer, type ActionTripReducer, type TripState } from "../../Buses/reducers/tripReducer";
 import { estadosMexico } from "../../shared/constants/constants";
+import { error } from "console";
 
 export enum stepsTicketOffice {
     originAndDestinationSelection = 0,
@@ -58,6 +59,7 @@ type TicketContextType = {
     showNofification: (props: PropsModal) => void;
     getSeatStatus: () => Promise<void>;
     handleSeatSelect: (seatId: number) => void;
+    handleRegisterCustomer: (customer: Customer, isSearch: boolean) => Promise<Customer | null>;
 
 };
 
@@ -239,20 +241,32 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
 
     //obtiene nombre de customer 
-    const handleRegisterCustomer = async (userName: User['phone']): Promise<Customer> => {
+    const handleRegisterCustomer = async (customer: Customer, isSearch: boolean): Promise<Customer | null> => {
 
-        const customerNameToRegister = await window.electron.customers.getCustomerByPhone(userName);
-        console.log({ customerNameToRegister });
+        if (isSearch) {
+            const customerNameToRegister = await window.electron.customers.getCustomerByPhone(customer.phone);
+            console.warn('customerNameToRegister ->', customerNameToRegister);
+            if (!customerNameToRegister.ok) return null;
 
-        if (!customerNameToRegister.ok) {
+            return customerNameToRegister.data;
+        } else {
+
+            const currentCustomer = await window.electron.customers.createOrUpdateCustomer(customer);
+            if (currentCustomer.ok) return currentCustomer.data;
 
             showNofification({
                 typeAlert: 'error',
-                title: 'Error al obtener cliente',
-                message: customerNameToRegister.error?.message || 'No fue posible obtener la información del cliente, intenta nuevamente'
+                title: currentCustomer.error?.message,
+                message: currentCustomer.error?.detail
             })
-            return { name: '', phone: userName };
+            return null;
+
         }
+
+
+
+
+
 
 
 
@@ -291,7 +305,8 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             handleNext,
             handleBack,
             getSeatStatus,
-            handleSeatSelect
+            handleSeatSelect,
+            handleRegisterCustomer,
 
         }}>
             {children}

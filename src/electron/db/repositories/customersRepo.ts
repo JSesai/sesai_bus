@@ -16,12 +16,13 @@ export const customersRepo = {
         err ? reject(err) : resolve(row)
       );
     }),
-  getByPhone: (phone: string) =>
+  getByPhone: (phone: string): Promise<Customer> =>
     new Promise((resolve, reject) => {
       db.get(`SELECT * FROM customers WHERE phone = ?`, [phone], (err, row) =>
-        err ? reject(err) : resolve(row)
+        err ? reject(err) : resolve(row as Customer)
       );
-    }),
+    })
+  ,
 
   add: (customer: {
     name: string;
@@ -39,12 +40,7 @@ export const customersRepo = {
       );
     }),
 
-  update: (customer: {
-    id: number;
-    name?: string;
-    email?: string;
-    phone?: string;
-  }) =>
+  update: ({ id, name, phone, email = "" }: Customer): Promise<Customer & { changes: number }> =>
     new Promise((resolve, reject) => {
       db.run(
         `UPDATE customers SET
@@ -52,10 +48,10 @@ export const customersRepo = {
           email = COALESCE(?, email),
           phone = COALESCE(?, phone)
          WHERE id = ?`,
-        [customer.name, customer.email, customer.phone, customer.id],
+        [name, email, phone, id],
         function (err) {
           if (err) reject(err);
-          else resolve({ changes: this.changes });
+          else resolve({ id, name, email, phone, changes: this.changes });
         }
       );
     }),

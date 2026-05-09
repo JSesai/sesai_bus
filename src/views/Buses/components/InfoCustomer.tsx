@@ -3,14 +3,14 @@ import { useTicket } from "../../auth/context/TicketContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toCapitalCase } from "../../shared/utils/helpers";
 
 const longitudtelefono = 10;
 
 export default function InfoCustomer() {
 
-    const { backgrounTiketSale } = useTicket();
+    const { backgrounTiketSale, handleRegisterCustomer } = useTicket();
 
     const [formData, setFormData] = useState<Customer>({
         name: "",
@@ -20,6 +20,46 @@ export default function InfoCustomer() {
     const handleChange = (field: string, value: string) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     }
+
+    //debounce para busqueda de customer por telefono
+    useEffect(() => {
+        if (formData.phone.length >= 9) {
+            console.log("se ejecuta el debouncecuando el telefono tiene al menos 9 caracteres", formData.phone);
+
+            const idTimeout = setTimeout(async () => {
+                const customer = await handleRegisterCustomer(formData, true);
+                if (!customer) return;
+                console.log(customer);
+                setFormData(customer);
+
+            }, 800);
+
+            return () => {
+                clearTimeout(idTimeout)
+            }
+        }
+
+    }, [formData.phone]);
+
+    //debounce para busqueda de customer por telefono
+    useEffect(() => {
+        if (formData.name.length >= 9) {
+            console.log("se ejecuta el debouncecuando el telefono tiene al menos 9 caracteres", formData.phone);
+
+            const idTimeout = setTimeout(async () => {
+                const customer = await handleRegisterCustomer(formData, true);
+                if (!customer) return;
+                console.log(customer);
+                setFormData(customer);
+
+            }, 800);
+
+            return () => {
+                clearTimeout(idTimeout)
+            }
+        }
+
+    }, [formData.name])
 
     return (
         <Card className={`${backgrounTiketSale} dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden`}>

@@ -174,6 +174,7 @@ interface CustomersAPI {
   getCustomers: () => Promise<Customer[]>;
   getCustomerById: (id: Customer['id']) => Promise<Customer>;
   getCustomerByPhone: (phone: Customer['phone']) => Promise<ResponseElectronGeneric>;
+  createOrUpdateCustomer: (customer: Customer) => Promise<ResponseElectronGeneric>;
   addCustomer: (customer: Customer) => Promise<Customer>;
   updateCustomer: (customer: Customer) => Promise<void>;
   deleteCustomer: (id: Customer['id']) => Promise<void>;
