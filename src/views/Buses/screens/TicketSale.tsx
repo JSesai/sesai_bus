@@ -21,7 +21,8 @@ export type handlerSteps = {
 export function TicketSale() {
 
     const { stepsTicketSale, stepCompletedTravelTypeAndBookingType, stepCompletedOrigenDestination, state,
-        stepCompletedSelectedDates, stepCompletedPassengersSelection, currentStep, resetSteps, handleNext, handleBack
+        stepCompletedSelectedDates, stepCompletedPassengersSelection, currentStep, stepCompletedSelectedSeats,
+        resetSteps, handleNext, handleBack
     } = useTicket();
 
 
@@ -32,8 +33,9 @@ export function TicketSale() {
         if (currentStep === stepsTicketOffice['originAndDestinationSelection'] && stepCompletedOrigenDestination) return false;
         if (currentStep === stepsTicketOffice['selectTravelTypeAndBookingType'] && stepCompletedTravelTypeAndBookingType) return false;
         if (currentStep === stepsTicketOffice['datesSelection'] && stepCompletedSelectedDates && state.idSchedule !== 0) return false;
+        if (currentStep === stepsTicketOffice['infoCustomer'] && state.customer) return false;
         if (currentStep === stepsTicketOffice['passengersSelection'] && stepCompletedPassengersSelection) return false;
-        if (currentStep === stepsTicketOffice['seatSelection'] && state.seats.length > 0) return false;
+        if (currentStep === stepsTicketOffice['seatSelection'] && stepCompletedSelectedSeats) return false;
 
         console.info('va a retornar true');
         return true;

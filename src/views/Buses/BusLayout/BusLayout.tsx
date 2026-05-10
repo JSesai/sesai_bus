@@ -1,12 +1,8 @@
 
-import { useTicket } from "../../auth/context/TicketContext"
-import { BusSeat, type SeatStatus } from "../components/BusSeat"
+import { BusSeat } from "../components/BusSeat"
 import { User } from "lucide-react"
 
-// export interface SeatData {
-//     seat_number: number
-//     status: SeatStatus
-// }
+
 
 interface BusLayoutProps {
     seats: SeatData[]

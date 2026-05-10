@@ -8,19 +8,17 @@ import { formatDateDisplay } from "../../../shared/utils/helpers"
 
 export function SeatSelection() {
 
-    const { handleSeatSelect, backgrounTiketSale, getSeatStatus, seats, state,
-        cityOrigin, cityDestination, destinationSelected
+    const { handleSeatSelect, backgrounTiketSale, seats, state, cityOrigin, cityDestination,
+        destinationSelected, totalPassengers, getSeatStatus, handleRegisterTicket
     } = useTicket();
     const [totalSeats] = useState(seats.length || 0);
     const [seatsPerRow] = useState(4)
 
     console.log({ totalSeats, seats });
 
+    //obtener los asientos disponibles con el query de la base de datos
     useLayoutEffect(() => {
-        //obtener los asientos disponibles con el query de la base de datos
         getSeatStatus()
-        console.log('me ejecute');
-
 
     }, [])
 
@@ -67,23 +65,18 @@ export function SeatSelection() {
                         </div>
                     </div>
 
-                    {/* <BusConfigurator
-                        totalSeats={totalSeats}
-                        seatsPerRow={seatsPerRow}
-                        occupancyRate={occupancyRate}
-                        onTotalSeatsChange={handleTotalSeatsChange}
-                        onSeatsPerRowChange={handleSeatsPerRowChange}
-                        onOccupancyRateChange={setOccupancyRate}
-                    /> */}
 
                     <OrderSummary
                         selectedSeats={seats.filter((s) => s.status === "selected").map((s) => s.seat_number)}
                         pricePerSeat={Number(destinationSelected?.baseFare) || 0}
+                        onContinue={handleRegisterTicket}
                         tripInfo={{
                             origin: cityOrigin,
+                            accionBtn: state.bookingType === 'reserve' ? 'Continuar reservación' : 'Continuar al pago',
                             destination: cityDestination,
                             date: formatDateDisplay(state.departureDate),
-                            time: state.departureTime
+                            time: state.departureTime,
+                            pasengers: totalPassengers,
                         }}
                     />
                 </div>

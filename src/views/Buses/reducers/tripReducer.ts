@@ -14,6 +14,7 @@ export type TripState = {
     idOrigin: number;
     idDestination: number;
     idSchedule: number;
+    customer: Customer | null;
     departureDate: string;
     departureTime: string;
     returnDate: string;
@@ -23,7 +24,7 @@ export type TripState = {
     bookingType: BookingType | null;
     totalPassengers: number;
     seats: SeatData[];
-    customerData: Customer | null
+
 };
 
 export type ActionTripReducer =
@@ -45,8 +46,8 @@ export const initialStateTrip: TripState = {
     bookingType: null,
     totalPassengers: 0,
     seats: [],
-    customerData: null,
-    idSchedule: 0
+    idSchedule: 0,
+    customer: null,
 };
 
 

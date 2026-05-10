@@ -66,6 +66,7 @@ const ticketAPI: TicketAPI = {
   addTicket: (ticket: Ticket['id']) => ipcRenderer.invoke("addTicket", ticket),
   updateTicket: (ticket: Ticket['id']) => ipcRenderer.invoke("updateTicket", ticket),
   deleteTicket: (id: Ticket['id']) => ipcRenderer.invoke("deleteTicket", id),
+  insertSelectedSeats: (ticketInsert: TicketInsert) => ipcRenderer.invoke("insertSelectedSeats", ticketInsert),
 }
 
 const paymetsAPI: PaymentsAPI = {

@@ -297,7 +297,10 @@ export const schedulesRepo = {
             )
             SELECT sn.seat_number,
                    CASE 
-                     WHEN t.id IS NOT NULL THEN 'occupied'
+                     WHEN t.status = 'active' THEN 'occupied'
+                     WHEN t.status = 'selected' THEN 'selected'
+                     WHEN t.status = 'selectedTemporal' THEN 'selectedTemporal'
+                     WHEN t.status = 'reserved' THEN 'reserved'
                      ELSE 'available'
                    END AS status
             FROM seat_numbers sn

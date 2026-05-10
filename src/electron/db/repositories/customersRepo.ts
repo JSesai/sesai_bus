@@ -40,7 +40,7 @@ export const customersRepo = {
       );
     }),
 
-  update: ({ id, name, phone, email = "" }: Customer): Promise<Customer & { changes: number }> =>
+  update: ({ id, name, phone, email }: Customer): Promise<Customer & { changes: number }> =>
     new Promise((resolve, reject) => {
       db.run(
         `UPDATE customers SET

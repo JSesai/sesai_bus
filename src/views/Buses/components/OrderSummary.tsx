@@ -1,18 +1,22 @@
+import { on } from "events";
 import { Button } from "../../components/ui/button"
 import { Ticket, CreditCard } from "lucide-react"
 
 interface OrderSummaryProps {
-    selectedSeats: number[]
-    pricePerSeat: number
+    selectedSeats: number[];
+    pricePerSeat: number;
+    onContinue: () => void;
     tripInfo: {
-        origin: string
-        destination: string
-        date: string
-        time: string
+        origin: string;
+        destination: string;
+        date: string;
+        time: string;
+        pasengers: number;
+        accionBtn: string;
     }
 }
 
-export function OrderSummary({ selectedSeats, pricePerSeat, tripInfo }: OrderSummaryProps) {
+export function OrderSummary({ onContinue, selectedSeats, pricePerSeat, tripInfo }: OrderSummaryProps) {
     const total = selectedSeats.length * pricePerSeat
 
     return (
@@ -70,12 +74,13 @@ export function OrderSummary({ selectedSeats, pricePerSeat, tripInfo }: OrderSum
 
             {/* Checkout button */}
             <Button
+                onClick={onContinue}
                 className="w-full"
                 size="lg"
-                disabled={selectedSeats.length === 0}
+                disabled={selectedSeats.length !== tripInfo.pasengers}
             >
                 <CreditCard className="w-4 h-4 mr-2" />
-                Continuar al pago
+                {tripInfo.accionBtn}
             </Button>
 
             {selectedSeats.length === 0 && (

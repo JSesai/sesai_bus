@@ -188,13 +188,20 @@ interface Ticket {
   price: number;
   purchase_time?: string;
 }
-
+interface TicketInsert {
+  scheduleId: number,
+  customerId: number,
+  seatNumbers: number[],
+  price: number
+}
 interface TicketAPI {
   getTickets: () => Promise<Ticket>,
   getTicketById: (id: Ticket['id']) => Promise<Ticket[]>;
   addTicket: (ticket: Ticket['id']) => Promise<Ticket>;
   updateTicket: (ticket: Ticket['id']) => Promise<void>;
   deleteTicket: (id: Ticket['id']) => Promise<void>;
+  insertSelectedSeats: (ticketInsert: TicketInsert) => Promise<ResponseElectronGeneric>;
+
 }
 
 interface Payment {
@@ -276,8 +283,8 @@ interface AppConfig {
 }
 
 interface SeatData {
-  seat_number: number;              // número de asiento
-  status: "available" | "occupied" | "selected";
+  seat_number: number;
+  status: "available" | "occupied" | "selected" | "reserved" | "selectedTemporal";
 }
 
 

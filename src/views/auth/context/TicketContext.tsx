@@ -42,6 +42,7 @@ type TicketContextType = {
     hasInapamPassengers: boolean;
     totalPassengers: number;
     stepCompletedPassengersSelection: boolean;
+    stepCompletedSelectedSeats: boolean;
     noDepertureTime: boolean;
     destinationSelected: Route | null;
     cityOrigin: string;
@@ -49,6 +50,12 @@ type TicketContextType = {
     vehicleForTripe: Bus | null;
     seats: SeatData[];
     selectedSchedule: Schedule | null;
+    seatColors: {
+        available: string;
+        selected: string;
+        occupied: string;
+        selectedTemporal: string;
+    };
 
     //methods
     resetSteps: () => void;
@@ -60,6 +67,7 @@ type TicketContextType = {
     getSeatStatus: () => Promise<void>;
     handleSeatSelect: (seatId: number) => void;
     handleRegisterCustomer: (customer: Customer, isSearch: boolean) => Promise<Customer | null>;
+    handleRegisterTicket: () => Promise<void>;
 
 };
 
@@ -71,7 +79,10 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     const { vehicles, agencies, runningSchedules, destinations } = useDashboard();
     const [isLoading, setIsLoading] = useState(false);
     const [currentStep, setCurrentStep] = useState<stepsTicketOffice>(stepsTicketOffice.originAndDestinationSelection);
-    const [seats, setSeats] = useState<SeatData[]>([])
+    const [seats, setSeats] = useState<SeatData[]>([]);
+    const [stepCompletedSelectedSeats, setStepCompletedSelectedSeats] = useState(false);
+
+
 
     const destinationSelected = destinations.find((d) => d.id === state.idDestination) || null;
     const cityOrigin = agencies?.find((a) => a.id === state.idOrigin)?.city || "";
@@ -84,6 +95,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     const stepCompletedTravelTypeAndBookingType = !!(state.bookingType && state.travelType);
     const stepCompletedOrigenDestination = !!(state.idOrigin && state.idDestination);
     const stepCompletedSelectedDates = !!(state.departureDate && (!isRoundTrip || (state.returnDate)));
+
     const hasInapamPassengers = state.passengers.inapam > 0;
     const totalPassengers = state.passengers.adults + state.passengers.children + state.passengers.inapam;
     const stepCompletedPassengersSelection = totalPassengers > 0;
@@ -91,14 +103,15 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     const descriptionTravelTypeAndBookingType = stepCompletedTravelTypeAndBookingType ? isRoundTrip ? "Redondo" : "Sencillo" : "";
     const descriptionDateSelected = stepCompletedSelectedDates ?
         `${formatDayMonth(state.departureDate)}` + (isRoundTrip ? `↔ ${formatDayMonth(state.returnDate)}` : "") : "";
-    const descriptionSeatselection = state.seats.length > 0 ? state.seats.map((s) => s.seat_number) : undefined
+    const seatsSelected = state.seats.map((s) => s.seat_number);
+    const descriptionSeatselection = state.seats.length > 0 ? seatsSelected : undefined
 
 
     const stepsTicketSale = useMemo<Step[]>(() => [
         { id: stepsTicketOffice.originAndDestinationSelection, label: "Origen/Destino", icon: UnfoldHorizontal, description: descriptionDestinationOrigin },
         { id: stepsTicketOffice.selectTravelTypeAndBookingType, label: "Tipo de viaje", icon: BookOpenCheck, description: descriptionTravelTypeAndBookingType },
         { id: stepsTicketOffice.datesSelection, label: "Fecha", icon: Calendars, description: descriptionDateSelected },
-        { id: stepsTicketOffice.infoCustomer, label: "Cliente", icon: Contact },
+        { id: stepsTicketOffice.infoCustomer, label: "Cliente", icon: Contact, description: state.customer ? state.customer.name.split(' ').slice(0, 2).join(' ') : '' },
         { id: stepsTicketOffice.passengersSelection, label: "Pasajeros", icon: Users, description: stepCompletedPassengersSelection ? String(totalPassengers) : '' },
         { id: stepsTicketOffice.seatSelection, label: "Asientos", icon: Armchair, description: JSON.stringify(descriptionSeatselection) },
         { id: stepsTicketOffice.pay, label: "Pago", icon: HandCoins, disabled: state.bookingType === "reserve" },
@@ -112,6 +125,13 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     const selectedSchedule = scheduleToSelection.find((s) => s.id === state.idSchedule) || null;
     const noDepertureTime = scheduleToSelection.length === 0;
     const vehicleForTripe = vehicles.find((v) => v.id === selectedSchedule?.bus_id) || null;
+
+    const seatColors = {
+        available: "bg-green-200",
+        selected: "bg-sky-600",
+        occupied: "bg-gray-200",
+        selectedTemporal: "bg-yellow-400",
+    }
     console.warn({ destinationSelected });
 
 
@@ -262,14 +282,45 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             return null;
 
         }
+    }
 
+    //todo validar cuando se haga la peticion por el web service, ya que puede dar error si otro punto de venta ya selecciono esos asientos, manejar ese error mostrando una notificacion al usuario y refrescando el estado de los asientos disponibles
+    const handleRegisterTicket = async () => {
+        //aqui va la logica para registrar el ticket en la base de datos, con toda la informacion del estado global (state) y los asientos seleccionados (seats)
+        const result = await window.electron.tickets.insertSelectedSeats({
+            customerId: state.customer?.id || 0,
+            price: destinationSelected?.baseFare || 0,
+            scheduleId: state.idSchedule,
+            seatNumbers: seatsSelected,
 
+        });
+        console.log({ insertSelectedSeats: result });
 
+        if (!result.ok) {
+            showNofification({
+                typeAlert: 'error',
+                title: 'Error al registrar asientos',
+                message: result.error?.message || 'No fue posible registrar los asientos seleccionados, intenta nuevamente'
+            })
 
+            //remover asientos seleccionados que ya no estan disponibles del estado global y local para reflejar el estado actual de los asientos disponibles
+            dispatch({
+                type: "SET_FIELD",
+                field: "seats",
+                value: []
+            });
 
+            //actualizar estato de los asientos para reflejar que los asientos seleccionados ya no estan disponibles
+            await getSeatStatus();
 
+            return;
 
+        }
 
+        //actualizar estado par marcar el paso como completado
+        setStepCompletedSelectedSeats(true);
+        //avanza al siguiente paso
+        handleNext();
     }
 
     const backgrounTiketSale = 'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 border-b border-slate-200 dark:border-slate-700/50 transition-colors';
@@ -297,6 +348,8 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             vehicleForTripe,
             seats,
             selectedSchedule,
+            seatColors,
+            stepCompletedSelectedSeats,
 
             dispatch,
             showModalAlert: showAlert,
@@ -307,6 +360,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             getSeatStatus,
             handleSeatSelect,
             handleRegisterCustomer,
+            handleRegisterTicket,
 
         }}>
             {children}

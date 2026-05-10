@@ -65,4 +65,89 @@ export const ticketsRepo = {
         else resolve({ changes: this.changes });
       });
     }),
+
+  // insertSelectedSeats: ({ customerId, price, scheduleId, seatNumbers }: TicketInsert): Promise<void> => {
+  //   return new Promise((resolve, reject) => {
+  //     db.serialize(() => {
+  //       db.run("BEGIN TRANSACTION");
+
+  //       seatNumbers.forEach((seatNumber) => {
+  //         db.run(
+  //           `
+  //             INSERT INTO tickets (schedule_id, customer_id, seat_number, price, status)
+  //             VALUES (?, ?, ?, ?, 'selectedTemporal')
+  //             `,
+  //           [scheduleId, customerId, seatNumber, price],
+  //           (err) => {
+  //             if (err) {
+  //               if (err.message.includes("UNIQUE constraint failed")) {
+  //                 reject(new Error(`El asiento ${seatNumber} ya fue ocupado.`));
+  //               } else {
+  //                 reject(err);
+  //               }
+  //             }
+  //           }
+  //         );
+  //       });
+
+  //       db.run("COMMIT", (err) => {
+  //         if (err) reject(err);
+  //         else resolve();
+  //       });
+  //     });
+  //   });
+  // },
+
+
+  insertSelectedSeats: ({
+    scheduleId,
+    customerId,
+    seatNumbers,
+    price
+  }: TicketInsert): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (seatNumbers.length === 0) {
+        return resolve(); // nada que insertar
+      }
+
+      // Construir placeholders dinámicos
+      const placeholders = seatNumbers.map(() => "(?, ?, ?, ?, 'selectedTemporal')").join(", ");
+      const sql = `
+      INSERT INTO tickets (schedule_id, customer_id, seat_number, price, status)
+      VALUES ${placeholders}
+    `;
+
+      // Flatten de parámetros
+      const params: any[] = [];
+      seatNumbers.forEach((seatNumber) => {
+        params.push(scheduleId, customerId, seatNumber, price);
+      });
+
+      db.serialize(() => {
+        db.run("BEGIN TRANSACTION");
+        db.run(sql, params, (err) => {
+          if (err) {
+            db.run("ROLLBACK");
+            if (err.message.includes("UNIQUE constraint failed")) {
+              reject(new Error("Uno o más asientos ya fueron ocupados."));
+            } else {
+              reject(err);
+            }
+          } else {
+            db.run("COMMIT", (commitErr) => {
+              if (commitErr) {
+                db.run("ROLLBACK");
+                reject(commitErr);
+              } else {
+                resolve();
+              }
+            });
+          }
+        });
+      });
+    });
+  }
+
+
+
 };

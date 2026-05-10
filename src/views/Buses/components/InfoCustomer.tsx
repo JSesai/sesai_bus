@@ -10,9 +10,9 @@ const longitudtelefono = 10;
 
 export default function InfoCustomer() {
 
-    const { backgrounTiketSale, handleRegisterCustomer } = useTicket();
+    const { state, backgrounTiketSale, handleRegisterCustomer, dispatch } = useTicket();
 
-    const [formData, setFormData] = useState<Customer>({
+    const [formData, setFormData] = useState<Customer>(state.customer || {
         name: "",
         phone: ""
     })
@@ -29,10 +29,11 @@ export default function InfoCustomer() {
             const idTimeout = setTimeout(async () => {
                 const customer = await handleRegisterCustomer(formData, true);
                 if (!customer) return;
+                dispatch({ type: "SET_FIELD", field: "customer", value: customer })
                 console.log(customer);
                 setFormData(customer);
 
-            }, 800);
+            }, 1000);
 
             return () => {
                 clearTimeout(idTimeout)
@@ -41,18 +42,18 @@ export default function InfoCustomer() {
 
     }, [formData.phone]);
 
-    //debounce para busqueda de customer por telefono
+    //debounce para registro de customer por nombre, se ejecuta cuando el telefono tiene al menos 9 caracteres y el nombre al menos 4 caracteres
     useEffect(() => {
-        if (formData.name.length >= 9) {
-            console.log("se ejecuta el debouncecuando el telefono tiene al menos 9 caracteres", formData.phone);
+        if (formData.phone.length === longitudtelefono && formData.name.length >= 4) {
+            console.log("se ejecuta el debounce cuando el telefono tiene al menos 9 caracteres y el nombre al menos 4 caracteres, formData.phone");
 
             const idTimeout = setTimeout(async () => {
-                const customer = await handleRegisterCustomer(formData, true);
+                const customer = await handleRegisterCustomer(formData, false);
                 if (!customer) return;
-                console.log(customer);
                 setFormData(customer);
+                dispatch({ type: "SET_FIELD", field: "customer", value: customer })
 
-            }, 800);
+            }, 1000);
 
             return () => {
                 clearTimeout(idTimeout)
