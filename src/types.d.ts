@@ -201,6 +201,7 @@ interface TicketAPI {
   updateTicket: (ticket: Ticket['id']) => Promise<void>;
   deleteTicket: (id: Ticket['id']) => Promise<void>;
   insertSelectedSeats: (ticketInsert: TicketInsert) => Promise<ResponseElectronGeneric>;
+  updateTicketStatus: (scheduleId: number, seatNumbers: SeatData['seat_number'][], newStatus: SeatData['status']) => Promise<ResponseElectronGeneric>;
 
 }
 

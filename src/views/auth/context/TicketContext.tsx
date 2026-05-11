@@ -5,12 +5,12 @@ import { createContext, useContext, useMemo, useReducer, useState } from "react"
 import { useDashboard } from "./DashBoardContext";
 import { formatDayMonth, getDayName } from "../../../shared/utils/helpers";
 import showAlert, { type PropsModal } from "../../Modals/Modals";
-import { Armchair, BookOpenCheck, Calendars, Contact, HandCoins, TicketsPlane, UnfoldHorizontal, Users } from "lucide-react";
+import { Armchair, BookOpenCheck, Calendars, Contact, HandCoins, NotebookPen, TicketsPlane, UnfoldHorizontal, Users } from "lucide-react";
 import type { Step } from "../../Buses/components/Steper";
 import { toast } from "sonner";
 import { initialStateTrip, tripReducer, type ActionTripReducer, type TripState } from "../../Buses/reducers/tripReducer";
 import { estadosMexico } from "../../shared/constants/constants";
-import { error } from "console";
+
 
 export enum stepsTicketOffice {
     originAndDestinationSelection = 0,
@@ -19,8 +19,8 @@ export enum stepsTicketOffice {
     infoCustomer = 3,
     passengersSelection = 4,
     seatSelection = 5,
-    pay = 6,
-    PrintTicket = 7,
+    paymentOrReservatiion = 6,
+    // PrintTicket = 7,
 }
 
 
@@ -49,6 +49,7 @@ type TicketContextType = {
     cityDestination: string;
     vehicleForTripe: Bus | null;
     seats: SeatData[];
+    seatsSelected: number[];
     selectedSchedule: Schedule | null;
     seatColors: {
         available: string;
@@ -68,6 +69,8 @@ type TicketContextType = {
     handleSeatSelect: (seatId: number) => void;
     handleRegisterCustomer: (customer: Customer, isSearch: boolean) => Promise<Customer | null>;
     handleRegisterTicket: () => Promise<void>;
+    handleConfirmTicketSale: () => Promise<void>;
+    handleTicketSaleCard: () => void;
 
 };
 
@@ -114,8 +117,8 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         { id: stepsTicketOffice.infoCustomer, label: "Cliente", icon: Contact, description: state.customer ? state.customer.name.split(' ').slice(0, 2).join(' ') : '' },
         { id: stepsTicketOffice.passengersSelection, label: "Pasajeros", icon: Users, description: stepCompletedPassengersSelection ? String(totalPassengers) : '' },
         { id: stepsTicketOffice.seatSelection, label: "Asientos", icon: Armchair, description: JSON.stringify(descriptionSeatselection) },
-        { id: stepsTicketOffice.pay, label: "Pago", icon: HandCoins, disabled: state.bookingType === "reserve" },
-        { id: stepsTicketOffice.PrintTicket, label: "Impresión", icon: TicketsPlane },
+        { id: stepsTicketOffice.paymentOrReservatiion, label: isReservation ? "Reservar" : "Pago", icon: isReservation ? NotebookPen : HandCoins },
+        // { id: stepsTicketOffice.PrintTicket, label: "Impresión", icon: TicketsPlane },
     ], [state]);
 
 
@@ -125,6 +128,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     const selectedSchedule = scheduleToSelection.find((s) => s.id === state.idSchedule) || null;
     const noDepertureTime = scheduleToSelection.length === 0;
     const vehicleForTripe = vehicles.find((v) => v.id === selectedSchedule?.bus_id) || null;
+
 
     const seatColors = {
         available: "bg-green-200",
@@ -145,50 +149,58 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
 
     const resetSteps = () => setCurrentStep(stepsTicketOffice.originAndDestinationSelection);
-    const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, stepsTicketOffice.PrintTicket))
+    const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, stepsTicketOffice.paymentOrReservatiion))
     const handleBack = () => setCurrentStep((prev) => Math.max(prev - 1, 0))
 
 
 
 
-    const showNofification = ({ typeAlert, message, title, duration }: PropsModal) => {
+    const showNofification = ({ typeAlert, message, title, duration, btnAccept, callbackAcept }: PropsModal) => {
 
         switch (typeAlert) {
             case 'success':
-                toast.success(title, {
+                return toast.success(title, {
                     description: message,
                     richColors: true,
                     duration: duration ? duration : 8_000,
                     position: 'top-center'
                 })
-                break;
 
             case 'error':
-                toast.error(title, {
+                return toast.error(title, {
                     richColors: true,
                     description: message,
                     duration: duration ? duration : 10_000,
                     position: 'top-center'
                 })
-                break;
+
 
             case 'info':
-                toast.info(title, {
+                return toast.info(title, {
                     description: message,
                     richColors: true,
                     duration: duration ? duration : 8_000,
-                    position: 'top-center'
+                    position: 'top-center',
+                    ...btnAccept && {
+                        action: {
+                            label: 'Aceptar',
+                            onClick: () => {
+                                if (callbackAcept) callbackAcept();
+                            }
+                        }
+                    }
+
                 })
-                break;
+
 
             default:
-                toast(message, {
+                return toast(message, {
                     description: message,
                     richColors: true,
                     duration: duration ? duration : 10_000,
                     position: 'top-center'
                 })
-                break;
+
         }
 
 
@@ -303,13 +315,6 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
                 message: result.error?.message || 'No fue posible registrar los asientos seleccionados, intenta nuevamente'
             })
 
-            //remover asientos seleccionados que ya no estan disponibles del estado global y local para reflejar el estado actual de los asientos disponibles
-            dispatch({
-                type: "SET_FIELD",
-                field: "seats",
-                value: []
-            });
-
             //actualizar estato de los asientos para reflejar que los asientos seleccionados ya no estan disponibles
             await getSeatStatus();
 
@@ -321,6 +326,47 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         setStepCompletedSelectedSeats(true);
         //avanza al siguiente paso
         handleNext();
+    }
+
+    const handleUpdateTicket = async (): Promise<boolean> => {
+        const updateStatusSelectedSeats = await window.electron.tickets.updateTicketStatus(state.idSchedule, seatsSelected, 'occupied');
+        console.log({ updateStatusSelectedSeats });
+        if (!updateStatusSelectedSeats.ok) {
+            showNofification({
+                typeAlert: 'error',
+                title: 'Error al confirmar venta',
+                message: updateStatusSelectedSeats.error?.message || 'No fue posible confirmar la venta, intenta nuevamente'
+            });
+
+            return false;
+        }
+
+        return true;
+
+    }
+
+
+    const handleConfirmTicketSale = async (): Promise<void> => {
+
+        const updateStatusTicket = await handleUpdateTicket();
+
+
+        if (!updateStatusTicket) return;
+
+        showAlert({
+            typeAlert: 'success',
+            title: 'Venta realizada',
+            message: 'El ticket ha sido registrado exitosamente.'
+        })
+    }
+
+    const handleTicketSaleCard = () => {
+        //implementacion de cobro con tarjeta
+        showNofification({
+            typeAlert: 'info',
+            title: 'Función no implementada',
+            message: 'La función de cobro con tarjeta no está implementada en esta versión.'
+        })
     }
 
     const backgrounTiketSale = 'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 border-b border-slate-200 dark:border-slate-700/50 transition-colors';
@@ -350,6 +396,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             selectedSchedule,
             seatColors,
             stepCompletedSelectedSeats,
+            seatsSelected,
 
             dispatch,
             showModalAlert: showAlert,
@@ -361,6 +408,8 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             handleSeatSelect,
             handleRegisterCustomer,
             handleRegisterTicket,
+            handleConfirmTicketSale,
+            handleTicketSaleCard
 
         }}>
             {children}

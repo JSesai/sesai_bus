@@ -1,17 +1,16 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
-import { MapPin, Bus, ListOrdered, SquareUserRound, Clock3, ClockPlus, Clock2, Calendar } from "lucide-react";
+import { Bus, ListOrdered, SquareUserRound, Clock3, ClockPlus, Clock2, Calendar } from "lucide-react";
 import { useDashboard } from "../../auth/context/DashBoardContext";
 import { useSearchParams } from "react-router-dom";
 import { ScheduleError } from "../../../shared/errors/customError";
 import { daysOfWeek } from "../../shared/constants/constants";
 import { Checkbox } from "../../components/ui/checkbox";
 import { sumarHorasYMinutos } from "../../../shared/utils/helpers";
-import { useAuth } from "../../auth/context/AuthContext";
 import SelectorsOriginDestination from "./SelectorsOriginDestination";
 
 
@@ -46,8 +45,7 @@ const initialDataForm: Schedule = {
 export default function HorarioForm({ initialData, onCancel, isEditing = false }: HorarioFormProps) {
 
   const [_, setSearchParams] = useSearchParams();
-  const { agency, agencies, destinations, vehicles, driverEmployees, handleRegisterSchedules } = useDashboard();
-  const { isSuperUser } = useAuth();
+  const { agency, destinations, vehicles, driverEmployees, handleRegisterSchedules } = useDashboard();
 
   const [formData, setFormData] = useState<Schedule>(
     isEditing && initialData ? initialData : { ...initialDataForm, agency_id_origin: agency?.id || 0 }
@@ -103,62 +101,6 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-6 sm:grid-cols-2">
-            {/* {isSuperUser ?
-              <div className="space-y-2">
-                <Label htmlFor="destino" className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  Origen
-                </Label>
-                <Select defaultValue={String(formData.agency_id_origin)} value={String(formData.agency_id_origin)} onValueChange={(value) => setFormData({ ...formData, agency_id_origin: +value })}>
-                  <SelectTrigger id="destino" className="w-full py-5">
-                    <SelectValue placeholder="Seleccionar destino" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {agencies?.map((agency) => (
-                      <SelectItem key={agency.id} value={String(agency.id)}>
-                        {agency.city.toUpperCase()}{' - '}{agency.name.toUpperCase()}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              :
-              <div className="space-y-2">
-                <Label htmlFor="horaSalida" className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  Origen
-                </Label>
-                <Input
-                  id="horaSalida"
-                  type="text"
-                  value={`${agency.city.toUpperCase()} - ${agency.name.toUpperCase()}`}
-                  className="h-11"
-                  required
-                  disabled
-                />
-              </div>
-
-            }
-
-
-            <div className="space-y-2">
-              <Label htmlFor="destino" className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                Destino
-              </Label>
-              <Select defaultValue={String(formData.route_id)} value={String(formData.route_id)} onValueChange={(value) => setFormData({ ...formData, route_id: +value })}>
-                <SelectTrigger id="destino" className="w-full py-5">
-                  <SelectValue placeholder="Seleccionar destino" />
-                </SelectTrigger>
-                <SelectContent>
-                  {destinations.map((destino) => (
-                    <SelectItem key={destino.id} value={String(destino.id)}>
-                      {destino.cityName.toUpperCase()}{' - '}{destino.terminalName.toUpperCase()}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div> */}
 
             <SelectorsOriginDestination
               agencyID={formData.agency_id_origin}

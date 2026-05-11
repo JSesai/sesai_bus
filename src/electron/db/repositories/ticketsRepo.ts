@@ -66,39 +66,6 @@ export const ticketsRepo = {
       });
     }),
 
-  // insertSelectedSeats: ({ customerId, price, scheduleId, seatNumbers }: TicketInsert): Promise<void> => {
-  //   return new Promise((resolve, reject) => {
-  //     db.serialize(() => {
-  //       db.run("BEGIN TRANSACTION");
-
-  //       seatNumbers.forEach((seatNumber) => {
-  //         db.run(
-  //           `
-  //             INSERT INTO tickets (schedule_id, customer_id, seat_number, price, status)
-  //             VALUES (?, ?, ?, ?, 'selectedTemporal')
-  //             `,
-  //           [scheduleId, customerId, seatNumber, price],
-  //           (err) => {
-  //             if (err) {
-  //               if (err.message.includes("UNIQUE constraint failed")) {
-  //                 reject(new Error(`El asiento ${seatNumber} ya fue ocupado.`));
-  //               } else {
-  //                 reject(err);
-  //               }
-  //             }
-  //           }
-  //         );
-  //       });
-
-  //       db.run("COMMIT", (err) => {
-  //         if (err) reject(err);
-  //         else resolve();
-  //       });
-  //     });
-  //   });
-  // },
-
-
   insertSelectedSeats: ({
     scheduleId,
     customerId,
@@ -146,8 +113,43 @@ export const ticketsRepo = {
         });
       });
     });
-  }
+  },
 
+
+  updateTicketStatus: (scheduleId: number, seatNumbers: SeatData['seat_number'][], newStatus: SeatData['status']): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (seatNumbers.length === 0) return resolve();
+
+      const placeholders = seatNumbers.map(() => "?").join(", ");
+      const sql = `
+      UPDATE tickets
+      SET status = ?
+      WHERE schedule_id = ?
+        AND seat_number IN (${placeholders})
+    `;
+
+      const params = [newStatus, scheduleId, ...seatNumbers];
+      db.serialize(() => {
+        db.run("BEGIN TRANSACTION");
+        db.run(sql, params, (err) => {
+          if (err) {
+            db.run("ROLLBACK");
+            reject(err);
+          } else {
+            db.run("COMMIT", (commitErr) => {
+              if (commitErr) {
+                db.run("ROLLBACK");
+                reject(commitErr);
+              } else {
+                resolve();
+              }
+            });
+          }
+        });
+      });
+
+    });
+  }
 
 
 };

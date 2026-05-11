@@ -8,6 +8,7 @@ import OrigenAndDestination from "../components/OrigenAndDestination";
 import Passengers from "../components/Passengers";
 import { SeatSelection } from "../components/SeatSelection";
 import InfoCustomer from "../components/InfoCustomer";
+import Payment from "../components/Payment";
 
 
 export type handlerSteps = {
@@ -22,6 +23,7 @@ export function TicketSale() {
 
     const { stepsTicketSale, stepCompletedTravelTypeAndBookingType, stepCompletedOrigenDestination, state,
         stepCompletedSelectedDates, stepCompletedPassengersSelection, currentStep, stepCompletedSelectedSeats,
+        isReservation, seatsSelected, totalPassengers,
         resetSteps, handleNext, handleBack
     } = useTicket();
 
@@ -35,7 +37,7 @@ export function TicketSale() {
         if (currentStep === stepsTicketOffice['datesSelection'] && stepCompletedSelectedDates && state.idSchedule !== 0) return false;
         if (currentStep === stepsTicketOffice['infoCustomer'] && state.customer) return false;
         if (currentStep === stepsTicketOffice['passengersSelection'] && stepCompletedPassengersSelection) return false;
-        if (currentStep === stepsTicketOffice['seatSelection'] && stepCompletedSelectedSeats) return false;
+        if (currentStep === stepsTicketOffice['seatSelection'] && stepCompletedSelectedSeats && seatsSelected.length === totalPassengers) return false;
 
         console.info('va a retornar true');
         return true;
@@ -57,6 +59,10 @@ export function TicketSale() {
                 {currentStep === stepsTicketOffice['infoCustomer'] && <InfoCustomer />}
                 {currentStep === stepsTicketOffice['passengersSelection'] && <Passengers />}
                 {currentStep === stepsTicketOffice['seatSelection'] && <SeatSelection />}
+                {currentStep === stepsTicketOffice['paymentOrReservatiion'] && (isReservation ?
+                    <div>Reservación realizada</div> :
+                    <Payment />
+                )}
 
             </div>
 

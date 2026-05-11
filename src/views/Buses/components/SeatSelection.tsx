@@ -4,12 +4,12 @@ import { SeatLegend } from "./SeatLegend"
 import { useTicket } from "../../auth/context/TicketContext"
 import { Card } from "../../components/ui/card"
 import { OrderSummary } from "./OrderSummary"
-import { formatDateDisplay } from "../../../shared/utils/helpers"
+import { formatDateDisplay, formatTime } from "../../../shared/utils/helpers"
 
 export function SeatSelection() {
 
     const { handleSeatSelect, backgrounTiketSale, seats, state, cityOrigin, cityDestination,
-        destinationSelected, totalPassengers, getSeatStatus, handleRegisterTicket
+        destinationSelected, totalPassengers, selectedSchedule, getSeatStatus, handleRegisterTicket
     } = useTicket();
     const [totalSeats] = useState(seats.length || 0);
     const [seatsPerRow] = useState(4)
@@ -70,12 +70,13 @@ export function SeatSelection() {
                         selectedSeats={seats.filter((s) => s.status === "selected").map((s) => s.seat_number)}
                         pricePerSeat={Number(destinationSelected?.baseFare) || 0}
                         onContinue={handleRegisterTicket}
+                        disabledContinue={seats.filter((s) => s.status === "selected").map((s) => s.seat_number).length !== totalPassengers}
                         tripInfo={{
                             origin: cityOrigin,
                             accionBtn: state.bookingType === 'reserve' ? 'Continuar reservación' : 'Continuar al pago',
                             destination: cityDestination,
                             date: formatDateDisplay(state.departureDate),
-                            time: state.departureTime,
+                            time: selectedSchedule?.departure_time || "",
                             pasengers: totalPassengers,
                         }}
                     />

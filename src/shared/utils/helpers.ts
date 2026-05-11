@@ -176,3 +176,19 @@ export const formatDayMonth = (dateString: string): string => {
     const date = parseISO(dateString);
     return format(date, "dd/MM", { locale: es });
 };
+
+
+
+export const formatCardNumber = (value: string) => {
+    const numbers = value.replace(/\D/g, "")
+    const groups = numbers.match(/.{1,4}/g)
+    return groups ? groups.join(" ").substr(0, 19) : ""
+}
+
+export const formatExpiry = (value: string) => {
+    const numbers = value.replace(/\D/g, "")
+    if (numbers.length >= 2) {
+        return numbers.substr(0, 2) + "/" + numbers.substr(2, 2)
+    }
+    return numbers
+}

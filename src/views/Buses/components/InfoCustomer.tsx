@@ -23,17 +23,18 @@ export default function InfoCustomer() {
 
     //debounce para busqueda de customer por telefono
     useEffect(() => {
-        if (formData.phone.length >= 9) {
-            console.log("se ejecuta el debouncecuando el telefono tiene al menos 9 caracteres", formData.phone);
-
+        if (formData.phone.length === longitudtelefono) {
             const idTimeout = setTimeout(async () => {
                 const customer = await handleRegisterCustomer(formData, true);
-                if (!customer) return;
+                if (!customer) {
+                    setFormData((prev) => ({ ...prev, name: "" }))
+                    return;
+                }
                 dispatch({ type: "SET_FIELD", field: "customer", value: customer })
                 console.log(customer);
                 setFormData(customer);
 
-            }, 1000);
+            }, 1);
 
             return () => {
                 clearTimeout(idTimeout)
@@ -45,8 +46,6 @@ export default function InfoCustomer() {
     //debounce para registro de customer por nombre, se ejecuta cuando el telefono tiene al menos 9 caracteres y el nombre al menos 4 caracteres
     useEffect(() => {
         if (formData.phone.length === longitudtelefono && formData.name.length >= 4) {
-            console.log("se ejecuta el debounce cuando el telefono tiene al menos 9 caracteres y el nombre al menos 4 caracteres, formData.phone");
-
             const idTimeout = setTimeout(async () => {
                 const customer = await handleRegisterCustomer(formData, false);
                 if (!customer) return;

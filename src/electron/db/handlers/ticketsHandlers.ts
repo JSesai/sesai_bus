@@ -22,4 +22,18 @@ export function registerTicketsHandlers() {
 
   });
 
+  ipcMain.handle("updateTicketStatus", async (_, scheduleId: number, seatNumbers: SeatData['seat_number'][], newStatus: SeatData['status']) => {
+    console.log("init process updateTicketStatus", 'scheduleId', scheduleId, 'setNumbers', seatNumbers, 'newStatus', newStatus);
+    try {
+      const updated = await ticketsRepo.updateTicketStatus(scheduleId, seatNumbers, newStatus);
+      return { ok: true, error: null, data: updated }
+
+    } catch (error: any) {
+      console.log('error al actualizar el estado de los tickets ->', error);
+      return { ok: false, data: null, error: { message: error.message || "Error interno", detail: "No fue posible actualizar el estado de los tickets" } };
+
+    }
+
+
+  });
 }

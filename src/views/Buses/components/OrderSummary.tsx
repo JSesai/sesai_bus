@@ -1,11 +1,11 @@
-import { on } from "events";
 import { Button } from "../../components/ui/button"
-import { Ticket, CreditCard } from "lucide-react"
+import { Ticket, CreditCard, MapPin, Calendar, Clock } from "lucide-react"
 
 interface OrderSummaryProps {
     selectedSeats: number[];
     pricePerSeat: number;
     onContinue: () => void;
+    disabledContinue?: boolean;
     tripInfo: {
         origin: string;
         destination: string;
@@ -16,7 +16,7 @@ interface OrderSummaryProps {
     }
 }
 
-export function OrderSummary({ onContinue, selectedSeats, pricePerSeat, tripInfo }: OrderSummaryProps) {
+export function OrderSummary({ onContinue, selectedSeats, pricePerSeat, tripInfo, disabledContinue = false }: OrderSummaryProps) {
     const total = selectedSeats.length * pricePerSeat
 
     return (
@@ -28,22 +28,30 @@ export function OrderSummary({ onContinue, selectedSeats, pricePerSeat, tripInfo
 
             {/* Trip info */}
             <div className="space-y-3 pb-4 border-b border-border">
-                <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Origen</span>
-                    <span className="font-medium text-foreground">{tripInfo.origin}</span>
+                <div className="flex items-start gap-3">
+                    <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div className="text-sm">
+                        <p className="text-muted-foreground">Ruta</p>
+                        <p className="font-medium text-foreground">{tripInfo.origin} → {tripInfo.destination}</p>
+                    </div>
                 </div>
-                <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Destino</span>
-                    <span className="font-medium text-foreground">{tripInfo.destination}</span>
+
+                <div className="flex items-start gap-3">
+                    <Calendar className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div className="text-sm">
+                        <p className="text-muted-foreground">Fecha</p>
+                        <p className="font-medium text-foreground">{tripInfo.date}</p>
+                    </div>
                 </div>
-                <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Fecha</span>
-                    <span className="font-medium text-foreground">{tripInfo.date}</span>
+
+                <div className="flex items-start gap-3">
+                    <Clock className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div className="text-sm">
+                        <p className="text-muted-foreground">Hora de salida</p>
+                        <p className="font-medium text-foreground">{tripInfo.time}</p>
+                    </div>
                 </div>
-                <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Hora</span>
-                    <span className="font-medium text-foreground">{tripInfo.time}</span>
-                </div>
+
             </div>
 
             {/* Selected seats */}
@@ -77,7 +85,7 @@ export function OrderSummary({ onContinue, selectedSeats, pricePerSeat, tripInfo
                 onClick={onContinue}
                 className="w-full"
                 size="lg"
-                disabled={selectedSeats.length !== tripInfo.pasengers}
+                disabled={disabledContinue}
             >
                 <CreditCard className="w-4 h-4 mr-2" />
                 {tripInfo.accionBtn}
