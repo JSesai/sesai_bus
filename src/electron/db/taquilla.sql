@@ -116,6 +116,15 @@ CREATE TABLE IF NOT EXISTS customers (
 );
 
 
+CREATE TABLE IF NOT EXISTS purchases (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id INTEGER NOT NULL,
+    total_amount REAL NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('pending','confirmed','cancelled')) DEFAULT 'pending',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+
 -- 7. TICKETS (Boletos)
 CREATE TABLE IF NOT EXISTS tickets (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -124,27 +133,26 @@ CREATE TABLE IF NOT EXISTS tickets (
     seat_number INTEGER NOT NULL,
     price REAL NOT NULL,
     purchase_time TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    purchase_id INTEGER NOT NULL,
     status TEXT NOT NULL DEFAULT 'active',
 
     FOREIGN KEY (schedule_id) REFERENCES schedules(id),
-    FOREIGN KEY (customer_id) REFERENCES customers(id)
+    FOREIGN KEY (customer_id) REFERENCES customers(id),
+    FOREIGN KEY (purchase_id) REFERENCES purchases(id) ON DELETE CASCADE
 );
 -- Índice único para evitar duplicados de asiento en un mismo viaje
 CREATE UNIQUE INDEX idx_unique_seat_per_schedule
 ON tickets(schedule_id, seat_number);
 
 -- 8. PAYMENTS (Pagos del boleto)
-
 CREATE TABLE IF NOT EXISTS payments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    ticket_id INTEGER NOT NULL,
-    method TEXT NOT NULL,   -- cash, card, transfer
+    purchase_id INTEGER,
+    method TEXT NOT NULL CHECK (method IN ('cash', 'card', 'transfer')),
     amount REAL NOT NULL,
-    status TEXT NOT NULL DEFAULT 'confirmed',
+    status TEXT NOT NULL CHECK (status IN ('pending', 'confirmed', 'failed', 'refunded')) DEFAULT 'pending',
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (ticket_id) REFERENCES tickets(id)
-
+    FOREIGN KEY (purchase_id) REFERENCES purchases(id) ON DELETE CASCADE
 );
 
 

@@ -48,6 +48,18 @@ interface appConfigAPI {
   updateAppConfig: (data: Partial<any>) => Promise<ResponseElectronAppConfig>;
 }
 
+interface IProcessConfirmedPurchase {
+  customerId: number;
+  scheduleId: number;
+  seatNumbers: number[];
+  totalAmount: number;
+  paymentMethod: "cash" | "card" | "transfer";
+}
+
+interface ProcessFlowAPI {
+  processConfirmedPurchase: (props: IProcessConfirmedPurchase) => Promise<ResponseElectronGeneric>;
+}
+
 interface Agency {
   id?: number;
   name: string;

@@ -89,6 +89,10 @@ const appConfiAPI: appConfigAPI = {
   updateAppConfig: (data: Partial<any>) => ipcRenderer.invoke("updateAppConfig", data)
 }
 
+const processFlowAPI: ProcessFlowAPI = {
+  processConfirmedPurchase: (props: IProcessConfirmedPurchase) => ipcRenderer.invoke("processConfirmedPurchase", props)
+}
+
 contextBridge.exposeInMainWorld("electron", {
   users: usersAPI,
   agency: agencyAPI,
@@ -98,6 +102,7 @@ contextBridge.exposeInMainWorld("electron", {
   customers: customerAPI,
   tickets: ticketAPI,
   payments: paymetsAPI,
+  processFlow: processFlowAPI,
   biometric: biometricAPI,
   appConfig: appConfiAPI
 });
