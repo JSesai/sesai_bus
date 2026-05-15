@@ -318,7 +318,8 @@ interface Window {
     tickets: TicketAPI;
     payments: PaymentsAPI;
     biometric: BiometricService;
-    appConfig: appConfigAPI
+    appConfig: appConfigAPI;
+    processFlow: ProcessFlowAPI;
 
   };
 }

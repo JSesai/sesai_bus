@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS tickets (
     seat_number INTEGER NOT NULL,
     price REAL NOT NULL,
     purchase_time TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    purchase_id INTEGER NOT NULL,
+    purchase_id INTEGER,
     status TEXT NOT NULL DEFAULT 'active',
 
     FOREIGN KEY (schedule_id) REFERENCES schedules(id),
@@ -147,7 +147,7 @@ ON tickets(schedule_id, seat_number);
 -- 8. PAYMENTS (Pagos del boleto)
 CREATE TABLE IF NOT EXISTS payments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    purchase_id INTEGER,
+    purchase_id INTEGER NOT NULL,
     method TEXT NOT NULL CHECK (method IN ('cash', 'card', 'transfer')),
     amount REAL NOT NULL,
     status TEXT NOT NULL CHECK (status IN ('pending', 'confirmed', 'failed', 'refunded')) DEFAULT 'pending',

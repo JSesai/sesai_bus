@@ -348,7 +348,13 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
     const handleConfirmTicketSale = async (): Promise<void> => {
 
-        const updateStatusTicket = await handleUpdateTicket();
+        const updateStatusTicket = await window.electron.processFlow.processConfirmedPurchase({
+            customerId: state.customer?.id || 0,
+            scheduleId: state.idSchedule,
+            totalAmount: destinationSelected?.baseFare ? destinationSelected.baseFare * seatsSelected.length : 0,
+            paymentMethod: 'cash',
+            seatNumbers: seatsSelected
+        })
 
 
         if (!updateStatusTicket) return;
