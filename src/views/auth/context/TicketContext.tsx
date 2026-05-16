@@ -71,6 +71,7 @@ type TicketContextType = {
     handleRegisterTicket: () => Promise<void>;
     handleConfirmTicketSale: () => Promise<void>;
     handleTicketSaleCard: () => void;
+    handleConfirmReservation: () => Promise<void>;
 
 };
 
@@ -328,24 +329,6 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         handleNext();
     }
 
-    const handleUpdateTicket = async (): Promise<boolean> => {
-        const updateStatusSelectedSeats = await window.electron.tickets.updateTicketStatus(state.idSchedule, seatsSelected, 'occupied');
-        console.log({ updateStatusSelectedSeats });
-        if (!updateStatusSelectedSeats.ok) {
-            showNofification({
-                typeAlert: 'error',
-                title: 'Error al confirmar venta',
-                message: updateStatusSelectedSeats.error?.message || 'No fue posible confirmar la venta, intenta nuevamente'
-            });
-
-            return false;
-        }
-
-        return true;
-
-    }
-
-
     const handleConfirmTicketSale = async (): Promise<void> => {
 
         const updateStatusTicket = await window.electron.processFlow.processConfirmedPurchase({
@@ -362,7 +345,47 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         showAlert({
             typeAlert: 'success',
             title: 'Venta realizada',
-            message: 'El ticket ha sido registrado exitosamente.'
+            message: 'Se ha registrado exitosamente el boleto.',
+            callbackAcept: () => {
+                //reiniciar estados y reducer para iniciar una nueva venta
+                dispatch({ type: 'RESET' });
+                setSeats([]);
+                setStepCompletedSelectedSeats(false);
+                resetSteps();
+            }
+
+        })
+    }
+
+    const handleConfirmReservation = async (): Promise<void> => {
+
+        const updateStatusTicket = await window.electron.tickets.updateTicketStatus(state.idSchedule, seatsSelected, 'reserved');
+
+        if (!updateStatusTicket.ok) {
+            showNofification({
+                typeAlert: 'error',
+                title: 'Error al confirmar reservación',
+                message: updateStatusTicket.error?.message || 'No fue posible confirmar la reservación, intenta nuevamente'
+            })
+
+            //actualizar estato de los asientos para reflejar que los asientos seleccionados ya no estan disponibles
+            await getSeatStatus();
+
+            return;
+        }
+
+        showAlert({
+            typeAlert: 'success',
+            title: 'Reservación realizada',
+            message: 'Se ha reservado exitosamente el boleto.',
+            callbackAcept: () => {
+                //reiniciar estados y reducer para iniciar una nueva venta
+                dispatch({ type: 'RESET' });
+                setSeats([]);
+                setStepCompletedSelectedSeats(false);
+                resetSteps();
+            }
+
         })
     }
 
@@ -415,7 +438,8 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             handleRegisterCustomer,
             handleRegisterTicket,
             handleConfirmTicketSale,
-            handleTicketSaleCard
+            handleTicketSaleCard,
+            handleConfirmReservation
 
         }}>
             {children}

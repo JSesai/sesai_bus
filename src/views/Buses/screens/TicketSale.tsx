@@ -9,6 +9,7 @@ import Passengers from "../components/Passengers";
 import { SeatSelection } from "../components/SeatSelection";
 import InfoCustomer from "../components/InfoCustomer";
 import Payment from "../components/Payment";
+import ReservationComfirmation from "./ReservationComfirmation";
 
 
 export type handlerSteps = {
@@ -59,10 +60,7 @@ export function TicketSale() {
                 {currentStep === stepsTicketOffice['infoCustomer'] && <InfoCustomer />}
                 {currentStep === stepsTicketOffice['passengersSelection'] && <Passengers />}
                 {currentStep === stepsTicketOffice['seatSelection'] && <SeatSelection />}
-                {currentStep === stepsTicketOffice['paymentOrReservatiion'] && (isReservation ?
-                    <div>Reservación realizada</div> :
-                    <Payment />
-                )}
+                {currentStep === stepsTicketOffice['paymentOrReservatiion'] && (isReservation ? <ReservationComfirmation /> : <Payment />)}
 
             </div>
 

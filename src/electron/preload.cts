@@ -90,7 +90,8 @@ const appConfiAPI: appConfigAPI = {
 }
 
 const processFlowAPI: ProcessFlowAPI = {
-  processConfirmedPurchase: (props: IProcessConfirmedPurchase) => ipcRenderer.invoke("processConfirmedPurchase", props)
+  processConfirmedPurchase: (props: IProcessConfirmedPurchase) => ipcRenderer.invoke("processConfirmedPurchase", props),
+  processConfirmedReservation: (props: IProcessConfirmedReservation) => ipcRenderer.invoke("processConfirmedReservation", props)
 }
 
 contextBridge.exposeInMainWorld("electron", {

@@ -18,10 +18,12 @@ export function registerProcessFlowHandlers() {
             //     return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
             //   }
 
-            return { ok: false, data: null, error: { message: "Error interno no esperado", detail: "No fue posible obtener la configuración" } };
+            return { ok: false, data: null, error: { message: "Error interno no esperado", detail: "No fue posible obtener confirmar el proceso de confirmación de compra" } };
         }
 
 
     });
+
+
 
 }

@@ -96,13 +96,10 @@ export default function Payment() {
             return
         }
 
-        setIsProcessing(true)
-
+        // setisloading(true)
         // Simulate payment processing
         await new Promise((resolve) => setTimeout(resolve, 2000))
 
-        setIsProcessing(false)
-        setIsComplete(true)
     }
 
     if (paymentMethod === "card") {
@@ -115,71 +112,6 @@ export default function Payment() {
 
     }
 
-    if (isComplete) {
-        return (
-            <div className="min-h-screen bg-background flex items-center justify-center p-4">
-                <div className="max-w-md w-full bg-card rounded-2xl border border-border p-8 text-center space-y-6">
-                    <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center mx-auto">
-                        <CheckCircle2 className="w-10 h-10 text-green-500" />
-                    </div>
-
-                    <div className="space-y-2">
-                        <h2 className="text-2xl font-bold text-foreground">Compra Exitosa</h2>
-                        <p className="text-muted-foreground">
-                            Tu reservación ha sido confirmada
-                        </p>
-                    </div>
-
-                    <div className="bg-muted/50 rounded-xl p-4 space-y-3 text-left">
-                        <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Código de reservación</span>
-                            <span className="font-mono font-bold text-foreground">BT-{Math.random().toString(36).substr(2, 8).toUpperCase()}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Ruta</span>
-                            <span className="font-medium text-foreground">{tripInfo.origin} → {tripInfo.destination}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Fecha</span>
-                            <span className="font-medium text-foreground">{tripInfo.date}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Asientos</span>
-                            <span className="font-medium text-foreground">{selectedSeats.sort((a, b) => a - b).join(", ")}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Método de pago</span>
-                            <span className="font-medium text-foreground">
-                                {paymentMethod === "card" ? "Tarjeta" : "Efectivo"}
-                            </span>
-                        </div>
-                        <div className="flex justify-between text-sm pt-2 border-t border-border">
-                            <span className="text-muted-foreground">Total pagado</span>
-                            <span className="font-bold text-foreground">${finalTotal.toFixed(2)}</span>
-                        </div>
-                        {paymentMethod === "cash" && change > 0 && (
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Cambio entregado</span>
-                                <span className="font-bold text-green-600">${change.toFixed(2)}</span>
-                            </div>
-                        )}
-                    </div>
-
-                    {formData.email && (
-                        <p className="text-sm text-muted-foreground">
-                            Se ha enviado un correo de confirmación a <span className="font-medium text-foreground">{formData.email}</span>
-                        </p>
-                    )}
-
-                    <Button
-                        // onClick={onBack}
-                        className="w-full" size="lg">
-                        Realizar otra compra
-                    </Button>
-                </div>
-            </div>
-        )
-    }
 
     return (
         <div className="min-h-screen bg-background">
