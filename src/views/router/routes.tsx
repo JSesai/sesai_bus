@@ -24,15 +24,17 @@ import { TicketProvider } from "../auth/context/TicketContext";
 import SetupWizard from "../Buses/screens/SetupWizard";
 import SetupLayout from "../shared/layouts/SetupLayout";
 import Agencies from "../Buses/screens/Agencies";
+import { ReservationProvider } from "../auth/context/ReservationContext";
+import ComfirmationList from "../Buses/components/ComfirmationList";
 
 export const routeDirectory = {
-    pathsLocationAuth: {
+    auth: {
         login: "/auth/login",
         register: "/auth/register",
         forgotPassword: "/auth/forgot-password",
         newPassword: "/auth/new-password"
     },
-    pathsLocationDashboard: {
+    dashboard: {
         mainDashboard: "/dashboard",
         summary: "/dashboard/summary",
         agency: "/dashboard/agency",
@@ -69,32 +71,34 @@ export function AppRouter() {
 
                 <DashboardProvider>
                     <TicketProvider>
+                        <ReservationProvider>
+                            <Routes>
+                                <Route path="setup/" element={<SetupLayout />} >
+                                    <Route index element={<SetupWizard />} />
 
-                        <Routes>
-                            <Route path="setup/" element={<SetupLayout />} >
-                                <Route index element={<SetupWizard />} />
+                                </Route>
 
-                            </Route>
+                                <Route path="dashboard/" element={<DashBoardLayout />}>
+                                    <Route index element={<MainDashboard />} />
+                                    <Route path="summary" element={<Summary />} />
+                                    <Route path="agency" element={<AgencieForm />} />
+                                    <Route path={"ticket-sale"} element={<TicketSale />} />
+                                    <Route path="setting" element={<Setting />} />
+                                    <Route path="setting-bus" element={<BusesSetting />} />
+                                    <Route path="buses" element={<Buses />} />
+                                    <Route path="bus-daily-assignment" element={<BusDailyAssignment />} />
+                                    <Route path="add-bus" element={<RegisterBus />} />
+                                    <Route path="destinations" element={<Destinations />} />
+                                    <Route path="schedules" element={<Schedules />} />
+                                    <Route path="employees" element={<Employees />} />
+                                    <Route path="customers" element={<Customers />} />
+                                    <Route path="agencies" element={<Agencies />} />
+                                    <Route path="confirmation-reservation" element={<ComfirmationList />} />
+                                </Route>
 
-                            <Route path="dashboard/" element={<DashBoardLayout />}>
-                                <Route index element={<MainDashboard />} />
-                                <Route path="summary" element={<Summary />} />
-                                <Route path="agency" element={<AgencieForm />} />
-                                <Route path={routeDirectory.pathsLocationDashboard.ticketSale} element={<TicketSale />} />
-                                <Route path="setting" element={<Setting />} />
-                                <Route path="setting-bus" element={<BusesSetting />} />
-                                <Route path="buses" element={<Buses />} />
-                                <Route path="bus-daily-assignment" element={<BusDailyAssignment />} />
-                                <Route path="add-bus" element={<RegisterBus />} />
-                                <Route path="destinations" element={<Destinations />} />
-                                <Route path="schedules" element={<Schedules />} />
-                                <Route path="employees" element={<Employees />} />
-                                <Route path="customers" element={<Customers />} />
-                                <Route path="agencies" element={<Agencies />} />
-                            </Route>
+                            </Routes>
 
-                        </Routes>
-
+                        </ReservationProvider>
                     </TicketProvider>
                 </DashboardProvider>
 

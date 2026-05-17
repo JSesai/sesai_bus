@@ -141,7 +141,7 @@ CREATE TABLE IF NOT EXISTS tickets (
     FOREIGN KEY (purchase_id) REFERENCES purchases(id) ON DELETE CASCADE
 );
 -- Índice único para evitar duplicados de asiento en un mismo viaje
-CREATE UNIQUE INDEX idx_unique_seat_per_schedule
+CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_seat_per_schedule
 ON tickets(schedule_id, seat_number);
 
 -- 8. PAYMENTS (Pagos del boleto)

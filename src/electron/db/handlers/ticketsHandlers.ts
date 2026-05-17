@@ -36,4 +36,22 @@ export function registerTicketsHandlers() {
 
 
   });
+
+
+  ipcMain.handle("getReservationsByDate", async (_, dateReservation: string) => {
+    console.log("init process getReservationsByDate", 'dateReservation', dateReservation);
+    try {
+      const reservations = await ticketsRepo.getReservationsByDate(dateReservation);
+      return { ok: true, error: null, data: reservations }
+
+    } catch (error: any) {
+      console.log('error al actualizar el estado de los tickets ->', error);
+      return { ok: false, data: null, error: { message: error.message || "Error interno", detail: "No fue posible obtener reservaciones por fecha" } };
+
+    }
+
+
+  });
+
+
 }

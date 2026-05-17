@@ -9,7 +9,6 @@ import {
     Coins,
     Receipt
 } from "lucide-react"
-import { Button } from "../../components/ui/button"
 import { Label } from "../../components/ui/label"
 import { Input } from "../../components/ui/input"
 import { useTicket } from "../../auth/context/TicketContext"
@@ -18,8 +17,6 @@ import { OrderSummary } from "./OrderSummary"
 
 
 
-type PaymentMethod = "card" | "cash"
-
 export default function Payment() {
 
     const { state, seatsSelected: selectedSeats, destinationSelected, cityOrigin, cityDestination, selectedSchedule, seats,
@@ -27,14 +24,7 @@ export default function Payment() {
     } = useTicket();
     const pricePerSeat = Number(destinationSelected?.baseFare) ?? 0;
 
-    const tripInfo = {
-        origin: cityOrigin,
-        destination: cityDestination,
-        date: formatDateDisplay(state.departureDate),
-        time: selectedSchedule?.departure_time || "",
-    }
-    const [isProcessing, setIsProcessing] = useState(false)
-    const [isComplete, setIsComplete] = useState(false)
+
     const [paymentMethod, setPaymentMethod] = useState<Payment['method']>("cash")
     const [cashReceived, setCashReceived] = useState("")
     const [formData, setFormData] = useState({

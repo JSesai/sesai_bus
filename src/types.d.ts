@@ -217,6 +217,7 @@ interface TicketAPI {
   deleteTicket: (id: Ticket['id']) => Promise<void>;
   insertSelectedSeats: (ticketInsert: TicketInsert) => Promise<ResponseElectronGeneric>;
   updateTicketStatus: (scheduleId: number, seatNumbers: SeatData['seat_number'][], newStatus: SeatData['status']) => Promise<ResponseElectronGeneric>;
+  getReservationsByDate: (dateReservation: string) => Promise<ResponseElectronGeneric>;
 
 }
 
@@ -300,7 +301,7 @@ interface AppConfig {
 
 interface SeatData {
   seat_number: number;
-  status: "available" | "occupied" | "selected" | "reserved" | "selectedTemporal";
+  status: "available" | "occupied" | "selected" | "reserved" | "selectedTemporal" | "cancelled";
 }
 
 

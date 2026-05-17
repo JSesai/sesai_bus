@@ -115,7 +115,6 @@ export const ticketsRepo = {
     });
   },
 
-
   updateTicketStatus: (scheduleId: number, seatNumbers: SeatData['seat_number'][], newStatus: SeatData['status']): Promise<void> => {
     return new Promise((resolve, reject) => {
       if (seatNumbers.length === 0) return resolve();
@@ -149,7 +148,43 @@ export const ticketsRepo = {
       });
 
     });
+  },
+
+  getReservationsByDate: async (date: string): Promise<any[]> => {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        SELECT 
+          c.name AS customer_name,
+          c.phone AS customer_phone,
+          s.id AS schedule_id,
+          s.departure_time,
+          s.route,
+          GROUP_CONCAT(t.seat_number, ', ') AS seats,
+          SUM(t.price) AS total_amount,
+          t.status AS ticket_status,
+          DATE(t.purchase_time) AS reservation_date
+        FROM tickets t
+        JOIN customers c ON t.customer_id = c.id
+        JOIN schedules s ON t.schedule_id = s.id
+        WHERE DATE(t.purchase_time) = DATE(?)
+        GROUP BY c.name, c.phone, s.id, s.departure_time, s.route, t.status, reservation_date
+        ORDER BY t.purchase_time ASC;
+      `;
+
+      db.all(sql, [date], (err, rows) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(rows);
+      });
+    });
   }
+
+
+
+
+
+
 
 
 };

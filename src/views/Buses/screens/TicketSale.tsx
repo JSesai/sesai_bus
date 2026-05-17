@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import { stepsTicketOffice, useTicket } from "../../auth/context/TicketContext";
 import Stepper from "../components/Steper";
 import TravelTypeAndBookingType from "../components/TravelTypeAndBookingType";
@@ -29,8 +29,6 @@ export function TicketSale() {
     } = useTicket();
 
 
-    console.log('::;;;', state);
-
     //construir ejecutor de validaciones
     const isBlockedAdvance = (): boolean => {
         if (currentStep === stepsTicketOffice['originAndDestinationSelection'] && stepCompletedOrigenDestination) return false;
@@ -40,7 +38,6 @@ export function TicketSale() {
         if (currentStep === stepsTicketOffice['passengersSelection'] && stepCompletedPassengersSelection) return false;
         if (currentStep === stepsTicketOffice['seatSelection'] && stepCompletedSelectedSeats && seatsSelected.length === totalPassengers) return false;
 
-        console.info('va a retornar true');
         return true;
 
     }

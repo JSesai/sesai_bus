@@ -68,6 +68,7 @@ const ticketAPI: TicketAPI = {
   deleteTicket: (id: Ticket['id']) => ipcRenderer.invoke("deleteTicket", id),
   insertSelectedSeats: (ticketInsert: TicketInsert) => ipcRenderer.invoke("insertSelectedSeats", ticketInsert),
   updateTicketStatus: (scheduleId: number, seatNumbers: SeatData['seat_number'][], newStatus: SeatData['status']) => ipcRenderer.invoke("updateTicketStatus", scheduleId, seatNumbers, newStatus),
+  getReservationsByDate: (dateReservation: string) => ipcRenderer.invoke("getReservationsByDate", dateReservation),
 
 }
 

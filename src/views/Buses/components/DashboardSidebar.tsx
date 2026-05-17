@@ -1,14 +1,15 @@
-import React, { use, useContext, useState } from "react"
+import React, { useState } from "react"
 import {
     Activity, Command, Globe, type LucideIcon,
     MessageSquare, Settings,
-    Shield, Terminal, TicketPlus, LayoutDashboard, Bus
+    Shield, Terminal, TicketPlus, LayoutDashboard, Bus,
+    NotebookText
 } from "lucide-react"
 
 import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
-import { Navigate, NavLink, useLocation, useParams } from "react-router-dom";
-import { AuthContext, useAuth } from "../../auth/context/AuthContext";
+import { Navigate, NavLink } from "react-router-dom";
+import { useAuth } from "../../auth/context/AuthContext";
 import { useDashboard } from "../../auth/context/DashBoardContext";
 
 
@@ -37,6 +38,12 @@ export const menuDashboard: MeuDash[] = [
         label: "Venta de boletos",
         path: "/dashboard/ticket-sale",
         icon: TicketPlus,
+        roles: ["ticketSeller", "manager", "developer"],
+    },
+    {
+        label: "Reservaciones",
+        path: "/dashboard/confirmation-reservation",
+        icon: NotebookText,
         roles: ["ticketSeller", "manager", "developer"],
     },
     {
