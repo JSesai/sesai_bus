@@ -33,8 +33,13 @@ export function registerSchedulesHandlers() {
 
         try {
             console.log('init process add schedule', schedule);
-            if (!schedule.route_id || !schedule.driver_id || !schedule.departure_time || !schedule.bus_id || !schedule.arrival_time || !schedule.agency_id_origin)
+            if (!schedule.route_id || !schedule.driver_id || !schedule.departure_time ||
+                !schedule.bus_id || !schedule.arrival_time || !schedule.agency_id_origin || !schedule.vehicle_number ||
+                !schedule.status || !schedule.dateDeparture
+            ) {
                 throw new ScheduleError("No se pudo agregar horario faltan datos por  completar")
+
+            }
             const isAgencyLocal = await isCurrentAgency(schedule.agency_id_origin);
             if (!isAgencyLocal && !isSuperUser()) throw new ScheduleError("No se pudo agregar horario.", "No tienes permisos para agregar horarios de otras agencias.");
             const scheduleResponse = await schedulesRepo.add(schedule);

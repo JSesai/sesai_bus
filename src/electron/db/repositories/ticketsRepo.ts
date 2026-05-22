@@ -158,7 +158,9 @@ export const ticketsRepo = {
           c.phone AS customer_phone,
           s.id AS schedule_id,
           s.departure_time,
-          s.route,
+          r.origin,
+          r.cityName,
+          r.terminalName,
           GROUP_CONCAT(t.seat_number, ', ') AS seats,
           SUM(t.price) AS total_amount,
           t.status AS ticket_status,
@@ -166,8 +168,9 @@ export const ticketsRepo = {
         FROM tickets t
         JOIN customers c ON t.customer_id = c.id
         JOIN schedules s ON t.schedule_id = s.id
+        JOIN routes r ON s.route_id = r.id
         WHERE DATE(t.purchase_time) = DATE(?)
-        GROUP BY c.name, c.phone, s.id, s.departure_time, s.route, t.status, reservation_date
+        GROUP BY c.name, c.phone, s.id, s.departure_time, r.origin, r.cityName, r.terminalName, t.status, reservation_date
         ORDER BY t.purchase_time ASC;
       `;
 
@@ -179,6 +182,7 @@ export const ticketsRepo = {
       });
     });
   }
+
 
 
 

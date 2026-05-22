@@ -155,7 +155,8 @@ interface Schedule {
   arrival_time: string;   //hora de llegada
   status: StatusType;
   created_at?: string;
-  daysOperation: string[];
+  // daysOperation: string[];
+  dateDeparture: string;
 }
 
 interface ScheduleData extends Schedule {

@@ -160,13 +160,12 @@ export default function SchedulesManager({ configInitial = false }: { configInit
                 <div className="flex items-start gap-2 mb-2">
                   <Calendar className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                   <div className="flex-1">
-                    <p className="text-xs text-muted-foreground mb-1">Días de operación:</p>
+                    <p className="text-xs text-muted-foreground mb-1">Fecha de salida:</p>
                     <div className="flex flex-wrap gap-1">
-                      {schedule.daysOperation.map((dia) => (
-                        <Badge key={dia} variant="outline" className="text-xs">
-                          {dia}
-                        </Badge>
-                      ))}
+
+                      <span className="font-medium text-foreground">{schedule.dateDeparture}</span>
+
+
                     </div>
                   </div>
                 </div>

@@ -7,7 +7,6 @@ import type { Step } from "../../Buses/components/Steper";
 import { toast } from "sonner";
 import { initialStateTrip, tripReducer, type ActionTripReducer, type TripState } from "../../Buses/reducers/tripReducer";
 import { estadosMexico } from "../../shared/constants/constants";
-import type { Reservation } from "../../Buses/components/ComfirmationList";
 
 
 export enum stepsReservationComfirm {
@@ -20,6 +19,9 @@ export enum stepsReservationComfirm {
 type ReservationContextType = {
     //data
     isLoading: boolean;
+    reservations: Reservation[];
+
+
     scheduleToSelection: Schedule[];
     numberDeparturesToday: number;
     state: TripState;
@@ -66,6 +68,19 @@ type ReservationContextType = {
 
 };
 
+export interface Reservation {
+    cityName: string;
+    customer_name: string;
+    customer_phone: string;
+    departure_time: string;
+    origin: string;
+    reservation_date: string;
+    schedule_id: number;
+    seats: string;
+    terminalName: string;
+    ticket_status: string;
+    total_amount: number;
+}
 
 export const ReservationContext = createContext<ReservationContextType | undefined>(undefined);
 
@@ -113,7 +128,7 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
 
 
     const travelDay = getDayName(state.departureDate).toLowerCase();
-    const scheduleToSelection = runningSchedules.filter((rs) => rs.daysOperation.includes(travelDay) && rs.route_id === state.idDestination);
+    const scheduleToSelection = runningSchedules.filter((rs) => rs.dateDeparture === 'js' && rs.route_id === state.idDestination);
     const selectedSchedule = scheduleToSelection.find((s) => s.id === state.idSchedule) || null;
     const noDepertureTime = scheduleToSelection.length === 0;
     const vehicleForTripe = vehicles.find((v) => v.id === selectedSchedule?.bus_id) || null;
@@ -201,7 +216,7 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
         if (!reservationsDate.ok) {
             showNofification({
                 typeAlert: 'error',
-                title: 'Error al obtener reservaciones por fecha',
+                title: 'Error al obtener reservaciones',
                 message: reservationsDate.error?.message || 'No fue posible obtener información de la reservaciones, intenta nuevamente'
             })
             return
@@ -320,6 +335,9 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
     const backgrounTiketSale = 'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 border-b border-slate-200 dark:border-slate-700/50 transition-colors';
     return (
         <ReservationContext.Provider value={{
+            reservations,
+
+
             stepsComfirmationReservation,
             state,
             isLoading,

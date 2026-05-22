@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS buses (
     plate TEXT NOT NULL UNIQUE,
     serialNumber TEXT NOT NULL UNIQUE,
     year TEXT NOT NULL,
-    model TEXT NOT NULL,
+    model TEXT NOT NULL, 
     characteristics TEXT,
     status TEXT NOT NULL DEFAULT 'active',
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
@@ -95,7 +95,8 @@ CREATE TABLE IF NOT EXISTS schedules (
     arrival DATETIME NOT NULL,
     status TEXT NOT NULL DEFAULT 'active',
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    daysOperation TEXT NOT NULL,
+    -- daysOperation TEXT NOT NULL,
+    dateDeparture TEXT NOT NULL,
 
     FOREIGN KEY (route_id) REFERENCES routes(id) ON DELETE CASCADE,
     FOREIGN KEY (bus_id) REFERENCES buses(id),
@@ -132,7 +133,7 @@ CREATE TABLE IF NOT EXISTS tickets (
     customer_id INTEGER NOT NULL,
     seat_number INTEGER NOT NULL,
     price REAL NOT NULL,
-    purchase_time TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     purchase_id INTEGER,
     status TEXT NOT NULL DEFAULT 'active',
 
@@ -157,7 +158,6 @@ CREATE TABLE IF NOT EXISTS payments (
 
 
 -- 9. USERS (Usuarios del sistema)
-
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,

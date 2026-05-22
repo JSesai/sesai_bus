@@ -125,7 +125,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
 
     const travelDay = getDayName(state.departureDate).toLowerCase();
-    const scheduleToSelection = runningSchedules.filter((rs) => rs.daysOperation.includes(travelDay) && rs.route_id === state.idDestination);
+    const scheduleToSelection = runningSchedules.filter((rs) => rs.dateDeparture === state.departureDate && rs.route_id === state.idDestination);
     const selectedSchedule = scheduleToSelection.find((s) => s.id === state.idSchedule) || null;
     const noDepertureTime = scheduleToSelection.length === 0;
     const vehicleForTripe = vehicles.find((v) => v.id === selectedSchedule?.bus_id) || null;

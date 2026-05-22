@@ -120,6 +120,8 @@ export const isvalidHour = (horaStr: string): boolean => {
 
 export const getTodayDate = (): string => { return format(new Date(), "yyyy-MM-dd"); };
 
+export const dateInFormatAMD = (date: string): string => { return format(date, "yyyy-MM-dd"); };
+
 
 export const getDayName = (dateStr: string): string => {
     const date = parseISO(dateStr);

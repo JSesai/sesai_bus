@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useLayoutEffect } from 'react'
 import { format, isSameDay, parseISO } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { es, se } from 'date-fns/locale'
 import { ReservationTable } from './ReservationTable'
 import { ReservationDetail } from './ReservationDetail'
 import { Button } from '../../components/ui/button'
@@ -11,221 +11,98 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '
 // import { Dialog, DialogContent, DialogTitle } from '../../components/ui/dialog'
 import { TicketCheck, Search, Filter, RefreshCw, CalendarIcon, X } from 'lucide-react'
 import { cn } from '../../lib/utils'
-import { useReservation } from '../../auth/context/ReservationContext'
+import { useReservation, type Reservation } from '../../auth/context/ReservationContext'
+import { dateInFormatAMD } from '../../../shared/utils/helpers'
 // import { OrderSummary } from './OrderSummary'
 export type ReservationStatus = SeatData['status']
 
-export interface Reservation {
-    id: string
-    customerId: string
-    customer: Customer
-    scheduleId: string
-    eventName: string
-    eventDate: string
-    seatNumbers: string[]
-    totalAmount: number
-    status: SeatData['status']
-    createdAt: string
-}
+
 
 // Helper to get today's date in ISO format
-const today = new Date()
-const todayStr = today.toISOString().split('T')[0]
-export const mockReservations: Reservation[] = [
-    // Today's reservations
-    {
-        id: 'res-001',
-        customerId: 'cust-001',
-        customer: {
-            id: 1,
-            name: 'María García López',
-            phone: '+52 55 1234 5678',
-            email: 'maria.garcia@email.com',
-        },
-        scheduleId: 'sch-001',
-        eventName: 'Concierto de Rock Nacional',
-        eventDate: `${todayStr}T20:00:00`,
-        seatNumbers: ['A1', 'A2', 'A3'],
-        totalAmount: 1500,
-        status: 'reserved',
-        createdAt: `${todayStr}T09:30:00`,
-    },
-    {
-        id: 'res-002',
-        customerId: 'cust-002',
-        customer: {
-            id: 2,
-            name: 'Carlos Rodríguez Martínez',
-            phone: '+52 55 9876 5432',
-            email: 'carlos.rodriguez@email.com',
-        },
-        scheduleId: 'sch-001',
-        eventName: 'Concierto de Rock Nacional',
-        eventDate: `${todayStr}T20:00:00`,
-        seatNumbers: ['B5', 'B6'],
-        totalAmount: 1000,
-        status: 'reserved',
-        createdAt: `${todayStr}T10:15:00`,
-    },
-    {
-        id: 'res-003',
-        customerId: 'cust-003',
-        customer: {
-            id: 3,
-            name: 'Ana Fernández Silva',
-            phone: '+52 33 5555 1234',
-            email: 'ana.fernandez@email.com',
-        },
-        scheduleId: 'sch-001',
-        eventName: 'Concierto de Rock Nacional',
-        eventDate: `${todayStr}T20:00:00`,
-        seatNumbers: ['C10', 'C11', 'C12', 'C13'],
-        totalAmount: 2000,
-        status: 'reserved',
-        createdAt: `${todayStr}T08:45:00`,
-    },
-    {
-        id: 'res-007',
-        customerId: 'cust-007',
-        customer: {
-            id: 4,
-            name: 'Luis Ramírez Torres',
-            phone: '+52 55 8888 9999',
-            email: 'luis.ramirez@email.com',
-        },
-        scheduleId: 'sch-001',
-        eventName: 'Concierto de Rock Nacional',
-        eventDate: `${todayStr}T20:00:00`,
-        seatNumbers: ['D1', 'D2'],
-        totalAmount: 1000,
-        status: 'reserved',
-        createdAt: `${todayStr}T11:00:00`,
-    },
-    // Tomorrow's reservations
-    {
-        id: 'res-004',
-        customerId: 'cust-004',
-        customer: {
-            id: 5,
-            name: 'Roberto Hernández Ruiz',
-            phone: '+52 81 4444 7890',
-        },
-        scheduleId: 'sch-002',
-        eventName: 'Teatro: El Fantasma de la Ópera',
-        eventDate: '2026-05-17T19:00:00',
-        seatNumbers: ['D1'],
-        totalAmount: 800,
-        status: 'reserved',
-        createdAt: '2026-05-15T09:00:00',
-    },
-    {
-        id: 'res-005',
-        customerId: 'cust-005',
-        customer: {
-            id: 6,
-            name: 'Laura Morales Díaz',
-            phone: '+52 55 2222 3333',
-            email: 'laura.morales@email.com',
-        },
-        scheduleId: 'sch-002',
-        eventName: 'Teatro: El Fantasma de la Ópera',
-        eventDate: '2026-05-17T19:00:00',
-        seatNumbers: ['A8', 'A9'],
-        totalAmount: 1600,
-        status: 'cancelled',
-        createdAt: '2026-05-14T11:30:00',
-    },
-    // Future reservations
-    {
-        id: 'res-006',
-        customerId: 'cust-006',
-        customer: {
-            id: 7,
-            name: 'Pedro Sánchez Vega',
-            phone: '+52 55 6666 7777',
-        },
-        scheduleId: 'sch-003',
-        eventName: 'Stand-up Comedy: Noche de Risas',
-        eventDate: '2026-05-20T21:00:00',
-        seatNumbers: ['E5', 'E6', 'E7', 'E8', 'E9', 'E10'],
-        totalAmount: 1800,
-        status: 'reserved',
-        createdAt: '2026-05-13T15:20:00',
-    },
-    {
-        id: 'res-008',
-        customerId: 'cust-008',
-        customer: {
-            id: 8,
-            name: 'Sofía Castillo Mendez',
-            phone: '+52 55 3333 4444',
-            email: 'sofia.castillo@email.com',
-        },
-        scheduleId: 'sch-004',
-        eventName: 'Ballet: El Lago de los Cisnes',
-        eventDate: '2026-05-22T18:30:00',
-        seatNumbers: ['F1', 'F2', 'F3'],
-        totalAmount: 2400,
-        status: 'reserved',
-        createdAt: '2026-05-12T14:00:00',
-    },
-]
+// const today = new Date()
+// const todayStr = today.toISOString().split('T')[0]
+// export const mockReservations: Reservation[] = [
+//     // Today's reservations
+//     {
+//         id: 'res-001',
+//         customerId: 'cust-001',
+//         customer: {
+//             id: 1,
+//             name: 'María García López',
+//             phone: '+52 55 1234 5678',
+//             email: 'maria.garcia@email.com',
+//         },
+//         scheduleId: 'sch-001',
+//         eventName: 'Concierto de Rock Nacional',
+//         eventDate: `${todayStr}T20:00:00`,
+//         seatNumbers: ['A1', 'A2', 'A3'],
+//         totalAmount: 1500,
+//         status: 'reserved',
+//         createdAt: `${todayStr}T09:30:00`,
+//     },
+
+// ]
+
+
 type StatusFilter = 'all' | ReservationStatus
 
 export default function ComfirmationList() {
 
 
-    const { getReservationsByDate } = useReservation();
+    const { getReservationsByDate, reservations } = useReservation();
 
-    const [reservations, setReservations] = useState<Reservation[]>(mockReservations);
+    // const [reservations, setReservations] = useState<Reservation[]>(mockReservations);
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
     const [showPayment, setShowPayment] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
+    const dateAMD = useMemo(() => {
+        return dateInFormatAMD(selectedDate ? selectedDate.toISOString() : '')
+    }, [selectedDate])
+    console.log({ selectedDate });
+
+    console.log(dateInFormatAMD(selectedDate ? selectedDate.toISOString() : ''));
+
 
     // Filter reservations
-    const filteredReservations = useMemo(() => {
-        return reservations.filter((res) => {
-            const matchesSearch =
-                res.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                res.customer.phone.includes(searchTerm) ||
-                res.eventName.toLowerCase().includes(searchTerm.toLowerCase())
+    // const filteredReservations = useMemo(() => {
+    //     return reservations.filter((res) => {
+    //         const matchesSearch =
+    //             res.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //             res.customer_phone.includes(searchTerm)
+    //         // res.eventName.toLowerCase().includes(searchTerm.toLowerCase())
 
-            const matchesStatus =
-                statusFilter === 'all' || res.status === statusFilter
+    //         const matchesStatus = statusFilter === 'all' || res.ticket_status === statusFilter;
+    //         // const matchesDate = res.da
 
-            const matchesDate = selectedDate
-                ? isSameDay(parseISO(res.eventDate), selectedDate)
-                : true
-
-            return matchesSearch && matchesStatus && matchesDate
-        })
-    }, [reservations, searchTerm, statusFilter, selectedDate])
+    //         return matchesSearch && matchesStatus && matchesDate
+    //     })
+    // }, [reservations, searchTerm, statusFilter, selectedDate])
 
     // Count by status (for filtered results)
-    const statusCounts = useMemo(() => {
-        const filtered = reservations.filter((res) => {
-            const matchesDate = selectedDate
-                ? isSameDay(parseISO(res.eventDate), selectedDate)
-                : true
-            return matchesDate
-        })
-        return filtered.reduce(
-            (acc, res) => {
-                acc[res.status] = (acc[res.status] || 0) + 1
-                return acc
-            },
-            {} as Record<ReservationStatus, number>
-        )
-    }, [reservations, selectedDate])
+    // const statusCounts = useMemo(() => {
+    //     const filtered = reservations.filter((res) => {
+    //         const matchesDate = selectedDate
+    //             ? isSameDay(parseISO(res.eventDate), selectedDate)
+    //             : true
+    //         return matchesDate
+    //     })
+    //     return filtered.reduce(
+    //         (acc, res) => {
+    //             acc[res.status] = (acc[res.status] || 0) + 1
+    //             return acc
+    //         },
+    //         {} as Record<ReservationStatus, number>
+    //     )
+    // }, [reservations, selectedDate])
 
-    const totalForDate = useMemo(() => {
-        if (!selectedDate) return reservations.length
-        return reservations.filter((res) =>
-            isSameDay(parseISO(res.eventDate), selectedDate)
-        ).length
-    }, [reservations, selectedDate])
+    // const totalForDate = useMemo(() => {
+    //     if (!selectedDate) return reservations.length
+    //     return reservations.filter((res) =>
+    //         isSameDay(parseISO(res.eventDate), selectedDate)
+    //     ).length
+    // }, [reservations, selectedDate])
 
     const handleSelectReservation = (reservation: Reservation) => {
         setSelectedReservation(reservation)
@@ -246,23 +123,7 @@ export default function ComfirmationList() {
     }
 
     const handlePaymentComplete = () => {
-        if (!selectedReservation) return
 
-        // Update reservation status
-        setReservations((prev) =>
-            prev.map((res) =>
-                res.id === selectedReservation.id
-                    ? { ...res, status: 'confirmed' as ReservationStatus }
-                    : res
-            )
-        )
-
-        // Update selected reservation
-        setSelectedReservation((prev) =>
-            prev ? { ...prev, status: 'confirmed' as ReservationStatus } : null
-        )
-
-        setShowPayment(false)
     }
 
     const handleReset = () => {
@@ -279,37 +140,11 @@ export default function ComfirmationList() {
     }
 
 
+
+
     useLayoutEffect(() => {
-
-        getReservationsByDate(todayStr)
-        // window.electron.tickets.getReservationsByDate(todayStr).then((response) => {
-        //     console.log("response getReservationsByDate ->", response);
-
-        //     if (response.ok && response.data) {
-        //         const reservationsFromDB: Reservation[] = response.data.map((res: any) => ({
-        //             id: res.id.toString(),
-        //             customerId: res.customer_id.toString(),
-        //             customer: {
-        //                 id: res.customer_id,
-        //                 name: res.customer_name,
-        //                 phone: res.customer_phone,
-        //                 email: '', // Assuming email is not returned, set as empty
-        //             },
-        //             scheduleId: res.schedule_id.toString(),
-        //             eventName: res.event_name,
-        //             eventDate: res.event_date,
-        //             seatNumbers: res.seat_numbers.split(',').map((s: string) => s.trim()),
-        //             totalAmount: res.total_amount,
-        //             status: res.status as ReservationStatus,
-        //             createdAt: res.created_at,
-        //         }))
-        //         setReservations(reservationsFromDB)
-        //     } else {
-        //         console.error('Error fetching reservations:', response.error)
-        //     }
-        // })
-
-    }, [])
+        getReservationsByDate(dateAMD)
+    }, [selectedDate])
 
     return (
         <div className="bg-background">
@@ -335,7 +170,7 @@ export default function ComfirmationList() {
             {/* Main Content */}
             <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 {/* Stats Cards */}
-                <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                {/* <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
                     <div className="rounded-lg border bg-card p-4">
                         <p className="text-sm font-medium text-muted-foreground">Total</p>
                         <p className="text-2xl font-bold text-foreground">
@@ -366,7 +201,7 @@ export default function ComfirmationList() {
                             {statusCounts.cancelled || 0}
                         </p>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Filters */}
                 <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -452,10 +287,10 @@ export default function ComfirmationList() {
                 {/* Content Grid */}
                 <div className="grid gap-6 lg:grid-cols-3">
                     {/* Table Section */}
-                    <div className={selectedReservation ? 'lg:col-span-2' : 'lg:col-span-3'}>
+                    {/* <div className={selectedReservation ? 'lg:col-span-2' : 'lg:col-span-3'}>
                         <ReservationTable
                             reservations={filteredReservations}
-                            selectedId={selectedReservation?.id}
+                            selectedId={selectedReservation?.}
                             onSelect={handleSelectReservation}
                         />
                         {filteredReservations.length > 0 && (
@@ -469,7 +304,7 @@ export default function ComfirmationList() {
                                 )}
                             </p>
                         )}
-                    </div>
+                    </div> */}
 
                     {/* Detail Panel */}
                     {selectedReservation && (

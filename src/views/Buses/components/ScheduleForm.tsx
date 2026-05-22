@@ -8,9 +8,7 @@ import { Bus, ListOrdered, SquareUserRound, Clock3, ClockPlus, Clock2, Calendar 
 import { useDashboard } from "../../auth/context/DashBoardContext";
 import { useSearchParams } from "react-router-dom";
 import { ScheduleError } from "../../../shared/errors/customError";
-import { daysOfWeek } from "../../shared/constants/constants";
-import { Checkbox } from "../../components/ui/checkbox";
-import { sumarHorasYMinutos } from "../../../shared/utils/helpers";
+import { minDateToday, oneMontFromToday, sumarHorasYMinutos } from "../../../shared/utils/helpers";
 import SelectorsOriginDestination from "./SelectorsOriginDestination";
 
 
@@ -39,7 +37,7 @@ const initialDataForm: Schedule = {
   departure_time: '',
   arrival_time: '',
   status: 'disabled',
-  daysOperation: [],
+  dateDeparture: '',
 }
 
 export default function HorarioForm({ initialData, onCancel, isEditing = false }: HorarioFormProps) {
@@ -78,14 +76,6 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
 
   }
 
-  const toggleDay = (day: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      daysOperation: prev.daysOperation.includes(day)
-        ? prev.daysOperation.filter((d) => d !== day)
-        : [...prev.daysOperation, day],
-    }))
-  };
 
   console.log({ formData, initialData, isEditing });
 
@@ -211,25 +201,23 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
 
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                Días de Operación
+                <Calendar size={15} />
+                Fecha de salida
               </Label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 border border-border rounded-lg bg-muted/30">
-                {daysOfWeek.map((day) => (
-                  <div key={day} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={day}
-                      checked={formData.daysOperation.includes(day)}
-                      onCheckedChange={() => toggleDay(day)}
-                      disabled={formData.vehicle_number === 0}
-                    />
-                    <label htmlFor={day} className="text-sm font-medium cursor-pointer">
-                      {day}
-                    </label>
-                  </div>
-                ))}
-              </div>
+              <Input
+                id="departureDate"
+                type="date"
+                value={formData.dateDeparture}
+                onChange={(e) => setFormData({ ...formData, dateDeparture: e.target.value })}
+                className="h-11"
+                required
+                min={minDateToday()}
+                max={oneMontFromToday()}
+                disabled={formData.vehicle_number === 0}
+              />
+
             </div>
+
 
           </div>
 
@@ -244,7 +232,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
             >
               Cancelar
             </Button>
-            <Button type="submit" className="flex-1 h-11" disabled={isLoading || formData.daysOperation.length === 0}>
+            <Button type="submit" className="flex-1 h-11" disabled={isLoading || Boolean(!formData.dateDeparture)}>
               {isLoading ? "Guardando..." : isEditing ? "Actualizar Horario" : "Crear Horario"}
             </Button>
           </div>

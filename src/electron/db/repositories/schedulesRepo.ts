@@ -15,7 +15,7 @@ export const schedulesRepo = {
           s.arrival AS arrival_time, 
           s.status, 
           s.created_at, 
-          s.daysOperation,
+          s.dateDeparture,
           s.route_id,
           s.bus_id,
           b.plate AS bus_plate,
@@ -36,11 +36,7 @@ export const schedulesRepo = {
         (err, rows: any[]) => {
           if (err) reject(err);
           else {
-            const result = rows.map(row => ({
-              ...row,
-              daysOperation: JSON.parse(row.daysOperation)
-            }))
-            resolve(result)
+            resolve(rows)
           }
         }
       );
@@ -56,7 +52,7 @@ export const schedulesRepo = {
   // add: (schedule: Schedule) =>
   //   new Promise((resolve, reject) => {
   //     db.run(
-  //       `INSERT INTO schedules (route_id, bus_id,vehicle_number, driver_id, agency_id, departure_time, arrival, daysOperation)
+  //       `INSERT INTO schedules (route_id, bus_id,vehicle_number, driver_id, agency_id, departure_time, arrival, dateDeparture)
   //        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
   //       [
   //         schedule.route_id,
@@ -66,7 +62,7 @@ export const schedulesRepo = {
   //         schedule.agency_id_origin,
   //         schedule.departure_time,
   //         schedule.arrival_time,
-  //         JSON.stringify(schedule.daysOperation)
+  //         JSON.stringify(schedule.dateDeparture)
   //       ],
   //       function (err) {
   //         if (err) reject(err);
@@ -80,7 +76,7 @@ export const schedulesRepo = {
   //                 s.arrival as arrival_time, 
   //                 s.status, 
   //                 s.created_at, 
-  //                 s.daysOperation,
+  //                 s.dateDeparture,
   //                 r.cityName AS route_id,
   //                 b.model AS bus_id,
   //                 ud.name AS driver_id,
@@ -97,7 +93,7 @@ export const schedulesRepo = {
   //               else {
   //                 const result = {
   //                   ...rowGet,
-  //                   daysOperation: JSON.parse(rowGet.daysOperation)
+  //                   dateDeparture: JSON.parse(rowGet.dateDeparture)
   //                 }
   //                 resolve(result);
   //               }
@@ -111,7 +107,7 @@ export const schedulesRepo = {
   add: (schedule: Schedule) =>
     new Promise((resolve, reject) => {
       db.run(
-        `INSERT INTO schedules (route_id, bus_id, vehicle_number, driver_id, agency_id, departure_time, arrival, daysOperation)
+        `INSERT INTO schedules (route_id, bus_id, vehicle_number, driver_id, agency_id, departure_time, arrival, dateDeparture)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           schedule.route_id,
@@ -121,7 +117,7 @@ export const schedulesRepo = {
           schedule.agency_id_origin,
           schedule.departure_time,
           schedule.arrival_time,
-          JSON.stringify(schedule.daysOperation)
+          schedule.dateDeparture,
         ],
         function (err) {
           if (err) reject(err);
@@ -135,7 +131,7 @@ export const schedulesRepo = {
               s.arrival AS arrival_time, 
               s.status, 
               s.created_at, 
-              s.daysOperation,
+              s.dateDeparture,
               s.route_id,
               r.cityName AS city_destination,
               r.origin AS city_origin,
@@ -157,11 +153,8 @@ export const schedulesRepo = {
               (err2, rowGet: any) => {
                 if (err2) reject(err2)
                 else {
-                  const result = {
-                    ...rowGet,
-                    daysOperation: JSON.parse(rowGet.daysOperation)
-                  }
-                  resolve(result);
+
+                  resolve(rowGet);
                 }
               }
             )
@@ -208,7 +201,7 @@ export const schedulesRepo = {
           vehicle_number = COALESCE(?, vehicle_number),
           departure_time = COALESCE(?, departure_time),
           arrival = COALESCE(?, arrival),
-          daysOperation = COALESCE(?, daysOperation)
+          dateDeparture = COALESCE(?, dateDeparture)
          WHERE id = ?`,
         [
           schedule.route_id,
@@ -218,7 +211,7 @@ export const schedulesRepo = {
           schedule.vehicle_number,
           schedule.departure_time,
           schedule.arrival_time,
-          JSON.stringify(schedule.daysOperation),
+          schedule.dateDeparture,
           schedule.id,
         ],
         function (err) {
@@ -234,7 +227,7 @@ export const schedulesRepo = {
                 s.arrival AS arrival_time,
                 s.status,
                 s.created_at,
-                s.daysOperation,
+                s.dateDeparture,
                 s.route_id,
                 r.cityName AS route_name,
                 s.bus_id,
@@ -258,11 +251,7 @@ export const schedulesRepo = {
               (err2, rowGet: any) => {
                 if (err2) reject(err2);
                 else {
-                  const result = {
-                    ...rowGet,
-                    daysOperation: JSON.parse(rowGet.daysOperation),
-                  };
-                  resolve(result);
+                  resolve(rowGet);
                 }
               }
             );

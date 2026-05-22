@@ -5,8 +5,8 @@ import { Separator } from '../../components/ui/separator';
 import { User, Phone, Mail, Calendar, CreditCard, Armchair, X } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import type { Reservation } from './ComfirmationList';
 import { StatusBadge } from './StatusBadge';
+import type { Reservation } from '../../auth/context/ReservationContext';
 
 interface ReservationDetailProps {
     reservation: Reservation
