@@ -96,7 +96,7 @@ export default function TravelDates({ resetSteps }: { resetSteps: () => void }) 
                         </div>
                     </div>
 
-                    <div className="space-y-3">
+                    {/* <div className="space-y-3">
                         <Label htmlFor="destino" className="flex items-center gap-2">
                             <MapPin className="h-4 w-4 text-muted-foreground" />
                             Horario de salida
@@ -113,7 +113,7 @@ export default function TravelDates({ resetSteps }: { resetSteps: () => void }) 
                                 ))}
                             </SelectContent>
                         </Select>
-                    </div>
+                    </div> */}
 
                     {isRoundTrip && (
                         <div className="space-y-3 animate-in fade-in slide-in-from-top-4 duration-300">
