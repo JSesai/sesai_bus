@@ -167,6 +167,7 @@ interface ScheduleData extends Schedule {
   city_origin: string;
   city_destination: string;
   terminal_destination: string;
+  terminal_origin: string;
 }
 
 interface ScheduleAPI {

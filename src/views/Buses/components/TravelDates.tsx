@@ -7,6 +7,7 @@ import { Input } from "../../components/ui/input";
 import { formatDateDisplay, getDayName, minDateToday, oneMontFromToday, oneWeekFromToday } from "../../../shared/utils/helpers";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { useEffect } from "react";
+import { SelectorSchedule } from "./SelectorSchedule";
 
 
 
@@ -140,6 +141,8 @@ export default function TravelDates({ resetSteps }: { resetSteps: () => void }) 
                             </div>
                         </div>
                     )}
+
+                    <SelectorSchedule />
 
                 </div>
             </CardContent>

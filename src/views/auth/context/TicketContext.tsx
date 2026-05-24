@@ -28,7 +28,7 @@ export enum stepsTicketOffice {
 type TicketContextType = {
     //data
     isLoading: boolean;
-    scheduleToSelection: Schedule[];
+    scheduleToSelection: ScheduleData[];
     numberDeparturesToday: number;
     state: TripState;
     stepsTicketSale: Step[],
@@ -144,6 +144,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     console.info({ runningSchedules });
     console.log({ scheduleToSelection });
     console.warn({ destinations });
+    console.warn({ state });
     console.warn("value destination a setear es:::", state.idDestination);
 
     const numberDeparturesToday = scheduleToSelection.length;

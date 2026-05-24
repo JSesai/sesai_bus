@@ -25,6 +25,7 @@ export const schedulesRepo = {
           s.agency_id AS agency_id_origin,
           a.name AS agency_name,
           r.terminalName AS terminal_destination,
+          a.city AS terminal_origin,
           r.origin AS city_origin,
           r.cityName AS city_destination
         FROM schedules s
