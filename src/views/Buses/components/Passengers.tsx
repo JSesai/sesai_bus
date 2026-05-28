@@ -3,16 +3,42 @@ import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
 import { Users, Minus, Plus } from "lucide-react";
 import { useTicket } from "../../auth/context/TicketContext";
+import { useLayoutEffect } from "react";
 
 
 
 export default function Passengers() {
 
-    const { state, dispatch, backgrounTiketSale, showNofification, hasInapamPassengers, totalPassengers } = useTicket();
+    const { state, dispatch, backgrounTiketSale, showNofification, hasInapamPassengers,
+        totalPassengers, seats, getSeatStatus, } = useTicket();
+
+    const seatsAvailable = seats.filter((s) => s.status === "available").length;
 
     if (hasInapamPassengers) {
         showNofification({ typeAlert: 'info', title: 'Informa al cliente', message: 'Los asientos para INAPAN estan sujetos a disponibilidad.' })
     }
+
+    const handleAddPassenger = (type: "adults" | "children" | "inapam") => {
+        if (totalPassengers >= seatsAvailable) {
+            showNofification({ typeAlert: 'error', title: 'Limite de pasajeros alcanzado', message: `No puedes agregar más pasajeros. Solo hay ${seatsAvailable} asientos disponibles para este horario.` })
+            return;
+        }
+
+        dispatch({ type: "UPDATE_PASSENGERS", passengers: { [type]: state.passengers[type] + 1 } })
+    }
+
+    const handleRemovePassenger = (type: "adults" | "children" | "inapam") => {
+        if (state.passengers[type] === 0) return;
+
+        dispatch({ type: "UPDATE_PASSENGERS", passengers: { [type]: state.passengers[type] - 1 } })
+    }
+
+
+    //obtener los asientos disponibles con el query de la base de datos
+    useLayoutEffect(() => {
+        getSeatStatus()
+
+    }, [])
 
 
     return (
@@ -42,7 +68,7 @@ export default function Passengers() {
                                     type="button"
                                     variant="outline"
                                     size="icon"
-                                    onClick={() => dispatch({ type: "UPDATE_PASSENGERS", passengers: { adults: state.passengers.adults - 1 } })}
+                                    onClick={() => handleRemovePassenger("adults")}
                                     disabled={state.passengers.adults === 0}
                                     className="h-8 w-8"
                                 >
@@ -53,7 +79,7 @@ export default function Passengers() {
                                     type="button"
                                     variant="outline"
                                     size="icon"
-                                    onClick={() => dispatch({ type: "UPDATE_PASSENGERS", passengers: { adults: state.passengers.adults + 1 } })}
+                                    onClick={() => handleAddPassenger("adults")}
                                     className="h-8 w-8"
                                 >
                                     <Plus className="h-4 w-4" />
@@ -72,7 +98,7 @@ export default function Passengers() {
                                     type="button"
                                     variant="outline"
                                     size="icon"
-                                    onClick={() => dispatch({ type: "UPDATE_PASSENGERS", passengers: { children: state.passengers.children - 1 } })}
+                                    onClick={() => handleRemovePassenger("children")}
                                     disabled={state.passengers.children === 0}
                                     className="h-8 w-8"
                                 >
@@ -83,7 +109,7 @@ export default function Passengers() {
                                     type="button"
                                     variant="outline"
                                     size="icon"
-                                    onClick={() => dispatch({ type: "UPDATE_PASSENGERS", passengers: { children: state.passengers.children + 1 } })}
+                                    onClick={() => handleAddPassenger("children")}
                                     className="h-8 w-8"
                                 >
                                     <Plus className="h-4 w-4" />
@@ -102,7 +128,7 @@ export default function Passengers() {
                                     type="button"
                                     variant="outline"
                                     size="icon"
-                                    onClick={() => dispatch({ type: "UPDATE_PASSENGERS", passengers: { inapam: state.passengers.inapam - 1 } })}
+                                    onClick={() => handleRemovePassenger("inapam")}
                                     disabled={state.passengers.inapam === 0}
                                     className="h-8 w-8"
                                 >
@@ -113,7 +139,7 @@ export default function Passengers() {
                                     type="button"
                                     variant="outline"
                                     size="icon"
-                                    onClick={() => dispatch({ type: "UPDATE_PASSENGERS", passengers: { inapam: state.passengers.inapam + 1 } })}
+                                    onClick={() => handleAddPassenger("inapam")}
                                     className="h-8 w-8"
                                 >
                                     <Plus className="h-4 w-4" />

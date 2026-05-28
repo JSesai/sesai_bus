@@ -170,3 +170,13 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
 
 );
+
+
+-- trigers para actualizar del ticket
+CREATE TRIGGER IF NOT EXISTS cleanup_selected_temporal
+AFTER INSERT OR UPDATE ON tickets
+BEGIN
+  DELETE FROM tickets
+  WHERE status = 'selectedTemporal' AND purchase_id IS NULL
+    AND created_at <= datetime('now', '-4 minutes');
+END;

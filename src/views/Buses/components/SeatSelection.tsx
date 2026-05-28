@@ -4,7 +4,7 @@ import { SeatLegend } from "./SeatLegend"
 import { useTicket } from "../../auth/context/TicketContext"
 import { Card } from "../../components/ui/card"
 import { OrderSummary } from "./OrderSummary"
-import { formatDateDisplay, formatTime } from "../../../shared/utils/helpers"
+import { formatDateDisplay } from "../../../shared/utils/helpers"
 
 export function SeatSelection() {
 

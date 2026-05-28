@@ -24,6 +24,7 @@ export type TripState = {
     bookingType: BookingType | null;
     totalPassengers: number;
     seats: SeatData[];
+    seatsHistory: SeatData[];
 
 };
 
@@ -45,6 +46,7 @@ export const initialStateTrip: TripState = {
     success: false,
     bookingType: null,
     totalPassengers: 0,
+    seatsHistory: [],
     seats: [],
     idSchedule: 0,
     customer: null,

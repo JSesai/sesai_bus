@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/pop
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../../components/ui/command";
 import { useTicket } from "../../auth/context/TicketContext";
 import { toCapitalCase } from "../../shared/utils/helpers";
+import { useState } from "react";
 
 
 interface Props {
@@ -23,7 +24,17 @@ export default function SelectorsOriginDestination(options: Props) {
     const { agency, agencies, destinations } = useDashboard();
     const { destinationSelected } = useTicket();
     const { isSuperUser } = useAuth();
-    const { agencyID, routeID, handlerChangeOrigin, handlerChangeDestination } = options;
+    const { agencyID, handlerChangeOrigin, handlerChangeDestination } = options;
+
+
+    const [open, setOpen] = useState(false);
+    const [search, setSearch] = useState("");
+    console.log({ search });
+
+
+    const destinationfiltered = destinations.filter((destino) => destino.cityName.toLowerCase().includes(search.toLowerCase()));
+
+    console.log({ destinationfiltered });
 
 
     return (
@@ -71,7 +82,7 @@ export default function SelectorsOriginDestination(options: Props) {
                     Destino
                 </Label>
 
-                <Popover>
+                <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                         <Button
                             variant="outline"
@@ -87,19 +98,28 @@ export default function SelectorsOriginDestination(options: Props) {
 
                     <PopoverContent className="w-full p-0">
                         <Command>
-                            <CommandInput placeholder="Buscar destino..." />
+                            <CommandInput
+                                placeholder="Buscar destino..."
+                                value={search}
+                                onValueChange={setSearch} // captura lo que escribe el usuario
+                            />
                             <CommandList>
                                 <CommandEmpty>No se encontró destino.</CommandEmpty>
                                 <CommandGroup>
-                                    {destinations.map((destino) => (
-                                        <CommandItem
-                                            key={destino.id}
-                                            value={String(destino.id)}
-                                            onSelect={() => handlerChangeDestination(String(destino.id))}
-                                        >
-                                            <span className="font-bold">{toCapitalCase(destino.cityName)} </span> - {toCapitalCase(destino.terminalName)}
-                                        </CommandItem>
-                                    ))}
+                                    {destinationfiltered
+                                        .map((destino) => (
+                                            <CommandItem
+                                                key={destino.id}
+                                                value={`${destino.cityName} ${destino.terminalName}`} // texto que se filtra                
+                                                onSelect={() => {
+                                                    setOpen(false); // cierra el popover al seleccionar un destino
+                                                    handlerChangeDestination(String(destino.id))
+
+                                                }}
+                                            >
+                                                {toCapitalCase(destino.cityName)} - {toCapitalCase(destino.terminalName)}
+                                            </CommandItem>
+                                        ))}
                                 </CommandGroup>
                             </CommandList>
                         </Command>

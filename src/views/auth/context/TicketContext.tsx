@@ -300,6 +300,22 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
     //todo validar cuando se haga la peticion por el web service, ya que puede dar error si otro punto de venta ya selecciono esos asientos, manejar ese error mostrando una notificacion al usuario y refrescando el estado de los asientos disponibles
     const handleRegisterTicket = async () => {
+
+        //si ya esta en el historial de asientos seleccionados, no hacer nada
+        if (state.seatsHistory.some((s) => s.status === 'selected' && seatsSelected.includes(s.seat_number))) {
+            showNofification({
+                typeAlert: 'info',
+                title: 'Asientos ya registrados',
+                message: 'Los asientos seleccionados ya han sido registrados en el historial, no es necesario registrarlos nuevamente.'
+            });
+
+            //actualizar estado par marcar el paso como completado
+            setStepCompletedSelectedSeats(true);
+            //avanza al siguiente paso
+            handleNext();
+            return;
+        }
+
         //aqui va la logica para registrar el ticket en la base de datos, con toda la informacion del estado global (state) y los asientos seleccionados (seats)
         const result = await window.electron.tickets.insertSelectedSeats({
             customerId: state.customer?.id || 0,
@@ -317,12 +333,20 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
                 message: result.error?.message || 'No fue posible registrar los asientos seleccionados, intenta nuevamente'
             })
 
+
             //actualizar estato de los asientos para reflejar que los asientos seleccionados ya no estan disponibles
             await getSeatStatus();
 
             return;
 
         }
+
+        //agregar los asientos al historial de asientos seleccionados
+        dispatch({
+            type: "SET_FIELD",
+            field: "seatsHistory",
+            value: [...state.seatsHistory, ...state.seats]
+        });
 
         //actualizar estado par marcar el paso como completado
         setStepCompletedSelectedSeats(true);

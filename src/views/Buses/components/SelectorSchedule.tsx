@@ -71,6 +71,9 @@ function TripCard({ trip, origin, destination, discount, originalPrice, price,
                 const seatData = response.data as SeatData[]
                 setAvailableSeats(seatData.filter((seat) => seat.status === "available").length);
                 setTotalSeats(seatData.length);
+
+
+
                 return response.data
             } else {
                 console.error("Error al obtener el estado de los asientos:", response.error);
@@ -166,7 +169,7 @@ function TripCard({ trip, origin, destination, discount, originalPrice, price,
                             <div className="text-xs text-muted-foreground">Precio por persona</div>
                         </div>
 
-                        <Button onClick={onSelect} className="shrink-0">
+                        <Button disabled={availableSeats === 0} onClick={onSelect} className="shrink-0">
                             Seleccionar
                             <ArrowRight className="w-4 h-4 ml-1" />
                         </Button>
@@ -186,7 +189,7 @@ function TripCard({ trip, origin, destination, discount, originalPrice, price,
                             </span>
                             {isLowSeats && (
                                 <Badge variant="destructive" className="text-xs">
-                                    Ultimos lugares
+                                    {availableSeats === 0 ? 'Corrida llena' : 'Ultimos lugares'}
                                 </Badge>
                             )}
                         </div>
@@ -256,7 +259,7 @@ function TripCard({ trip, origin, destination, discount, originalPrice, price,
 
 export function SelectorSchedule() {
 
-    const { scheduleToSelection, cityOrigin, cityDestination, destinationSelected, dispatch } = useTicket();
+    const { scheduleToSelection, cityOrigin, cityDestination, destinationSelected, dispatch, handleNext } = useTicket();
     const { destinations } = useDashboard();
 
     const [sortBy, setSortBy] = useState<SortOption>("departure")
@@ -284,7 +287,10 @@ export function SelectorSchedule() {
                     <TripCard
                         key={trip.id}
                         trip={trip}
-                        onSelect={() => dispatch({ type: "SET_FIELD", field: "idSchedule", value: trip.id })}
+                        onSelect={() => {
+                            dispatch({ type: "SET_FIELD", field: "idSchedule", value: trip.id })
+                            handleNext();
+                        }}
                         destination={cityDestination}
                         origin={cityOrigin}
                         originTerminal={trip.terminal_origin}

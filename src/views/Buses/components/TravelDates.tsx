@@ -45,6 +45,8 @@ export default function TravelDates({ resetSteps }: { resetSteps: () => void }) 
 
         //si no hay salida/corrida para el destino en la fecha de salida seleccionada
         if (noDepertureTime) {
+
+            dispatch({ type: "SET_FIELD", field: "idSchedule", value: 0 }) //reiniciamos el idSchedule seleccionado porque no hay corridas para esa fecha
             showModalAlert({
                 typeAlert: 'info',
                 title: `Sin salidas para el ${travelDay} ${formatDateDisplay(state.departureDate)}`,
