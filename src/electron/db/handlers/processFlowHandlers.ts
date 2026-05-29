@@ -10,6 +10,8 @@ export function registerProcessFlowHandlers() {
         try {
 
             const response = await processFlowRepo.processConfirmedPurchase(props);
+            const deleted = await ticketsRepo.deletedTicketNotcomfirmed();
+            console.log('deleted tickets not confirmed ->', deleted);
             return { ok: true, data: response, error: null };
 
         } catch (error) {

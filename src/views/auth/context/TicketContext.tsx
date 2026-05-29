@@ -298,12 +298,17 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
-    //todo validar cuando se haga la peticion por el web service, ya que puede dar error si otro punto de venta ya selecciono esos asientos, manejar ese error mostrando una notificacion al usuario y refrescando el estado de los asientos disponibles
     const handleRegisterTicket = async () => {
 
+        //obtener los asientos que se van a registrar, filtrando el historial de asientos seleccionados para obtener solo los que estan en la lista de asientos seleccionados actualmente
+        const asientosARegistrar = seatsSelected.filter((s) => state.seatsHistory.every((sh) => sh.seat_number !== s || sh.status !== 'selected'));
+
+        console.log({ asientosARegistrar, seatsSelected, seatsHistory: state.seatsHistory });
+
+
         //si ya esta en el historial de asientos seleccionados, no hacer nada
-        if (state.seatsHistory.some((s) => s.status === 'selected' && seatsSelected.includes(s.seat_number))) {
-            showNofification({
+        if (asientosARegistrar.length === 0) {
+            showNofification({//todo quiitar notificacion ya que esto es un caso normal cuando el usuario selecciona los mismos asientos que ya habia seleccionado antes de ir al paso de seleccion de asientos, manejar esto simplemente avanzando al siguiente paso sin mostrar la notificacion
                 typeAlert: 'info',
                 title: 'Asientos ya registrados',
                 message: 'Los asientos seleccionados ya han sido registrados en el historial, no es necesario registrarlos nuevamente.'
@@ -321,7 +326,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             customerId: state.customer?.id || 0,
             price: destinationSelected?.baseFare || 0,
             scheduleId: state.idSchedule,
-            seatNumbers: seatsSelected,
+            seatNumbers: asientosARegistrar,
 
         });
         console.log({ insertSelectedSeats: result });
@@ -353,6 +358,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         //avanza al siguiente paso
         handleNext();
     }
+
 
     const handleConfirmTicketSale = async (): Promise<void> => {
 

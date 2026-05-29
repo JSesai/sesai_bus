@@ -1,6 +1,15 @@
 import { getDB } from "../connection.js";
+import { handleCheckSession } from "../handlers/userHandlers.js";
 
 const db = getDB();
+let userLoged: UserResponseAuth | null = null;
+
+handleCheckSession().then(({ data }) => {
+  if (data) {
+    userLoged = data;
+  }
+});
+
 
 export const ticketsRepo = {
   getAll: () =>
@@ -78,16 +87,16 @@ export const ticketsRepo = {
       }
 
       // Construir placeholders dinámicos
-      const placeholders = seatNumbers.map(() => "(?, ?, ?, ?, 'selectedTemporal')").join(", ");
+      const placeholders = seatNumbers.map(() => "(?, ?, ?, ?, ?, 'selectedTemporal')").join(", ");
       const sql = `
-      INSERT INTO tickets (schedule_id, customer_id, seat_number, price, status)
+      INSERT INTO tickets (schedule_id, customer_id, seat_number, user_id, price, status)
       VALUES ${placeholders}
     `;
 
       // Flatten de parámetros
       const params: any[] = [];
       seatNumbers.forEach((seatNumber) => {
-        params.push(scheduleId, customerId, seatNumber, price);
+        params.push(scheduleId, customerId, seatNumber, userLoged?.id, price);
       });
 
       db.serialize(() => {
@@ -111,6 +120,23 @@ export const ticketsRepo = {
             });
           }
         });
+      });
+    });
+  },
+
+  deletedTicketNotcomfirmed: (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        DELETE FROM tickets
+        WHERE purchase_id IS NULL
+        AND status = 'selectedTemporal' 
+        AND user_id = ?
+      `;
+
+      const params = [userLoged?.id];
+      db.run(sql, params, function (err) {
+        if (err) reject(err);
+        else resolve();
       });
     });
   },
@@ -182,10 +208,6 @@ export const ticketsRepo = {
       });
     });
   }
-
-
-
-
 
 
 

@@ -10,6 +10,27 @@ import jwt from "jsonwebtoken";
 
 const { JsonWebTokenError, TokenExpiredError } = jwt;
 
+export const handleCheckSession = async (): Promise<ResponseElectronUser> => {
+    try {
+        const token = sessionStore.getToken();
+        if (!token) throw new AuthError("Sesión invalida", "Debes iniciar nueva sesión.");
+        const payload = verifyToken(token);
+        console.log('payload', payload);
+        if (!payload.id || !payload.name || !payload.phone || !payload.role || !payload.status || !payload.userName) throw new AuthError("Sesión invalida", "Debes iniciar nueva sesión.");
+        return { ok: true, data: payload, error: null }
+    } catch (error) {
+
+        sessionStore.clear();
+        if (error instanceof AppError) return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
+        if (error instanceof TokenExpiredError) return { ok: false, data: null, error: { message: "Sesión expirada", detail: "Tu sesión ha expirado. Inicia sesión nuevamente." } };
+        if (error instanceof JsonWebTokenError) return { ok: false, data: null, error: { message: "Sesión inválida", detail: "Token inválido. Inicia sesión nuevamente." } };
+
+        console.log('error in check sesion', error);
+        return { ok: false, data: null, error: { message: "Error interno", detail: "error no esperado" } };
+    }
+}
+
+
 
 export function registerUserHandlers() {
     ipcMain.handle("getById", async (_event, id: User['id']) => userRepo.getById(id));
@@ -63,7 +84,7 @@ export function registerUserHandlers() {
 
         try {
 
-            if (!user.password || !user.phone || !user.role || !user.name || !user.status || !user.userName )
+            if (!user.password || !user.phone || !user.role || !user.name || !user.status || !user.userName)
                 throw new RegisterUserError("Ingresa la informacion completa.", "Faltan datos para poder realizar el registro del usuario.");
 
             user.password = await hashPassword(user.password);
@@ -99,17 +120,17 @@ export function registerUserHandlers() {
         try {
 
             console.log('user to update', user);
-            
+
             if (user.password) {
                 user.password = await hashPassword(user.password);
             }
 
-            const userUpdate = await userRepo.update(user);          
+            const userUpdate = await userRepo.update(user);
             return { ok: true, error: null, data: userUpdate }
 
         } catch (error) {
             console.log('error update user', error);
-            
+
             if (error instanceof AppError) {
                 return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
             }
@@ -177,12 +198,8 @@ export function registerUserHandlers() {
         console.log('process validation session');
 
         try {
-            const token = sessionStore.getToken();
-            if (!token) throw new AuthError("Sesión invalida", "Debes iniciar nueva sesión.");
-            const payload = verifyToken(token);
-            console.log('este es el mugroso payload', payload);
-            if (!payload.id || !payload.name || !payload.phone || !payload.role || !payload.status || !payload.userName) throw new AuthError("Sesión invalida", "Debes iniciar nueva sesión.");
-            return { ok: true, data: payload, error: null }
+            const { ok, data, error } = await handleCheckSession();
+            return { ok, data, error };
         } catch (error) {
 
             sessionStore.clear();

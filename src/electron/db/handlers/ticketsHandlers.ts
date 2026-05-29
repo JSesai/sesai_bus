@@ -25,7 +25,10 @@ export function registerTicketsHandlers() {
   ipcMain.handle("updateTicketStatus", async (_, scheduleId: number, seatNumbers: SeatData['seat_number'][], newStatus: SeatData['status']) => {
     console.log("init process updateTicketStatus", 'scheduleId', scheduleId, 'setNumbers', seatNumbers, 'newStatus', newStatus);
     try {
+
       const updated = await ticketsRepo.updateTicketStatus(scheduleId, seatNumbers, newStatus);
+      const deleted = await ticketsRepo.deletedTicketNotcomfirmed();
+      console.log('deleted tickets not confirmed ->', deleted);
       return { ok: true, error: null, data: updated }
 
     } catch (error: any) {
@@ -34,6 +37,20 @@ export function registerTicketsHandlers() {
 
     }
 
+
+  });
+
+  ipcMain.handle("deletedTicketNotcomfirmed", async (_, scheduleId: number, seatNumbers: SeatData['seat_number'][]) => {
+    console.log("init process deletedTicketNotcomfirmed", 'scheduleId', scheduleId, 'setNumbers', seatNumbers);
+    try {
+      const deleted = await ticketsRepo.deletedTicketNotcomfirmed();
+      return { ok: true, error: null, data: deleted }
+
+    } catch (error: any) {
+      console.log('error al eliminar tickets no confirmados ->', error);
+      return { ok: false, data: null, error: { message: error.message || "Error interno", detail: "No fue posible eliminar los tickets no confirmados" } };
+
+    }
 
   });
 

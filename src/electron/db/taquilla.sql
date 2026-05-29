@@ -135,11 +135,13 @@ CREATE TABLE IF NOT EXISTS tickets (
     price REAL NOT NULL,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     purchase_id INTEGER,
+    user_id INTEGER NOT NULL,
     status TEXT NOT NULL DEFAULT 'active',
 
     FOREIGN KEY (schedule_id) REFERENCES schedules(id),
     FOREIGN KEY (customer_id) REFERENCES customers(id),
-    FOREIGN KEY (purchase_id) REFERENCES purchases(id) ON DELETE CASCADE
+    FOREIGN KEY (purchase_id) REFERENCES purchases(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 -- Índice único para evitar duplicados de asiento en un mismo viaje
 CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_seat_per_schedule
@@ -178,5 +180,5 @@ AFTER INSERT OR UPDATE ON tickets
 BEGIN
   DELETE FROM tickets
   WHERE status = 'selectedTemporal' AND purchase_id IS NULL
-    AND created_at <= datetime('now', '-4 minutes');
+    AND created_at <= datetime('now', '-5 minutes');
 END;

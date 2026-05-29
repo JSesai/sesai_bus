@@ -94,7 +94,6 @@ function TripCard({ trip, origin, destination, discount, originalPrice, price,
                     <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                             <div className="text-center">
-                                {/* <div className="text-xs text-muted-foreground max-w-24">{origin} {originTerminal}</div> */}
                             </div>
                             <div className="space-y-2">
                                 <div className="text-center text-2xl font-bold text-foreground">{trip.departure_time}</div>
