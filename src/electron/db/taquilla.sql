@@ -95,8 +95,8 @@ CREATE TABLE IF NOT EXISTS schedules (
     arrival DATETIME NOT NULL,
     status TEXT NOT NULL DEFAULT 'active',
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    -- daysOperation TEXT NOT NULL,
     dateDeparture TEXT NOT NULL,
+    return_schedule_id INTEGER,
 
     FOREIGN KEY (route_id) REFERENCES routes(id) ON DELETE CASCADE,
     FOREIGN KEY (bus_id) REFERENCES buses(id),
@@ -174,11 +174,3 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 
--- trigers para actualizar del ticket
-CREATE TRIGGER IF NOT EXISTS cleanup_selected_temporal
-AFTER INSERT OR UPDATE ON tickets
-BEGIN
-  DELETE FROM tickets
-  WHERE status = 'selectedTemporal' AND purchase_id IS NULL
-    AND created_at <= datetime('now', '-5 minutes');
-END;

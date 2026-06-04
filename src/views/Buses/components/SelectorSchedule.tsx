@@ -23,7 +23,6 @@ import { useDashboard } from "../../auth/context/DashBoardContext"
 
 
 
-
 const serviceTypeConfig = {
     regular: { label: "Regular", color: "bg-secondary text-secondary-foreground" },
     plus: { label: "Plus", color: "bg-primary/10 text-primary" },
@@ -55,6 +54,7 @@ function TripCard({ trip, origin, destination, discount, originalPrice, price,
     price: number; onSelect: () => void
 }) {
 
+    const { stepCompletedSelectedDates } = useTicket();
     const [isExpanded, setIsExpanded] = useState(false);
     const [availableSeats, setAvailableSeats] = useState<number>(0);
     const [totalSeats, setTotalSeats] = useState<number>(0);
@@ -71,13 +71,10 @@ function TripCard({ trip, origin, destination, discount, originalPrice, price,
                 const seatData = response.data as SeatData[]
                 setAvailableSeats(seatData.filter((seat) => seat.status === "available").length);
                 setTotalSeats(seatData.length);
-
-
-
-                return response.data
+                return response.data;
             } else {
                 console.error("Error al obtener el estado de los asientos:", response.error);
-                return null
+                return null;
             }
         })
 
@@ -168,7 +165,7 @@ function TripCard({ trip, origin, destination, discount, originalPrice, price,
                             <div className="text-xs text-muted-foreground">Precio por persona</div>
                         </div>
 
-                        <Button disabled={availableSeats === 0} onClick={onSelect} className="shrink-0">
+                        <Button disabled={availableSeats === 0 || !stepCompletedSelectedDates} onClick={onSelect} className="shrink-0">
                             Seleccionar
                             <ArrowRight className="w-4 h-4 ml-1" />
                         </Button>

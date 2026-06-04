@@ -125,6 +125,7 @@ export const ticketsRepo = {
   },
 
   deletedTicketNotcomfirmed: (): Promise<void> => {
+
     return new Promise((resolve, reject) => {
       const sql = `
         DELETE FROM tickets
@@ -190,14 +191,15 @@ export const ticketsRepo = {
           GROUP_CONCAT(t.seat_number, ', ') AS seats,
           SUM(t.price) AS total_amount,
           t.status AS ticket_status,
-          DATE(t.purchase_time) AS reservation_date
+          DATE(s.dateDeparture) AS reservation_date
         FROM tickets t
         JOIN customers c ON t.customer_id = c.id
         JOIN schedules s ON t.schedule_id = s.id
         JOIN routes r ON s.route_id = r.id
-        WHERE DATE(t.purchase_time) = DATE(?)
+        WHERE DATE(s.dateDeparture) = DATE(?)
+        AND t.status IN ('reserved', 'cancelled', 'occupied')
         GROUP BY c.name, c.phone, s.id, s.departure_time, r.origin, r.cityName, r.terminalName, t.status, reservation_date
-        ORDER BY t.purchase_time ASC;
+        ORDER BY s.dateDeparture ASC;
       `;
 
       db.all(sql, [date], (err, rows) => {

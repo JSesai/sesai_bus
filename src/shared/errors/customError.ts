@@ -2,7 +2,7 @@
 
 export class AppError extends Error {
     public statusCode: number;
-    public error: string="";
+    public error: string = "";
     public details?: string;
 
     constructor(message: string, statusCode = 400, details?: any) {
@@ -24,12 +24,12 @@ export class ValidationError extends AppError {
 }
 
 export class AuthError extends AppError {
-    constructor(message:string, details:string) {
+    constructor(message: string, details: string) {
         super(message, 401, details);
     }
 }
 export class RegisterUserError extends AppError {
-    constructor(message:string, details:string) {
+    constructor(message: string, details: string) {
         super(message, 401, details);
     }
 }
@@ -47,24 +47,29 @@ export class DatabaseError extends AppError {
 }
 
 export class BusError extends AppError {
-    constructor(message:string, details:string) {
+    constructor(message: string, details: string) {
         super(message, 401, details);
     }
 }
 export class AgencyError extends AppError {
-    constructor(message:string, details:string) {
+    constructor(message: string, details: string) {
         super(message, 401, details);
     }
 }
 
 export class DestinationRouteError extends AppError {
-    constructor(message:string, details?:string) {
+    constructor(message: string, details?: string) {
         super(message, 401, details);
     }
 }
 
 export class ScheduleError extends AppError {
-    constructor(message:string, details?:string) {
+    constructor(message: string, details?: string) {
+        super(message, 401, details);
+    }
+}
+export class TicketError extends AppError {
+    constructor(message: string, details?: string) {
         super(message, 401, details);
     }
 }

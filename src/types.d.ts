@@ -220,6 +220,7 @@ interface TicketAPI {
   insertSelectedSeats: (ticketInsert: TicketInsert) => Promise<ResponseElectronGeneric>;
   updateTicketStatus: (scheduleId: number, seatNumbers: SeatData['seat_number'][], newStatus: SeatData['status']) => Promise<ResponseElectronGeneric>;
   getReservationsByDate: (dateReservation: string) => Promise<ResponseElectronGeneric>;
+  deletedTicketNotcomfirmed: (id: User['id']) => Promise<ResponseElectronGeneric>;
 
 }
 

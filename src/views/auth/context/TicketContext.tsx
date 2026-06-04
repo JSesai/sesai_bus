@@ -10,6 +10,7 @@ import type { Step } from "../../Buses/components/Steper";
 import { toast } from "sonner";
 import { initialStateTrip, tripReducer, type ActionTripReducer, type TripState } from "../../Buses/reducers/tripReducer";
 import { estadosMexico } from "../../shared/constants/constants";
+import { useAuth } from "./AuthContext";
 
 
 export enum stepsTicketOffice {
@@ -57,6 +58,7 @@ type TicketContextType = {
         occupied: string;
         selectedTemporal: string;
     };
+    isDateReturnValid: boolean;
 
     //methods
     resetSteps: () => void;
@@ -81,6 +83,7 @@ export const TicketContext = createContext<TicketContextType | undefined>(undefi
 export function TicketProvider({ children }: { children: React.ReactNode }) {
     const [state, dispatch] = useReducer(tripReducer, initialStateTrip);
     const { vehicles, agencies, runningSchedules, destinations } = useDashboard();
+    const { userLogged } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [currentStep, setCurrentStep] = useState<stepsTicketOffice>(stepsTicketOffice.originAndDestinationSelection);
     const [seats, setSeats] = useState<SeatData[]>([]);
@@ -96,9 +99,10 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     const descriptionDestinationOrigin = destinationSelected ? `${abbreviationOrigin} - ${abbreviationDestination}` : "";
     const isRoundTrip = state.travelType === 'round-trip';
     const isReservation = state.bookingType === 'reserve';
+    const isDateReturnValid = state.returnDate ? new Date(state.returnDate) >= new Date(state.departureDate) : true;
     const stepCompletedTravelTypeAndBookingType = !!(state.bookingType && state.travelType);
     const stepCompletedOrigenDestination = !!(state.idOrigin && state.idDestination);
-    const stepCompletedSelectedDates = !!(state.departureDate && (!isRoundTrip || (state.returnDate)));
+    const stepCompletedSelectedDates = !!(state.departureDate && (!isRoundTrip || (state.returnDate && isDateReturnValid)));
 
     const hasInapamPassengers = state.passengers.inapam > 0;
     const totalPassengers = state.passengers.adults + state.passengers.children + state.passengers.inapam;
@@ -305,15 +309,8 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
         console.log({ asientosARegistrar, seatsSelected, seatsHistory: state.seatsHistory });
 
-
-        //si ya esta en el historial de asientos seleccionados, no hacer nada
+        //si ya esta en el historial de asientos seleccionados, no hacer nada y eliminar esos registros del historial para evitar que el historial crezca innecesariamente, ya que el usuario puede seleccionar y deseleccionar los mismos asientos varias veces antes de registrar la venta o reservacion, lo importante es registrar en el historial solo los asientos que ya se han registrado en la base de datos, no cada seleccion que el usuario hace
         if (asientosARegistrar.length === 0) {
-            showNofification({//todo quiitar notificacion ya que esto es un caso normal cuando el usuario selecciona los mismos asientos que ya habia seleccionado antes de ir al paso de seleccion de asientos, manejar esto simplemente avanzando al siguiente paso sin mostrar la notificacion
-                typeAlert: 'info',
-                title: 'Asientos ya registrados',
-                message: 'Los asientos seleccionados ya han sido registrados en el historial, no es necesario registrarlos nuevamente.'
-            });
-
             //actualizar estado par marcar el paso como completado
             setStepCompletedSelectedSeats(true);
             //avanza al siguiente paso
@@ -321,12 +318,16 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             return;
         }
 
+        //todo eliminar registros que no se van a registrar
+        const deletedSeatsHistory = await window.electron.tickets.deletedTicketNotcomfirmed(userLogged?.id);
+        console.log({ deletedSeatsHistory });
+
         //aqui va la logica para registrar el ticket en la base de datos, con toda la informacion del estado global (state) y los asientos seleccionados (seats)
         const result = await window.electron.tickets.insertSelectedSeats({
             customerId: state.customer?.id || 0,
             price: destinationSelected?.baseFare || 0,
             scheduleId: state.idSchedule,
-            seatNumbers: asientosARegistrar,
+            seatNumbers: seatsSelected,
 
         });
         console.log({ insertSelectedSeats: result });
@@ -346,11 +347,13 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
         }
 
+
+
         //agregar los asientos al historial de asientos seleccionados
         dispatch({
             type: "SET_FIELD",
             field: "seatsHistory",
-            value: [...state.seatsHistory, ...state.seats]
+            value: [...state.seats]
         });
 
         //actualizar estado par marcar el paso como completado
@@ -440,8 +443,9 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             currentStep,
             stepCompletedTravelTypeAndBookingType,
             stepCompletedOrigenDestination,
-            stepCompletedSelectedDates,
             isRoundTrip,
+            isDateReturnValid,
+            stepCompletedSelectedDates,
             backgrounTiketSale,
             isReservation,
             hasInapamPassengers,

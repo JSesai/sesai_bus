@@ -1,5 +1,9 @@
 import { ipcMain } from "electron";
 import { ticketsRepo } from "../repositories/ticketsRepo.js";
+import { BusError, TicketError } from "../../../shared/errors/customError.js";
+import { se } from "date-fns/locale";
+import { userRepo } from "../repositories/userRepo.js";
+import { handleCheckSession } from "./userHandlers.js";
 
 export function registerTicketsHandlers() {
   ipcMain.handle("getTickets", () => ticketsRepo.getAll());
@@ -27,8 +31,6 @@ export function registerTicketsHandlers() {
     try {
 
       const updated = await ticketsRepo.updateTicketStatus(scheduleId, seatNumbers, newStatus);
-      const deleted = await ticketsRepo.deletedTicketNotcomfirmed();
-      console.log('deleted tickets not confirmed ->', deleted);
       return { ok: true, error: null, data: updated }
 
     } catch (error: any) {
@@ -40,9 +42,23 @@ export function registerTicketsHandlers() {
 
   });
 
-  ipcMain.handle("deletedTicketNotcomfirmed", async (_, scheduleId: number, seatNumbers: SeatData['seat_number'][]) => {
-    console.log("init process deletedTicketNotcomfirmed", 'scheduleId', scheduleId, 'setNumbers', seatNumbers);
+  ipcMain.handle("deletedTicketNotcomfirmed", async (_, id) => {
+
+
     try {
+      if (!id) {
+        throw new TicketError("Id de usuario es requerido para eliminar tickets no confirmados")
+      }
+
+      const userLogged = await handleCheckSession();
+
+      if (userLogged.error) {
+        throw new TicketError(userLogged.error?.message, userLogged.error?.detail)
+      }
+
+      if (userLogged?.data?.id !== id) {
+        throw new TicketError("No tienes permisos para eliminar estos tickets", "Solo puedes eliminar tus tickets no confirmados")
+      }
       const deleted = await ticketsRepo.deletedTicketNotcomfirmed();
       return { ok: true, error: null, data: deleted }
 
@@ -56,13 +72,13 @@ export function registerTicketsHandlers() {
 
 
   ipcMain.handle("getReservationsByDate", async (_, dateReservation: string) => {
-    console.log("init process getReservationsByDate", 'dateReservation', dateReservation);
+    console.log("init process getReservationsByDate", dateReservation);
     try {
       const reservations = await ticketsRepo.getReservationsByDate(dateReservation);
       return { ok: true, error: null, data: reservations }
 
     } catch (error: any) {
-      console.log('error al actualizar el estado de los tickets ->', error);
+      console.log('error al optener el estado de los tickets por fecha ->', error);
       return { ok: false, data: null, error: { message: error.message || "Error interno", detail: "No fue posible obtener reservaciones por fecha" } };
 
     }

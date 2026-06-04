@@ -33,7 +33,7 @@ export function TicketSale() {
     const isBlockedAdvance = (): boolean => {
         if (currentStep === stepsTicketOffice['originAndDestinationSelection'] && stepCompletedOrigenDestination) return false;
         if (currentStep === stepsTicketOffice['selectTravelTypeAndBookingType'] && stepCompletedTravelTypeAndBookingType) return false;
-        if (currentStep === stepsTicketOffice['datesSelection'] && stepCompletedSelectedDates && state.idSchedule !== 0) return false;
+        if (currentStep === stepsTicketOffice['datesSelection'] && stepCompletedSelectedDates) return false;
         if (currentStep === stepsTicketOffice['infoCustomer'] && state.customer) return false;
         if (currentStep === stepsTicketOffice['passengersSelection'] && stepCompletedPassengersSelection) return false;
         if (currentStep === stepsTicketOffice['seatSelection'] && stepCompletedSelectedSeats && seatsSelected.length === totalPassengers) return false;

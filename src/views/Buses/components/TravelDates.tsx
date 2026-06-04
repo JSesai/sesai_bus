@@ -14,7 +14,7 @@ import { SelectorSchedule } from "./SelectorSchedule";
 
 export default function TravelDates({ resetSteps }: { resetSteps: () => void }) {
 
-    const { state, dispatch, isRoundTrip, isReservation, backgrounTiketSale, scheduleToSelection, noDepertureTime,
+    const { state, dispatch, isRoundTrip, isReservation, backgrounTiketSale, isDateReturnValid, noDepertureTime,
         destinationSelected, showModalAlert } = useTicket();
     const { departureDate } = state;
 
@@ -62,7 +62,22 @@ export default function TravelDates({ resetSteps }: { resetSteps: () => void }) 
             })
         }
 
-    }, [travelDay])
+    }, [travelDay]);
+
+    useEffect(() => {
+
+        if (isRoundTrip && !isDateReturnValid) {
+            showModalAlert({
+                typeAlert: 'error',
+                title: `Fecha de regreso no válida`,
+                message: `La fecha de regreso no puede ser anterior a la fecha de salida. Por favor, selecciona una fecha de regreso válida.`,
+                btnAccept: "Aceptar",
+                callbackAcept: () => {
+                    dispatch({ type: "SET_FIELD", field: "returnDate", value: "" })
+                },
+            })
+        }
+    }, [isDateReturnValid])
 
     return (
         <Card className={`${backgrounTiketSale} mt-12 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden`}>
