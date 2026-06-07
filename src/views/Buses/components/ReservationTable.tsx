@@ -3,7 +3,8 @@ import { StatusBadge } from './StatusBadge';
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { cn } from '../../lib/utils'
-import type { Reservation } from "./ComfirmationList";
+import type { Reservation } from "../../auth/context/ReservationContext";
+
 
 interface ReservationTableProps {
     reservations: Reservation[]
@@ -54,27 +55,25 @@ export function ReservationTable({
                                 >
                                     <TableCell className="font-medium text-foreground">
                                         <div className="truncate max-w-[180px]">
-                                            {reservation.customer.name}
+                                            {reservation.customer_name}
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-muted-foreground">
-                                        {reservation.customer.phone}
+                                        {reservation.customer_phone}
                                     </TableCell>
                                     <TableCell className="text-muted-foreground">
                                         <div className="space-y-0.5">
                                             <div>
-                                                {format(new Date(reservation.eventDate), 'dd/MM/yyyy', {
-                                                    locale: es,
-                                                })}
+                                                {reservation.reservation_date}
                                             </div>
                                             <div className="text-xs">
-                                                {format(new Date(reservation.eventDate), 'HH:mm')} hrs
+                                                {reservation.departure_time} hrs
                                             </div>
                                         </div>
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex flex-wrap gap-1">
-                                            {reservation.seatNumbers.slice(0, 3).map((seat) => (
+                                            {reservation.seats.split(',').slice(0, 3).map((seat) => (
                                                 <span
                                                     key={seat}
                                                     className="inline-flex items-center rounded bg-secondary px-1.5 py-0.5 text-xs font-medium text-secondary-foreground"
@@ -82,18 +81,18 @@ export function ReservationTable({
                                                     {seat}
                                                 </span>
                                             ))}
-                                            {reservation.seatNumbers.length > 3 && (
+                                            {reservation.seats.split(',').length > 3 && (
                                                 <span className="inline-flex items-center rounded bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
-                                                    +{reservation.seatNumbers.length - 3}
+                                                    +4
                                                 </span>
                                             )}
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-right font-medium text-foreground">
-                                        ${reservation.totalAmount.toLocaleString('es-MX')}
+                                        ${reservation.total_amount.toFixed(2)}
                                     </TableCell>
                                     <TableCell className="text-center">
-                                        <StatusBadge status={reservation.status} />
+                                        <StatusBadge status={reservation.ticket_status} />
                                     </TableCell>
                                 </TableRow>
                             )

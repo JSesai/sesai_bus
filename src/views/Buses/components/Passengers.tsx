@@ -3,14 +3,13 @@ import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
 import { Users, Minus, Plus } from "lucide-react";
 import { useTicket } from "../../auth/context/TicketContext";
-import { useLayoutEffect } from "react";
+import { useEffect, useRef } from "react";
 
 
 
 export default function Passengers() {
 
-    const { state, dispatch, backgrounTiketSale, showNofification, hasInapamPassengers,
-        totalPassengers, seats, getSeatStatus, } = useTicket();
+    const { state, dispatch, backgrounTiketSale, showNofification, hasInapamPassengers, totalPassengers, seats, getSeatStatus, handleRegisterTicketAtBack } = useTicket();
 
     const seatsAvailable = seats.filter((s) => s.status === "available").length;
 
@@ -19,6 +18,9 @@ export default function Passengers() {
     }
 
     const handleAddPassenger = (type: "adults" | "children" | "inapam") => {
+        console.log(totalPassengers, seatsAvailable);
+        console.log('seats', seats);
+
         if (totalPassengers >= seatsAvailable) {
             showNofification({ typeAlert: 'error', title: 'Limite de pasajeros alcanzado', message: `No puedes agregar más pasajeros. Solo hay ${seatsAvailable} asientos disponibles para este horario.` })
             return;
@@ -33,12 +35,19 @@ export default function Passengers() {
         dispatch({ type: "UPDATE_PASSENGERS", passengers: { [type]: state.passengers[type] - 1 } })
     }
 
+    useEffect(() => {
+        //obtener los asientos disponibles con el query de la base de datos
+        getSeatStatus();
 
-    //obtener los asientos disponibles con el query de la base de datos
-    useLayoutEffect(() => {
-        getSeatStatus()
+    }, []);
 
-    }, [])
+    const executedRef = useRef(false);
+    useEffect(() => {
+        if (!executedRef.current) {
+            executedRef.current = true;
+            handleRegisterTicketAtBack();
+        }
+    }, []);
 
 
     return (

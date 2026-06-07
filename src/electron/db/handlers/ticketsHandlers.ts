@@ -6,6 +6,17 @@ import { userRepo } from "../repositories/userRepo.js";
 import { handleCheckSession } from "./userHandlers.js";
 
 export function registerTicketsHandlers() {
+
+  let userLoged: UserResponseAuth | null = null;
+  handleCheckSession().then(({ data }) => {
+    if (data) {
+      userLoged = data;
+    }
+  }).catch(error => {
+    console.log('error al verificar sesión en tickets handlers', error);
+  });
+
+
   ipcMain.handle("getTickets", () => ticketsRepo.getAll());
   ipcMain.handle("getTicketById", (_, id: number) => ticketsRepo.getById(id));
   ipcMain.handle("addTicket", (_, ticket) => ticketsRepo.add(ticket));
@@ -17,7 +28,14 @@ export function registerTicketsHandlers() {
     console.log("init process insertSelectedSeats", ticketInsert);
 
     try {
-      const insertedTickets = await ticketsRepo.insertSelectedSeats(ticketInsert);
+      // handleCheckSession().then(({ data }) => {
+      //   if (data) {
+      //     userLoged = data;
+      //   }
+      // });
+
+
+      const insertedTickets = await ticketsRepo.insertSelectedSeats(ticketInsert, userLoged?.id || 0);
       return { ok: true, error: null, data: insertedTickets }
     } catch (error: any) {
       console.log('error al insertar asientos seleccionados ->', error);
@@ -59,7 +77,7 @@ export function registerTicketsHandlers() {
       if (userLogged?.data?.id !== id) {
         throw new TicketError("No tienes permisos para eliminar estos tickets", "Solo puedes eliminar tus tickets no confirmados")
       }
-      const deleted = await ticketsRepo.deletedTicketNotcomfirmed();
+      const deleted = await ticketsRepo.deletedTicketNotcomfirmed(userLoged?.id || 0);
       return { ok: true, error: null, data: deleted }
 
     } catch (error: any) {

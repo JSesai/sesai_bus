@@ -1,38 +1,37 @@
-'use client'
-
+import type { Reservation } from '../../auth/context/ReservationContext'
 import { cn } from '../../lib/utils'
-import type { ReservationStatus } from './ComfirmationList'
 
 interface StatusBadgeProps {
-    status: ReservationStatus
+    status: Reservation['ticket_status']
     className?: string
 }
 
-const statusConfig: Record<ReservationStatus, { label: string; className: string }> = {
+const statusConfig: Record<Reservation['ticket_status'], { label: string; className: string }> = {
     reserved: {
         label: 'Reservado',
-        className: 'bg-status-reserved text-status-reserved-foreground',
+        className: 'bg-amber-400',
     },
     occupied: {
         label: 'Confirmado',
-        className: 'bg-status-confirmed text-status-confirmed-foreground',
+        className: 'bg-green-400',
     },
     cancelled: {
         label: 'Cancelado',
-        className: 'bg-status-cancelled text-status-cancelled-foreground',
+        className: 'bg-red-200',
     },
     available: {
         label: 'available',
-        className: 'bg-status-cancelled text-status-cancelled-foreground',
+        className: 'bg-orange-300 text-orange-900',
     },
     selected: {
         label: 'selected',
-        className: 'bg-status-cancelled text-status-cancelled-foreground',
+        className: 'bg-orange-300 text-orange-900',
     },
     selectedTemporal: {
         label: 'selectedTemporal',
-        className: 'bg-status-cancelled text-status-cancelled-foreground',
+        className: 'bg-orange-300 text-orange-900',
     },
+
 
 
 }

@@ -74,6 +74,7 @@ type TicketContextType = {
     handleConfirmTicketSale: () => Promise<void>;
     handleTicketSaleCard: () => void;
     handleConfirmReservation: () => Promise<void>;
+    handleRegisterTicketAtBack: () => Promise<void>;
 
 };
 
@@ -102,6 +103,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     const isDateReturnValid = state.returnDate ? new Date(state.returnDate) >= new Date(state.departureDate) : true;
     const stepCompletedTravelTypeAndBookingType = !!(state.bookingType && state.travelType);
     const stepCompletedOrigenDestination = !!(state.idOrigin && state.idDestination);
+
     const stepCompletedSelectedDates = !!(state.departureDate && (!isRoundTrip || (state.returnDate && isDateReturnValid)));
 
     const hasInapamPassengers = state.passengers.inapam > 0;
@@ -302,10 +304,65 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
+    const seatsNumberToRegister = () => seatsSelected.filter((s) => state.seatsHistory.every((sh) => sh.seat_number !== s || sh.status !== 'selected'));
+
+    const deletedTicketNotcomfirmed = async () => {   //eliminar registros que no se van a registrar porque no estan comfirmados
+        const deletedSeatsHistory = await window.electron.tickets.deletedTicketNotcomfirmed(userLogged?.id);
+        console.log({ deletedSeatsHistory });
+    }
+
+    const registerSeatsSelected = async () => {
+        return window.electron.tickets.insertSelectedSeats({
+            customerId: state.customer?.id || 0,
+            price: destinationSelected?.baseFare || 0,
+            scheduleId: state.idSchedule,
+            seatNumbers: seatsSelected,
+        });
+    }
+
+    const handleRegisterTicketAtBack = async () => {
+        // const asientosARegistrar = seatsNumberToRegister();
+        // console.log({ asientosARegistrar, seatsSelected, seatsHistory: state.seatsHistory });
+        // if (asientosARegistrar.length === 0) {
+        //     return;
+        // }
+
+        await deletedTicketNotcomfirmed();
+        // const result = await registerSeatsSelected();
+        // console.log({ insertSelectedSeats: result });
+
+
+        // if (!result.ok) {
+        //     showNofification({
+        //         typeAlert: 'error',
+        //         title: 'Error al registrar asientos',
+        //         message: result.error?.message || 'No fue posible registrar los asientos seleccionados, intenta nuevamente'
+        //     })
+
+        //     return;
+
+        // }
+        //actualizar estato de los asientos para reflejar que los asientos seleccionados ya no estan disponibles
+
+        //agregar los asientos al historial de asientos seleccionados
+        dispatch({
+            type: "SET_FIELD",
+            field: "seatsHistory",
+            value: []
+        });
+
+        dispatch({
+            type: "SET_FIELD",
+            field: "seats",
+            value: []
+        });
+
+    }
+
     const handleRegisterTicket = async () => {
 
         //obtener los asientos que se van a registrar, filtrando el historial de asientos seleccionados para obtener solo los que estan en la lista de asientos seleccionados actualmente
-        const asientosARegistrar = seatsSelected.filter((s) => state.seatsHistory.every((sh) => sh.seat_number !== s || sh.status !== 'selected'));
+        const asientosARegistrar = seatsNumberToRegister();
 
         console.log({ asientosARegistrar, seatsSelected, seatsHistory: state.seatsHistory });
 
@@ -318,18 +375,10 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             return;
         }
 
-        //todo eliminar registros que no se van a registrar
-        const deletedSeatsHistory = await window.electron.tickets.deletedTicketNotcomfirmed(userLogged?.id);
-        console.log({ deletedSeatsHistory });
 
+        await deletedTicketNotcomfirmed();
         //aqui va la logica para registrar el ticket en la base de datos, con toda la informacion del estado global (state) y los asientos seleccionados (seats)
-        const result = await window.electron.tickets.insertSelectedSeats({
-            customerId: state.customer?.id || 0,
-            price: destinationSelected?.baseFare || 0,
-            scheduleId: state.idSchedule,
-            seatNumbers: seatsSelected,
-
-        });
+        const result = await registerSeatsSelected();
         console.log({ insertSelectedSeats: result });
 
         if (!result.ok) {
@@ -338,16 +387,12 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
                 title: 'Error al registrar asientos',
                 message: result.error?.message || 'No fue posible registrar los asientos seleccionados, intenta nuevamente'
             })
-
-
             //actualizar estato de los asientos para reflejar que los asientos seleccionados ya no estan disponibles
             await getSeatStatus();
 
             return;
 
         }
-
-
 
         //agregar los asientos al historial de asientos seleccionados
         dispatch({
@@ -380,6 +425,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             typeAlert: 'success',
             title: 'Venta realizada',
             message: 'Se ha registrado exitosamente el boleto.',
+            btnAccept: 'Aceptar',
             callbackAcept: () => {
                 //reiniciar estados y reducer para iniciar una nueva venta
                 dispatch({ type: 'RESET' });
@@ -412,6 +458,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             typeAlert: 'success',
             title: 'Reservación realizada',
             message: 'Se ha reservado exitosamente el boleto.',
+            btnAccept: 'Aceptar',
             callbackAcept: () => {
                 //reiniciar estados y reducer para iniciar una nueva venta
                 dispatch({ type: 'RESET' });
@@ -474,7 +521,8 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             handleRegisterTicket,
             handleConfirmTicketSale,
             handleTicketSaleCard,
-            handleConfirmReservation
+            handleConfirmReservation,
+            handleRegisterTicketAtBack
 
         }}>
             {children}

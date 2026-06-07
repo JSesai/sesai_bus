@@ -69,6 +69,7 @@ type ReservationContextType = {
 };
 
 export interface Reservation {
+    id?: number;
     cityName: string;
     customer_name: string;
     customer_phone: string;
@@ -140,6 +141,7 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
         occupied: "bg-gray-200",
         selectedTemporal: "bg-yellow-400",
     }
+
     console.warn({ destinationSelected });
 
 
@@ -307,6 +309,7 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
             typeAlert: 'success',
             title: 'Venta realizada',
             message: 'Se ha registrado exitosamente el boleto.',
+            btnAccept: 'Aceptar',
             callbackAcept: () => {
                 //reiniciar estados y reducer para iniciar una nueva venta
                 dispatch({ type: 'RESET' });

@@ -1,47 +1,20 @@
-import { useState, useMemo, useEffect, useLayoutEffect } from 'react'
-import { format, isSameDay, parseISO } from 'date-fns'
-import { es, se } from 'date-fns/locale'
-import { ReservationTable } from './ReservationTable'
+import { useState, useMemo, useLayoutEffect } from 'react'
+import { format } from 'date-fns'
+import { es } from 'date-fns/locale'
 import { ReservationDetail } from './ReservationDetail'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Calendar } from '../../components/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger, } from '../../components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger, } from '../../components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '../../components/ui/select'
-// import { Dialog, DialogContent, DialogTitle } from '../../components/ui/dialog'
 import { TicketCheck, Search, Filter, RefreshCw, CalendarIcon, X } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { useReservation, type Reservation } from '../../auth/context/ReservationContext'
 import { dateInFormatAMD } from '../../../shared/utils/helpers'
-// import { OrderSummary } from './OrderSummary'
+import { ReservationTable } from './ReservationTable'
+
 export type ReservationStatus = SeatData['status']
 
-
-
-// Helper to get today's date in ISO format
-// const today = new Date()
-// const todayStr = today.toISOString().split('T')[0]
-// export const mockReservations: Reservation[] = [
-//     // Today's reservations
-//     {
-//         id: 'res-001',
-//         customerId: 'cust-001',
-//         customer: {
-//             id: 1,
-//             name: 'María García López',
-//             phone: '+52 55 1234 5678',
-//             email: 'maria.garcia@email.com',
-//         },
-//         scheduleId: 'sch-001',
-//         eventName: 'Concierto de Rock Nacional',
-//         eventDate: `${todayStr}T20:00:00`,
-//         seatNumbers: ['A1', 'A2', 'A3'],
-//         totalAmount: 1500,
-//         status: 'reserved',
-//         createdAt: `${todayStr}T09:30:00`,
-//     },
-
-// ]
 
 
 type StatusFilter = 'all' | ReservationStatus
@@ -51,12 +24,12 @@ export default function ComfirmationList() {
 
     const { getReservationsByDate, reservations } = useReservation();
 
-    // const [reservations, setReservations] = useState<Reservation[]>(mockReservations);
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
     const [showPayment, setShowPayment] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
+
     const dateAMD = useMemo(() => {
         return dateInFormatAMD(selectedDate ? selectedDate.toISOString() : '')
     }, [selectedDate])
@@ -64,45 +37,51 @@ export default function ComfirmationList() {
 
     console.log(dateInFormatAMD(selectedDate ? selectedDate.toISOString() : ''));
 
+    console.log(statusFilter);
+
+
+
 
     // Filter reservations
-    // const filteredReservations = useMemo(() => {
-    //     return reservations.filter((res) => {
-    //         const matchesSearch =
-    //             res.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    //             res.customer_phone.includes(searchTerm)
-    //         // res.eventName.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredReservations = useMemo(() => {
+        return reservations.filter((res) => {
+            const matchesSearch =
+                res.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                res.customer_phone.includes(searchTerm) ||
+                res.customer_name.toUpperCase().includes(searchTerm.toUpperCase())
 
-    //         const matchesStatus = statusFilter === 'all' || res.ticket_status === statusFilter;
-    //         // const matchesDate = res.da
+            const matchesStatus = statusFilter === 'all' || res.ticket_status === statusFilter;
+            const matchesDate = res.reservation_date
 
-    //         return matchesSearch && matchesStatus && matchesDate
-    //     })
-    // }, [reservations, searchTerm, statusFilter, selectedDate])
+            return matchesSearch && matchesStatus && matchesDate
+        })
+    }, [reservations, searchTerm, statusFilter, selectedDate])
+
+    console.log({ reservations });
+    console.log({ filteredReservations });
+
 
     // Count by status (for filtered results)
-    // const statusCounts = useMemo(() => {
-    //     const filtered = reservations.filter((res) => {
-    //         const matchesDate = selectedDate
-    //             ? isSameDay(parseISO(res.eventDate), selectedDate)
-    //             : true
-    //         return matchesDate
-    //     })
-    //     return filtered.reduce(
-    //         (acc, res) => {
-    //             acc[res.status] = (acc[res.status] || 0) + 1
-    //             return acc
-    //         },
-    //         {} as Record<ReservationStatus, number>
-    //     )
-    // }, [reservations, selectedDate])
+    const statusCounts = useMemo(() => {
+        const filtered = reservations.filter((res) => {
+            const matchesDate = selectedDate ? res.reservation_date === dateAMD : true
+            return matchesDate
+        })
 
-    // const totalForDate = useMemo(() => {
-    //     if (!selectedDate) return reservations.length
-    //     return reservations.filter((res) =>
-    //         isSameDay(parseISO(res.eventDate), selectedDate)
-    //     ).length
-    // }, [reservations, selectedDate])
+        return filtered.reduce(
+            (acc, res) => {
+                acc[res.ticket_status as ReservationStatus] = (acc[res.ticket_status as ReservationStatus] || 0) + 1
+                return acc
+            },
+            {} as Record<ReservationStatus, number>
+        )
+    }, [reservations, selectedDate])
+
+    const totalForDate = useMemo(() => {
+        if (!selectedDate) return reservations.length
+        return reservations.filter((res) => res.reservation_date === dateAMD).length
+
+    }, [reservations, selectedDate])
 
     const handleSelectReservation = (reservation: Reservation) => {
         setSelectedReservation(reservation)
@@ -127,7 +106,7 @@ export default function ComfirmationList() {
     }
 
     const handleReset = () => {
-        setReservations(mockReservations)
+        // setReservations(mockReservations)
         setSelectedReservation(null)
         setShowPayment(false)
         setSearchTerm('')
@@ -144,7 +123,8 @@ export default function ComfirmationList() {
 
     useLayoutEffect(() => {
         getReservationsByDate(dateAMD)
-    }, [selectedDate])
+    }, [selectedDate]);
+
 
     return (
         <div className="bg-background">
@@ -157,11 +137,9 @@ export default function ComfirmationList() {
                         </div>
                         <div>
                             <h1 className="text-xl font-semibold text-foreground">
-                                Confirmación de Reservaciones
+                                Administra  y controla las Reservaciones
                             </h1>
-                            <p className="text-sm text-muted-foreground">
-                                Sistema de Boletaje
-                            </p>
+
                         </div>
                     </div>
                 </div>
@@ -170,7 +148,7 @@ export default function ComfirmationList() {
             {/* Main Content */}
             <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 {/* Stats Cards */}
-                {/* <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
                     <div className="rounded-lg border bg-card p-4">
                         <p className="text-sm font-medium text-muted-foreground">Total</p>
                         <p className="text-2xl font-bold text-foreground">
@@ -201,7 +179,7 @@ export default function ComfirmationList() {
                             {statusCounts.cancelled || 0}
                         </p>
                     </div>
-                </div> */}
+                </div>
 
                 {/* Filters */}
                 <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -230,7 +208,6 @@ export default function ComfirmationList() {
                                     selected={selectedDate}
                                     onSelect={setSelectedDate}
                                     locale={es}
-                                    initialFocus
                                 />
                                 {selectedDate && (
                                     <div className="border-t p-2">
@@ -266,13 +243,13 @@ export default function ComfirmationList() {
                                 value={statusFilter}
                                 onValueChange={(value) => setStatusFilter(value as StatusFilter)}
                             >
-                                <SelectTrigger className="w-[160px]">
+                                <SelectTrigger className="w-40">
                                     <SelectValue placeholder="Filtrar estado" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Todos</SelectItem>
-                                    <SelectItem value="pending">Pendientes</SelectItem>
-                                    <SelectItem value="confirmed">Confirmadas</SelectItem>
+                                    <SelectItem value="reserved">Pendientes</SelectItem>
+                                    <SelectItem value="occupied">Confirmadas</SelectItem>
                                     <SelectItem value="cancelled">Canceladas</SelectItem>
                                 </SelectContent>
                             </Select>
@@ -287,10 +264,10 @@ export default function ComfirmationList() {
                 {/* Content Grid */}
                 <div className="grid gap-6 lg:grid-cols-3">
                     {/* Table Section */}
-                    {/* <div className={selectedReservation ? 'lg:col-span-2' : 'lg:col-span-3'}>
+                    <div className={selectedReservation ? 'lg:col-span-2' : 'lg:col-span-3'}>
                         <ReservationTable
                             reservations={filteredReservations}
-                            selectedId={selectedReservation?.}
+                            selectedId={String(selectedReservation?.id)}
                             onSelect={handleSelectReservation}
                         />
                         {filteredReservations.length > 0 && (
@@ -304,7 +281,7 @@ export default function ComfirmationList() {
                                 )}
                             </p>
                         )}
-                    </div> */}
+                    </div>
 
                     {/* Detail Panel */}
                     {selectedReservation && (

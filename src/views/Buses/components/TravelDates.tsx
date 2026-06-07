@@ -1,11 +1,10 @@
 
 import { Label } from "../../components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
-import { Calendar, CalendarSync, MapPin } from "lucide-react";
+import { Calendar, CalendarSync } from "lucide-react";
 import { useTicket } from "../../auth/context/TicketContext";
 import { Input } from "../../components/ui/input";
 import { formatDateDisplay, getDayName, minDateToday, oneMontFromToday, oneWeekFromToday } from "../../../shared/utils/helpers";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { useEffect } from "react";
 import { SelectorSchedule } from "./SelectorSchedule";
 
@@ -17,13 +16,6 @@ export default function TravelDates({ resetSteps }: { resetSteps: () => void }) 
     const { state, dispatch, isRoundTrip, isReservation, backgrounTiketSale, isDateReturnValid, noDepertureTime,
         destinationSelected, showModalAlert } = useTicket();
     const { departureDate } = state;
-
-
-    const handlerChangeSelectSchedule = (value: string) => {
-        dispatch({ type: "SET_FIELD", field: "idSchedule", value: Number(value) })
-    }
-
-
 
     const travelDay = getDayName(state.departureDate).toLowerCase();
 
@@ -84,7 +76,7 @@ export default function TravelDates({ resetSteps }: { resetSteps: () => void }) 
             <CardHeader className="space-y-2">
                 <CardTitle className="text-2xl font-semibold text-balance">{isRoundTrip ? "Fechas / Horarios" : "Fecha /horario"} </CardTitle>
                 <CardDescription className="text-base text-balance">
-                    Selecciona la fecha de salida{isRoundTrip && ' y fecha de regreso'}
+                    Selecciona la fecha de salida {isRoundTrip && ' y fecha de regreso'}; posteriormente selecciona el horario de salida para tu viaje.
                 </CardDescription>
             </CardHeader>
 

@@ -4,14 +4,10 @@ import { handleCheckSession } from "../handlers/userHandlers.js";
 const db = getDB();
 let userLoged: UserResponseAuth | null = null;
 
-handleCheckSession().then(({ data }) => {
-  if (data) {
-    userLoged = data;
-  }
-});
 
 
 export const ticketsRepo = {
+
   getAll: () =>
     new Promise((resolve, reject) => {
       db.all(`SELECT * FROM tickets`, (err, rows) =>
@@ -80,7 +76,10 @@ export const ticketsRepo = {
     customerId,
     seatNumbers,
     price
-  }: TicketInsert): Promise<void> => {
+  }: TicketInsert, idUserLoged: number): Promise<void> => {
+
+
+
     return new Promise((resolve, reject) => {
       if (seatNumbers.length === 0) {
         return resolve(); // nada que insertar
@@ -96,13 +95,14 @@ export const ticketsRepo = {
       // Flatten de parámetros
       const params: any[] = [];
       seatNumbers.forEach((seatNumber) => {
-        params.push(scheduleId, customerId, seatNumber, userLoged?.id, price);
+        params.push(scheduleId, customerId, seatNumber, idUserLoged, price);
       });
 
       db.serialize(() => {
         db.run("BEGIN TRANSACTION");
         db.run(sql, params, (err) => {
           if (err) {
+            console.log("Error en insert ticket:", err.message);
             db.run("ROLLBACK");
             if (err.message.includes("UNIQUE constraint failed")) {
               reject(new Error("Uno o más asientos ya fueron ocupados."));
@@ -124,7 +124,7 @@ export const ticketsRepo = {
     });
   },
 
-  deletedTicketNotcomfirmed: (): Promise<void> => {
+  deletedTicketNotcomfirmed: (idUserLoged: number): Promise<void> => {
 
     return new Promise((resolve, reject) => {
       const sql = `
@@ -134,7 +134,7 @@ export const ticketsRepo = {
         AND user_id = ?
       `;
 
-      const params = [userLoged?.id];
+      const params = [idUserLoged];
       db.run(sql, params, function (err) {
         if (err) reject(err);
         else resolve();

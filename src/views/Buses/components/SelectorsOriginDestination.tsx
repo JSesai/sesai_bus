@@ -20,9 +20,17 @@ interface Props {
     handlerChangeDestination: (valueOnChange: string) => void;
 }
 
+const getDestinationSelected = (destinations: Route[], routeID: number): Route | null => {
+
+    const destination = destinations.find((destino) => destino.id === routeID);
+    if (!destination) return null;
+    return destination;
+
+}
+
+
 export default function SelectorsOriginDestination(options: Props) {
     const { agency, agencies, destinations } = useDashboard();
-    const { destinationSelected } = useTicket();
     const { isSuperUser } = useAuth();
     const { agencyID, handlerChangeOrigin, handlerChangeDestination } = options;
 
@@ -33,6 +41,7 @@ export default function SelectorsOriginDestination(options: Props) {
 
 
     const destinationfiltered = destinations.filter((destino) => destino.cityName.toLowerCase().includes(search.toLowerCase()));
+    const destinationSelected = getDestinationSelected(destinations, options.routeID);
 
     console.log({ destinationfiltered });
 
