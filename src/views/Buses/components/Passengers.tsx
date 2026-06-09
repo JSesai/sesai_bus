@@ -11,7 +11,7 @@ export default function Passengers() {
 
     const { state, dispatch, backgrounTiketSale, showNofification, hasInapamPassengers, totalPassengers, seats, getSeatStatus, handleRegisterTicketAtBack } = useTicket();
 
-    const seatsAvailable = seats.filter((s) => s.status === "available").length;
+    const seatsAvailable = seats.filter((s) => s.status === "available" || s.status === "selected").length;
 
     if (hasInapamPassengers) {
         showNofification({ typeAlert: 'info', title: 'Informa al cliente', message: 'Los asientos para INAPAN estan sujetos a disponibilidad.' })

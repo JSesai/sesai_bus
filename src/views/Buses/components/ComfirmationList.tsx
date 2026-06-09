@@ -33,22 +33,13 @@ export default function ComfirmationList() {
     const dateAMD = useMemo(() => {
         return dateInFormatAMD(selectedDate ? selectedDate.toISOString() : '')
     }, [selectedDate])
-    console.log({ selectedDate });
-
-    console.log(dateInFormatAMD(selectedDate ? selectedDate.toISOString() : ''));
-
-    console.log(statusFilter);
-
-
-
 
     // Filter reservations
     const filteredReservations = useMemo(() => {
         return reservations.filter((res) => {
             const matchesSearch =
                 res.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                res.customer_phone.includes(searchTerm) ||
-                res.customer_name.toUpperCase().includes(searchTerm.toUpperCase())
+                res.customer_phone.includes(searchTerm)
 
             const matchesStatus = statusFilter === 'all' || res.ticket_status === statusFilter;
             const matchesDate = res.reservation_date
@@ -56,10 +47,6 @@ export default function ComfirmationList() {
             return matchesSearch && matchesStatus && matchesDate
         })
     }, [reservations, searchTerm, statusFilter, selectedDate])
-
-    console.log({ reservations });
-    console.log({ filteredReservations });
-
 
     // Count by status (for filtered results)
     const statusCounts = useMemo(() => {

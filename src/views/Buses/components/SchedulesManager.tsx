@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useMemo, useState } from "react"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Badge } from "../../components/ui/badge"
@@ -8,18 +8,47 @@ import ScheduleForm from "./ScheduleForm"
 import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useSearchParams } from "react-router-dom"
 import { toCapitalCase } from "../../shared/utils/helpers"
+import { CalendarCustom } from "./CalendarCustom"
+import type { DateRange } from "react-day-picker"
 
 
 
 export default function SchedulesManager({ configInitial = false }: { configInitial?: boolean }) {
   const { numberRegisterSchedule, runningSchedules } = useDashboard();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [date, setDate] = React.useState<DateRange | Date | undefined>(undefined);
 
   const [searchTerm, setSearchTerm] = useState("")
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null)
 
   const viewActiveAtSchedule = searchParams.get("viewAtSchedule") ?? "list";
+  console.log({ runningSchedules });
 
+  const filteredSchedules = useMemo(() => {
+    return runningSchedules.filter((res) => {
+      const matchesSearch =
+        res.city_origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        res.city_destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        res.terminal_destination.toUpperCase().includes(searchTerm.toUpperCase())
+      res.terminal_origin.toUpperCase().includes(searchTerm.toUpperCase())
+
+      const matchesStatus = res.status === 'active';
+      const matchesDate = res.dateDeparture === (date instanceof Date ? date.toISOString().split('T')[0] : date);
+
+      return matchesSearch && matchesStatus && matchesDate
+    })
+  }, [runningSchedules, searchTerm, date]);
+
+  console.log({ filteredSchedules });
+
+  const handleChangeDate = (selectedDate: Date | DateRange | undefined) => {
+    if (selectedDate && 'from' in selectedDate) {
+      setDate(selectedDate.from); // Use the 'from' date if it's a DateRange
+    } else {
+      searchTerm && setSearchTerm("") // Clear search term when changing date
+      setDate(selectedDate); // Use the Date directly
+    }
+  }
 
   const handleDeleteHorario = (id: number) => {
   }
@@ -89,21 +118,30 @@ export default function SchedulesManager({ configInitial = false }: { configInit
         }
       </div>
 
-      {configInitial ??
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Buscar por origen, destino o autobús..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-11"
-          />
+      <div className="flex gap-2 items-center">
+        <div className="pb-3">
+          <CalendarCustom value={date} mode="single" onChange={handleChangeDate} />
         </div>
-      }
+
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Buscar por origen, destino o terminal..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+        </div>
+
+      </div>
+
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {runningSchedules.map((schedule) => (
+        {filteredSchedules.map((schedule) => (
           <Card key={schedule.id} className={`transition-all hover:shadow-md ${schedule.status === 'disabled' ? "opacity-60" : ""}`}>
             <CardContent className="p-5 space-y-4">
               <div className="flex items-start justify-between">

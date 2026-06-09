@@ -19,7 +19,7 @@ interface Props {
     onChange?: (val: Date | DateRange | undefined) => void;
 }
 
-export function CalendarCustom({ labelCalendar = "Fecha", mode = "single", value, onChange }: Props) {
+export function CalendarCustom({ labelCalendar, mode = "single", value, onChange }: Props) {
     const [open, setOpen] = React.useState(false)
 
     // función para mostrar el texto en el botón
@@ -38,7 +38,7 @@ export function CalendarCustom({ labelCalendar = "Fecha", mode = "single", value
     return (
         <div className="flex flex-col gap-3">
             <Label htmlFor="date" className="px-1">
-                {labelCalendar}
+                {labelCalendar ? labelCalendar : null}
             </Label>
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>

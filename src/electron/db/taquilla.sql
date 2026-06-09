@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS schedules (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     route_id INTEGER NOT NULL,
     bus_id INTEGER NOT NULL,
-    vehicle_number INTEGER NOT NULL UNIQUE,
+    vehicle_number INTEGER NOT NULL,
     driver_id INTEGER NOT NULL,
     agency_id INTEGER NOT NULL,
     departure_time TEXT NOT NULL,
@@ -103,6 +103,16 @@ CREATE TABLE IF NOT EXISTS schedules (
     FOREIGN KEY (driver_id) REFERENCES drivers(id),
     FOREIGN KEY (agency_id) REFERENCES agencies(id)
 );
+
+-- Bloquea que se repita el mismo número de vehículo en la misma ruta y fecha
+CREATE UNIQUE INDEX idx_unique_vehicle_number_per_day_route
+ON schedules (route_id, dateDeparture, vehicle_number);
+
+-- Bloquea que se repita el mismo bus físico en la misma ruta y fecha
+CREATE UNIQUE INDEX idx_unique_bus_per_day_route
+ON schedules (route_id, dateDeparture, bus_id);
+
+
 
 
 -- 6. CUSTOMERS (Clientes)
