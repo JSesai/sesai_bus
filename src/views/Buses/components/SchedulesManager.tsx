@@ -10,13 +10,14 @@ import { useSearchParams } from "react-router-dom"
 import { toCapitalCase } from "../../shared/utils/helpers"
 import { CalendarCustom } from "./CalendarCustom"
 import type { DateRange } from "react-day-picker"
+import { dateInFormatAMD, getTodayDate } from "../../../shared/utils/helpers"
 
 
 
 export default function SchedulesManager({ configInitial = false }: { configInitial?: boolean }) {
   const { numberRegisterSchedule, runningSchedules } = useDashboard();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [date, setDate] = React.useState<DateRange | Date | undefined>(undefined);
+  const [date, setDate] = React.useState<DateRange | Date | undefined>(new Date(getTodayDate()));
 
   const [searchTerm, setSearchTerm] = useState("")
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null)
@@ -118,26 +119,31 @@ export default function SchedulesManager({ configInitial = false }: { configInit
         }
       </div>
 
-      <div className="flex gap-2 items-center">
-        <div className="pb-3">
-          <CalendarCustom value={date} mode="single" onChange={handleChangeDate} />
-        </div>
+      {
+        !configInitial && (
+          <div className="flex gap-2 items-center">
+            <div className="pb-3">
+              <CalendarCustom value={date} mode="single" onChange={handleChangeDate} />
+            </div>
 
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Buscar por origen, destino o terminal..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Buscar por origen, destino o terminal..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+            </div>
+
           </div>
 
-        </div>
-
-      </div>
+        )
+      }
 
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

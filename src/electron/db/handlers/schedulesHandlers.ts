@@ -59,6 +59,9 @@ export function registerSchedulesHandlers() {
             if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('schedules.vehicle_number')) {
                 return { ok: false, data: null, error: { message: 'El número de vehiculo ya se encuentra asignado a otra salida', detail: 'Cambia el el numero de vehiculo' } };
             }
+            if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('schedules.bus_id')) {
+                return { ok: false, data: null, error: { message: 'Seleccione otro vehículo', detail: 'El vehículo elegido ya se encuentra asignado a otra salida' } };
+            }
             console.log('error en addSchedule', error);
             return { ok: false, data: null, error: { message: "Error interno no esperado", detail: "No fue posible agregar horario" } };
         }
