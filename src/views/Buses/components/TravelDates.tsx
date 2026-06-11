@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Calendar, CalendarSync } from "lucide-react";
 import { useTicket } from "../../auth/context/TicketContext";
 import { Input } from "../../components/ui/input";
-import { formatDateDisplay, getDayName, minDateToday, oneMontFromToday, oneWeekFromToday } from "../../../shared/utils/helpers";
+import { minDateToday, oneMontFromToday, oneWeekFromToday } from "../../../shared/utils/helpers";
 import { useEffect } from "react";
 import { SelectorSchedule } from "./SelectorSchedule";
 
@@ -13,48 +13,10 @@ import { SelectorSchedule } from "./SelectorSchedule";
 
 export default function TravelDates({ resetSteps }: { resetSteps: () => void }) {
 
-    const { state, dispatch, isRoundTrip, isReservation, backgrounTiketSale, isDateReturnValid, noDepertureTime,
-        destinationSelected, showModalAlert } = useTicket();
+    const { state, dispatch, isRoundTrip, isReservation, backgrounTiketSale, isDateReturnValid,
+        showModalAlert } = useTicket();
     const { departureDate } = state;
 
-    const travelDay = getDayName(state.departureDate).toLowerCase();
-
-    useEffect(() => {
-
-        //este nunca deberia de verse, porque el select de horarios de salida solo se muestra si hay un destino seleccionado, pero por si acaso
-        if (!destinationSelected) {
-            showModalAlert({
-                typeAlert: 'error',
-                title: `Destino no seleccionado (error fatal)`,
-                message: `Por favor, selecciona un destino antes de elegir la fecha y horario de salida.`,
-                btnAccept: "Seleccionar destino",
-                callbackAcept: () => {
-                    resetSteps();
-                },
-            })
-            return;
-        }
-
-        //si no hay salida/corrida para el destino en la fecha de salida seleccionada
-        if (noDepertureTime) {
-
-            dispatch({ type: "SET_FIELD", field: "idSchedule", value: 0 }) //reiniciamos el idSchedule seleccionado porque no hay corridas para esa fecha
-            showModalAlert({
-                typeAlert: 'info',
-                title: `Sin salidas para el ${travelDay} ${formatDateDisplay(state.departureDate)}`,
-                message: `No hay salidas programadas para ${destinationSelected.cityName} - ${destinationSelected.terminalName} . Revisa los horarios disponibles.`,
-                btnAccept: "Cambiar destino",
-                btnCancel: "Cambiar fecha de salida",
-                callbackAcept: () => {
-                    resetSteps();
-                },
-                callbackCancel: () => {
-                    console.error("Cambiar fecha de salida");
-                }
-            })
-        }
-
-    }, [travelDay]);
 
     useEffect(() => {
 
