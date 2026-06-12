@@ -50,61 +50,6 @@ export const schedulesRepo = {
       );
     }),
 
-  // add: (schedule: Schedule) =>
-  //   new Promise((resolve, reject) => {
-  //     db.run(
-  //       `INSERT INTO schedules (route_id, bus_id,vehicle_number, driver_id, agency_id, departure_time, arrival, dateDeparture)
-  //        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-  //       [
-  //         schedule.route_id,
-  //         schedule.bus_id,
-  //         schedule.vehicle_number,
-  //         schedule.driver_id,
-  //         schedule.agency_id_origin,
-  //         schedule.departure_time,
-  //         schedule.arrival_time,
-  //         JSON.stringify(schedule.dateDeparture)
-  //       ],
-  //       function (err) {
-  //         if (err) reject(err);
-  //         else {
-  //           db.get(
-  //             `
-  //               SELECT 
-  //                 s.id AS id, 
-  //                 s.vehicle_number, 
-  //                 s.departure_time, 
-  //                 s.arrival as arrival_time, 
-  //                 s.status, 
-  //                 s.created_at, 
-  //                 s.dateDeparture,
-  //                 r.cityName AS route_id,
-  //                 b.model AS bus_id,
-  //                 ud.name AS driver_id,
-  //                 a.name AS agency_id_origin
-  //                 FROM schedules s
-  //                 JOIN routes r ON s.route_id = r.id
-  //                 JOIN buses b ON s.bus_id = b.id 
-  //                 JOIN users ud ON s.driver_id = ud.id 
-  //                 JOIN agencies a ON s.agency_id = a.id
-  //                 WHERE s.id = ?
-  //             `, [this.lastID],
-  //             (err2, rowGet: any) => {
-  //               if (err2) reject(err2)
-  //               else {
-  //                 const result = {
-  //                   ...rowGet,
-  //                   dateDeparture: JSON.parse(rowGet.dateDeparture)
-  //                 }
-  //                 resolve(result);
-  //               }
-  //             }
-  //           )
-  //         }
-  //       }
-  //     );
-  //   }),
-
   add: (schedule: Schedule) =>
     new Promise((resolve, reject) => {
       db.run(
@@ -163,33 +108,6 @@ export const schedulesRepo = {
         }
       );
     }),
-
-  // update: (schedule: Schedule) =>
-  //   new Promise((resolve, reject) => {
-  //     db.run(
-  //       `UPDATE schedules SET 
-  //         route_id = COALESCE(?, route_id),
-  //         bus_id = COALESCE(?, bus_id),
-  //         driver_id = COALESCE(?, driver_id),
-  //         agency_id = COALESCE(?, agency_id),
-  //         departure_time = COALESCE(?, departure_time),
-  //         arrival = COALESCE(?, arrival)
-  //        WHERE id = ?`,
-  //       [
-  //         schedule.route_id,
-  //         schedule.bus_id,
-  //         schedule.driver_id,
-  //         schedule.agency_id_origin,
-  //         schedule.departure_time,
-  //         schedule.arrival_time,
-  //         schedule.id,
-  //       ],
-  //       function (err) {
-  //         if (err) reject(err);
-  //         else resolve({ changes: this.changes });
-  //       }
-  //     );
-  //   }),
 
   update: (schedule: Schedule) =>
     new Promise((resolve, reject) => {
@@ -306,4 +224,54 @@ export const schedulesRepo = {
         }
       );
     }),
+
+  // Función para agregar un descuento a una salida específica
+  addDiscount: (discount: Discount) =>
+    new Promise((resolve, reject) => {
+      db.run(
+        `INSERT INTO discounts (
+        schedule_id, description, discount_type, value, start_date, end_date, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+          discount.schedule_id,
+          discount.description,
+          discount.discount_type,
+          discount.value,
+          discount.status || 'active',
+        ],
+        function (err) {
+          if (err) {
+            reject(err);
+          } else {
+            // Recuperar el registro recién insertado
+            db.get(
+              `SELECT 
+              d.id,
+              d.schedule_id,
+              d.description,
+              d.discount_type,
+              d.value,
+              d.start_date,
+              d.end_date,
+              d.status,
+              d.created_at,
+              s.departure_time,
+              s.dateDeparture,
+              r.origin,
+              r.cityName AS destination
+            FROM discounts d
+            JOIN schedules s ON d.schedule_id = s.id
+            JOIN routes r ON s.route_id = r.id
+            WHERE d.id = ?`,
+              [this.lastID],
+              (err2, rowGet) => {
+                if (err2) reject(err2);
+                else resolve(rowGet);
+              }
+            );
+          }
+        }
+      );
+    }),
+
 };

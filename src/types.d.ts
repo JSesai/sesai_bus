@@ -109,14 +109,15 @@ interface Driver {
   license_number: string;
 }
 
-// interface DriverAPI {
-//   getDrivers: () => Promise<Driver[]>;
-//   getDriverById: (id: Driver['id']) => Promise<Driver>;
-//   addDriver: (driver: Driver) => Promise<Driver>;
-//   updateDriver: (driver: Driver) => Promise<void>;
-//   deleteDriver: (id: Driver['id']) => Promise<void>;
-// }
-
+interface Discount {
+  id?: number;
+  schedule_id: number;
+  description?: string;
+  discount_type: 'percentage' | 'fixed';
+  value: number;
+  status?: 'active' | 'inactive';
+  created_at?: string;
+};
 
 type StatusType = 'active' | 'disabled' | 'removed';
 
@@ -177,6 +178,7 @@ interface ScheduleAPI {
   updateSchedule: (schedule: Schedule) => Promise<ResponseElectronGeneric>;
   deleteSchedule: (id: Schedule['id']) => Promise<void>;
   getVehicleSeatStatus: (idSchedule: Schedule['id']) => Promise<ResponseElectronGeneric>;
+  addDiscount: (discount: Discount) => Promise<ResponseElectronGeneric>;
 
 }
 

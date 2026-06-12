@@ -114,5 +114,26 @@ export function registerSchedulesHandlers() {
         }
 
     });
+    ipcMain.handle("addDiscount", async (_e, bus): Promise<ResponseElectronGeneric> => {
+        try {
+            console.log("init process addDiscount 💸");
+
+            const response = await schedulesRepo.addDiscount(bus);
+
+            return { ok: true, error: null, data: response }
+
+        } catch (error: any) {
+            console.log('error al agregar descuento ->', error);
+            if (error?.code === 'SQLITE_ERROR' && error.message.includes('no such table: discounts')) {
+                return { ok: false, data: null, error: { message: 'Informa a soporte', detail: 'La tabla de descuentos no existe' } };
+            }
+
+            return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible agregar el descuento" } };
+
+        }
+
+    });
+
+
 
 }

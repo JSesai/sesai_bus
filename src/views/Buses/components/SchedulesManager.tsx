@@ -11,11 +11,13 @@ import { toCapitalCase } from "../../shared/utils/helpers"
 import { CalendarCustom } from "./CalendarCustom"
 import type { DateRange } from "react-day-picker"
 import { dateInFormatAMD, getTodayDate } from "../../../shared/utils/helpers"
+import { useTicket } from "../../auth/context/TicketContext"
 
 
 
 export default function SchedulesManager({ configInitial = false }: { configInitial?: boolean }) {
-  const { numberRegisterSchedule, runningSchedules } = useDashboard();
+  const { numberRegisterSchedule, runningSchedules, handleAddDiscount } = useDashboard();
+  const { showModalAlert } = useTicket();
   const [searchParams, setSearchParams] = useSearchParams();
   const [date, setDate] = React.useState<DateRange | Date | undefined>(new Date(getTodayDate()));
 
@@ -51,10 +53,30 @@ export default function SchedulesManager({ configInitial = false }: { configInit
     }
   }
 
-  const handleDeleteHorario = (id: number) => {
-  }
 
   const handleToggleActivo = (id: number) => {
+  }
+
+  const startProcessDiscount = (schedule: Schedule) => {
+    console.log({ schedule });
+
+    //muestra modal para pedir ingresar el porcentaje de descuento a aplicar, luego hace la petición para aplicar el descuento a ese horario
+    showModalAlert({
+      typeAlert: 'discountInputOptions',
+      callbackAcept: (value) => {
+        console.log({ value });
+        //aqui va la petición para aplicar el descuento al horario, se le pasa el id del horario y el valor del descuento
+        const description = value.discountType === 'percentage' ? `Descuento del ${value.value}% para la salida del ${schedule.departure_time}` : `Descuento de $${value.value} para la salida del ${schedule.departure_time}`;
+        handleAddDiscount({
+          schedule_id: schedule.id || 0,
+          description: description,
+          discount_type: value.discountType,
+          value: Number(value),
+        })
+      }
+
+    })
+
   }
 
   const startEdit = (horario: Schedule) => {
@@ -198,6 +220,12 @@ export default function SchedulesManager({ configInitial = false }: { configInit
                     Llegada: <span className="font-medium text-foreground">{schedule.arrival_time}</span>
                   </span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="text-muted-foreground">
+                    Descuento: <span className="font-medium text-foreground">{'10%'}</span>
+                  </span>
+                </div>
               </div>
 
               <div className="border-t border-border pt-3">
@@ -223,14 +251,14 @@ export default function SchedulesManager({ configInitial = false }: { configInit
                 <Button variant="outline" size="sm" onClick={() => handleToggleActivo(schedule.id || 0)} className="flex-1">
                   {schedule.status === "active" ? "Desactivar" : "Activar"}
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeleteHorario(schedule.id || 0)}
-                  className="text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
+
+              </div>
+              <div className="flex gap-2 pt-2">
+                <Button variant="outline" size="sm" onClick={() => startProcessDiscount(schedule)} className="flex-1 gap-2 bg-default-200">
+                  <Edit className="h-4 w-4" />
+                  Aplicar descuento
                 </Button>
+
               </div>
             </CardContent>
           </Card>

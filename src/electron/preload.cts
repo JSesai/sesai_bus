@@ -47,6 +47,7 @@ const schedulesAPI: ScheduleAPI = {
   updateSchedule: (schedule: Schedule) => ipcRenderer.invoke("updateSchedule", schedule),
   deleteSchedule: (id: Schedule['id']) => ipcRenderer.invoke("deleteSchedule", id),
   getVehicleSeatStatus: (scheduleId: Schedule['id']) => ipcRenderer.invoke("getVehicleSeatStatus", scheduleId),
+  addDiscount: (discount: Discount) => ipcRenderer.invoke("addDiscount", discount),
 
 }
 

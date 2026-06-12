@@ -21,7 +21,7 @@ export default function ReservationComfirmation() {
                 <div className="space-y-2">
                     <h2 className="text-2xl font-bold text-foreground">Reservación de viaje</h2>
                     <p className="text-muted-foreground">
-                        Si necesitas hacer algún cambio debes hacerlo desde reservaciones.
+                        Revisa la información y comfirma la reservacion.
                     </p>
                 </div>
 

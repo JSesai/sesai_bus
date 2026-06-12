@@ -1,8 +1,8 @@
 import { createContext, useContext, useMemo, useReducer, useState } from "react";
 import { useDashboard } from "./DashBoardContext";
-import { formatDayMonth, getDayName } from "../../../shared/utils/helpers";
+import { getDayName } from "../../../shared/utils/helpers";
 import showAlert, { type PropsModal } from "../../Modals/Modals";
-import { Armchair, BookOpenCheck, Calendars, Contact, HandCoins, NotebookPen, TicketsPlane, UnfoldHorizontal, Users } from "lucide-react";
+import { HandCoins, UnfoldHorizontal } from "lucide-react";
 import type { Step } from "../../Buses/components/Steper";
 import { toast } from "sonner";
 import { initialStateTrip, tripReducer, type ActionTripReducer, type TripState } from "../../Buses/reducers/tripReducer";
@@ -115,11 +115,8 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
     const totalPassengers = state.passengers.adults + state.passengers.children + state.passengers.inapam;
     const stepCompletedPassengersSelection = totalPassengers > 0;
 
-    const descriptionDateSelected = stepCompletedSelectedDates ?
-        `${formatDayMonth(state.departureDate)}` + (isRoundTrip ? `↔ ${formatDayMonth(state.returnDate)}` : "") : "";
-    const seatsSelected = state.seats.map((s) => s.seat_number);
-    const descriptionSeatselection = state.seats.length > 0 ? seatsSelected : undefined
 
+    const seatsSelected = state.seats.map((s) => s.seat_number);
 
     const stepsComfirmationReservation = useMemo<Step[]>(() => [
         { id: stepsReservationComfirm.comfirmationsList, label: "Reservaciones", icon: UnfoldHorizontal, description: descriptionDestinationOrigin },

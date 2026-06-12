@@ -1,7 +1,7 @@
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
-type TtypeAlertInModal = | 'loading' | 'success' | 'error' | 'info' | 'selectOption' | 'closeAlert' | 'loaderBackground' | 'confirm';
+type TtypeAlertInModal = | 'loading' | 'success' | 'error' | 'info' | 'selectOption' | 'closeAlert' | 'loaderBackground' | 'confirm' | 'discountInputOptions';
 
 export interface PropsModal {
     duration?: number;
@@ -156,6 +156,60 @@ export default function showAlert({
             if (callbackAcept) callbackAcept();
             break;
 
+        case 'discountInputOptions':
+            /* inputOptions can be an object or Promise */
+            const inputOptions = {
+                "percentage": "Porcentaje",
+                "mount": "Monto fijo",
+
+            }
+
+            MySwal.fire({
+                title: "Tipo de descuento",
+                input: "radio",
+                inputOptions,
+                inputValidator: (value) => {
+                    if (!value) return "Es necesario elegir una opción!";
+                }
+            }).then((discount: any) => {
+                if (discount.isConfirmed) {
+                    const label = discount.value === 'percentage' ? 'Ingresa el pocentaje de descuento' : 'Ingresa el monto de descuento';
+                    const placeholder = discount.value === 'percentage' ? 'Ejemplo: 10 para 10%' : 'Ejemplo: 100 para $100';
+
+                    MySwal.fire({
+                        title: "Valor del descuento",
+                        input: "text",
+                        inputLabel: label,
+                        inputPlaceholder: placeholder,
+                        inputAttributes: {
+                            maxlength: "10",
+                            autocapitalize: "off",
+                            autocorrect: "off"
+                        },
+                        inputValidator: (value) => {
+                            if (!value) return "Es necesario ingresar un valor!";
+                            if (isNaN(Number(value))) return "El valor debe ser numérico!";
+                            if (discount.value === 'percentage' && (Number(value) <= 0 || Number(value) > 100)) return "El porcentaje debe ser entre 1 y 100!";
+                            if (discount.value === 'mount' && Number(value) <= 0) return "El monto debe ser mayor a 0!";
+                        }
+
+                    }).then((result: any) => {
+                        if (result.isConfirmed && result.value) {
+                            if (callbackAcept) callbackAcept({ discountType: discount.value, value: result.value });
+                        }
+                    })
+
+
+                }
+
+
+            })
+
+            // if (color) Swal.fire({ html: `You selected: ${color}` });
+
+
+
+            break;
         case 'loaderBackground':
             MySwal.fire({
                 title: '...',

@@ -183,4 +183,18 @@ CREATE TABLE IF NOT EXISTS users (
 
 );
 
+--10. DISCOUNTS (Descuentos aplicables a salidas específicas)
+CREATE TABLE IF NOT EXISTS discounts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    schedule_id INTEGER NOT NULL,             -- salida específica
+    description TEXT,                         -- texto opcional (ej. "Promo verano")
+    discount_type TEXT NOT NULL CHECK (
+        discount_type IN ('percentage','fixed')
+    ),                                        -- tipo de descuento
+    value REAL NOT NULL,                     -- porcentaje o monto fijo
+    status TEXT NOT NULL DEFAULT 'active',    -- activo/inactivo
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (schedule_id) REFERENCES schedules(id) ON DELETE CASCADE
+);
 

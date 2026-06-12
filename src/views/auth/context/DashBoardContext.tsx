@@ -36,6 +36,7 @@ type DashboardContextType = {
   handleRegisterSchedules: (schedule: Schedule, editingSchedule?: boolean, configInitial?: boolean) => Promise<boolean>;
   handleRegisterUser: (user: UserForm, configInitial: boolean, isEditing: boolean) => Promise<boolean>;
   showConfetti: () => void;
+  handleAddDiscount: (discount: Discount) => Promise<boolean>;
 
 };
 
@@ -543,6 +544,27 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  //manejador para agregar descuentos a salidas
+  const handleAddDiscount = async (discount: Discount): Promise<boolean> => {
+
+    const addDiscount = await window.electron.schedules.addDiscount(discount);
+    if (addDiscount) {
+      toast.error(addDiscount.error?.message, {
+        richColors: true,
+        description: addDiscount.error?.detail,
+        duration: 10_000,
+        position: 'top-center'
+      })
+      return false;
+    }
+
+    console.log({ addDiscount });
+
+
+    return false;
+
+  }
+
   //obtener salidas basadas en bus_daily_assignments
 
 
@@ -591,6 +613,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       handleRegisterUser,
       showConfetti,
       setTheme,
+      handleAddDiscount,
       theme,
       backgrounDynamic: 'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 border-b border-slate-200 dark:border-slate-700/50 transition-colors',
       destinations,
