@@ -10,6 +10,8 @@ import {
 } from "../../components/ui/popover"
 import type { DateRange } from "react-day-picker"
 import { es } from "date-fns/locale";
+import { format } from 'date-fns'
+
 
 
 interface Props {
@@ -25,7 +27,7 @@ export function CalendarCustom({ labelCalendar, mode = "single", value, onChange
     // función para mostrar el texto en el botón
     const formatLabel = () => {
         if (mode === "single") {
-            return value instanceof Date ? value.toLocaleDateString() : "Selecciona fecha";
+            return value instanceof Date ? format(value, "d 'de' MMMM, yyyy", { locale: es }) : "Selecciona fecha";
         } else {
             const range = value as DateRange | undefined;
             if (!range?.from) return "Selecciona rango de fechas"
@@ -48,6 +50,7 @@ export function CalendarCustom({ labelCalendar, mode = "single", value, onChange
                         className="w-64 justify-between font-normal"
                     >
                         {formatLabel()}
+
                         <ChevronDownIcon />
                     </Button>
                 </PopoverTrigger>

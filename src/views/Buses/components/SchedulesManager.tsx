@@ -3,14 +3,14 @@ import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Badge } from "../../components/ui/badge"
 import { Input } from "../../components/ui/input"
-import { Clock, Plus, Search, Edit, Trash2, Bus, MapPin, Calendar, Contact } from "lucide-react"
+import { Clock, Plus, Search, Edit, Bus, MapPin, Calendar, Contact } from "lucide-react"
 import ScheduleForm from "./ScheduleForm"
 import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useSearchParams } from "react-router-dom"
 import { toCapitalCase } from "../../shared/utils/helpers"
 import { CalendarCustom } from "./CalendarCustom"
 import type { DateRange } from "react-day-picker"
-import { dateInFormatAMD, getTodayDate } from "../../../shared/utils/helpers"
+import { getTodayDate } from "../../../shared/utils/helpers"
 import { useTicket } from "../../auth/context/TicketContext"
 
 
@@ -279,6 +279,13 @@ export default function SchedulesManager({ configInitial = false }: { configInit
             <Plus className="h-4 w-4" />
             Agregar Primer Horario
           </Button>
+        </div>
+      )}
+      {filteredSchedules.length === 0 && (
+        <div className="text-center py-12">
+          <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+          <h3 className="text-lg font-semibold mb-2">No se encontraron horarios</h3>
+          <p className="text-muted-foreground mb-4">Intenta con otra búsqueda o agrega un nuevo horario</p>
         </div>
       )}
     </div>

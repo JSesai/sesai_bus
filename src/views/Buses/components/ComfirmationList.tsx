@@ -12,6 +12,7 @@ import { cn } from '../../lib/utils'
 import { useReservation, type Reservation } from '../../auth/context/ReservationContext'
 import { dateInFormatAMD } from '../../../shared/utils/helpers'
 import { ReservationTable } from './ReservationTable'
+import { CalendarCustom } from './CalendarCustom'
 
 export type ReservationStatus = SeatData['status']
 
@@ -29,6 +30,7 @@ export default function ComfirmationList() {
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
+    const [open, setOpen] = useState(false)
 
     const dateAMD = useMemo(() => {
         return dateInFormatAMD(selectedDate ? selectedDate.toISOString() : '')
@@ -172,46 +174,18 @@ export default function ComfirmationList() {
                 <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
                         {/* Date Picker */}
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className={cn(
-                                        'w-full justify-start text-left font-normal sm:w-[200px]',
-                                        !selectedDate && 'text-muted-foreground'
-                                    )}
-                                >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {selectedDate ? (
-                                        format(selectedDate, "d 'de' MMMM, yyyy", { locale: es })
-                                    ) : (
-                                        <span>Todas las fechas</span>
-                                    )}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                    mode="single"
-                                    selected={selectedDate}
-                                    onSelect={setSelectedDate}
-                                    locale={es}
-                                />
-                                {selectedDate && (
-                                    <div className="border-t p-2">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="w-full"
-                                            onClick={handleClearDate}
-                                        >
-                                            <X className="mr-2 h-4 w-4" />
-                                            Ver todas las fechas
-                                        </Button>
-                                    </div>
-                                )}
-                            </PopoverContent>
-                        </Popover>
+                        <div className='mb-3'>
 
+                            <CalendarCustom
+                                value={selectedDate}
+                                mode='single'
+                                onChange={(val) => {
+                                    if (val instanceof Date || val === undefined) {
+                                        setSelectedDate(val);
+                                    }
+                                }}
+                            />
+                        </div>
                         {/* Search */}
                         <div className="relative flex-1 sm:max-w-xs">
                             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
