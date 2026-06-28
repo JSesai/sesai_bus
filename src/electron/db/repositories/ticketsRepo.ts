@@ -75,7 +75,8 @@ export const ticketsRepo = {
     scheduleId,
     customerId,
     seatNumbers,
-    price
+    price,
+    return_date
   }: TicketInsert, idUserLoged: number): Promise<void> => {
 
 
@@ -86,16 +87,16 @@ export const ticketsRepo = {
       }
 
       // Construir placeholders dinámicos
-      const placeholders = seatNumbers.map(() => "(?, ?, ?, ?, ?, 'selectedTemporal')").join(", ");
+      const placeholders = seatNumbers.map(() => "(?, ?, ?, ?, ?, ?, 'selectedTemporal')").join(", ");
       const sql = `
-      INSERT INTO tickets (schedule_id, customer_id, seat_number, user_id, price, status)
+      INSERT INTO tickets (schedule_id, customer_id, seat_number, user_id, price, return_date,status)
       VALUES ${placeholders}
     `;
 
       // Flatten de parámetros
       const params: any[] = [];
       seatNumbers.forEach((seatNumber) => {
-        params.push(scheduleId, customerId, seatNumber, idUserLoged, price);
+        params.push(scheduleId, customerId, seatNumber, idUserLoged, price, return_date);
       });
 
       db.serialize(() => {
@@ -191,6 +192,7 @@ export const ticketsRepo = {
           GROUP_CONCAT(t.seat_number, ', ') AS seats,
           SUM(t.price) AS total_amount,
           t.status AS ticket_status,
+          t.return_date,
           DATE(s.dateDeparture) AS reservation_date
         FROM tickets t
         JOIN customers c ON t.customer_id = c.id
@@ -198,7 +200,7 @@ export const ticketsRepo = {
         JOIN routes r ON s.route_id = r.id
         WHERE DATE(s.dateDeparture) = DATE(?)
         AND t.status IN ('reserved', 'cancelled', 'occupied')
-        GROUP BY c.name, c.phone, s.id, s.departure_time, r.origin, r.cityName, r.terminalName, t.status, reservation_date
+        GROUP BY c.name, c.phone, s.id, s.departure_time, r.origin, r.cityName, r.terminalName, t.status, reservation_date, t.return_date
         ORDER BY s.dateDeparture ASC;
       `;
 

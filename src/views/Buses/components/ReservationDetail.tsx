@@ -15,13 +15,14 @@ interface ReservationDetailProps {
 }
 
 export function ReservationDetail({ reservation, onPayment, onClose, }: ReservationDetailProps) {
+    console.log('reservation detail ->', reservation);
 
-    const { customer, eventName, eventDate, seatNumbers, totalAmount, status } = reservation;
+    const { customer_name, customer_phone, reservation_date, departure_time, cityName, seats, total_amount, ticket_status } = reservation;
 
-    const formattedDate = format(new Date(eventDate), "EEEE, d 'de' MMMM 'de' yyyy", {
+    const formattedDate = format(new Date(reservation_date), "EEEE, d 'de' MMMM 'de' yyyy", {
         locale: es,
     })
-    const formattedTime = format(new Date(eventDate), 'HH:mm')
+    const formattedTime = format(new Date(departure_time), 'HH:mm')
 
     return (
         <Card className="h-fit sticky top-4">
@@ -48,18 +49,18 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                     <div className="space-y-2">
                         <div className="flex items-center gap-3 text-sm">
                             <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                            <span className="font-medium text-foreground">{customer.name}</span>
+                            <span className="font-medium text-foreground">{customer_name}</span>
                         </div>
                         <div className="flex items-center gap-3 text-sm">
                             <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
-                            <span className="text-foreground">{customer.phone}</span>
+                            <span className="text-foreground">{customer_phone}</span>
                         </div>
-                        {customer.email && (
+                        {/* {customer.email && (
                             <div className="flex items-center gap-3 text-sm">
                                 <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
                                 <span className="text-foreground truncate">{customer.email}</span>
                             </div>
-                        )}
+                        )} */}
                     </div>
                 </div>
 
@@ -71,7 +72,7 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                         Evento
                     </h4>
                     <div className="space-y-2">
-                        <p className="font-medium text-foreground text-balance">{eventName}</p>
+                        <p className="font-medium text-foreground text-balance">{cityName}</p>
                         <div className="flex items-center gap-3 text-sm text-muted-foreground">
                             <Calendar className="h-4 w-4 shrink-0" />
                             <span className="capitalize">{formattedDate}</span>
@@ -85,10 +86,10 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                 {/* Seats */}
                 <div className="space-y-3">
                     <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                        Asientos Reservados ({seatNumbers.length})
+                        Asientos Reservados ({seats.length})
                     </h4>
                     <div className="flex flex-wrap gap-2">
-                        {seatNumbers.map((seat) => (
+                        {[seats].map((seat) => (
                             <span
                                 key={seat}
                                 className="inline-flex items-center gap-1.5 rounded-md bg-secondary px-2.5 py-1.5 text-sm font-medium text-secondary-foreground"
@@ -111,20 +112,20 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                     <div className="flex items-center justify-between">
                         <span className="text-lg font-medium text-foreground">Total</span>
                         <span className="text-2xl font-bold text-primary">
-                            ${totalAmount.toLocaleString('es-MX')}
+                            ${total_amount.toLocaleString('es-MX')}
                         </span>
                     </div>
                 </div>
 
                 {/* Payment Button */}
-                {status === 'pending' && (
+                {ticket_status === 'pending' && (
                     <Button onClick={onPayment} className="w-full" size="lg">
                         <CreditCard className="mr-2 h-4 w-4" />
                         Realizar Pago
                     </Button>
                 )}
 
-                {status === 'confirmed' && (
+                {ticket_status === 'confirmed' && (
                     <div className="rounded-lg bg-status-confirmed/20 border border-status-confirmed p-3 text-center">
                         <p className="text-sm font-medium text-status-confirmed-foreground">
                             Esta reservación ya fue confirmada
@@ -132,7 +133,7 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                     </div>
                 )}
 
-                {status === 'cancelled' && (
+                {ticket_status === 'cancelled' && (
                     <div className="rounded-lg bg-status-cancelled/20 border border-status-cancelled p-3 text-center">
                         <p className="text-sm font-medium text-status-cancelled-foreground">
                             Esta reservación fue cancelada

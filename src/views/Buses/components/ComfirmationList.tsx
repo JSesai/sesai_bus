@@ -18,7 +18,7 @@ export type ReservationStatus = SeatData['status']
 
 
 
-type StatusFilter = 'all' | ReservationStatus
+type StatusFilter = 'all' | 'roundTrip' | ReservationStatus
 
 export default function ComfirmationList() {
 
@@ -43,7 +43,7 @@ export default function ComfirmationList() {
                 res.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 res.customer_phone.includes(searchTerm)
 
-            const matchesStatus = statusFilter === 'all' || res.ticket_status === statusFilter;
+            const matchesStatus = statusFilter === 'all' || res.ticket_status === statusFilter || (statusFilter === 'roundTrip' && res.return_date !== null);
             const matchesDate = res.reservation_date
 
             return matchesSearch && matchesStatus && matchesDate
@@ -211,6 +211,7 @@ export default function ComfirmationList() {
                                     <SelectItem value="all">Todos</SelectItem>
                                     <SelectItem value="reserved">Pendientes</SelectItem>
                                     <SelectItem value="occupied">Confirmadas</SelectItem>
+                                    <SelectItem value="roundTrip">Redondos</SelectItem>
                                     <SelectItem value="cancelled">Canceladas</SelectItem>
                                 </SelectContent>
                             </Select>

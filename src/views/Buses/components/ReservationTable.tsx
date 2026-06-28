@@ -24,7 +24,8 @@ export function ReservationTable({
                     <TableRow className="hover:bg-transparent">
                         <TableHead className="w-[180px]">Cliente</TableHead>
                         <TableHead className="w-[130px]">Teléfono</TableHead>
-                        <TableHead className="w-[130px]">Fecha Reservación</TableHead>
+                        <TableHead className="w-[130px]">Fecha Salida</TableHead>
+                        <TableHead className="w-[120px]">Tipo</TableHead>
                         <TableHead className="w-[120px]">Asientos</TableHead>
                         <TableHead className="w-[100px] text-right">Monto Total</TableHead>
                         <TableHead className="w-[100px] text-center">Estado</TableHead>
@@ -68,6 +69,16 @@ export function ReservationTable({
                                             </div>
                                             <div className="text-xs">
                                                 {reservation.departure_time} hrs
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-muted-foreground">
+                                        <div className="space-y-0.5">
+                                            <div>
+                                                {reservation.return_date ? 'Redondo' : 'Solo Ida'}
+                                            </div>
+                                            <div className="text-xs">
+                                                {reservation.return_date}
                                             </div>
                                         </div>
                                     </TableCell>

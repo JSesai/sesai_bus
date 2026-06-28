@@ -76,6 +76,7 @@ export interface Reservation {
     departure_time: string;
     origin: string;
     reservation_date: string;
+    return_date: string | null;
     schedule_id: number;
     seats: string;
     terminalName: string;

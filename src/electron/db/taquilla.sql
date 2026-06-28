@@ -96,8 +96,6 @@ CREATE TABLE IF NOT EXISTS schedules (
     status TEXT NOT NULL DEFAULT 'active',
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     dateDeparture TEXT NOT NULL,
-    return_schedule_id INTEGER,
-
     FOREIGN KEY (route_id) REFERENCES routes(id) ON DELETE CASCADE,
     FOREIGN KEY (bus_id) REFERENCES buses(id),
     FOREIGN KEY (driver_id) REFERENCES drivers(id),
@@ -145,7 +143,8 @@ CREATE TABLE IF NOT EXISTS tickets (
     price REAL NOT NULL,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     purchase_id INTEGER,
-    user_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,    
+    return_date TEXT,
     status TEXT NOT NULL DEFAULT 'active',
 
     FOREIGN KEY (schedule_id) REFERENCES schedules(id),

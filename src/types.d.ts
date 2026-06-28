@@ -211,7 +211,8 @@ interface TicketInsert {
   scheduleId: number,
   customerId: number,
   seatNumbers: number[],
-  price: number
+  price: number,
+  return_date?: string;
 }
 interface TicketAPI {
   getTickets: () => Promise<Ticket>,

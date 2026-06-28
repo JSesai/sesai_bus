@@ -309,38 +309,19 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         console.log({ deletedSeatsHistory });
     }
 
+    //registra los asientos seleccionados en la base de datos, con el estado 'selectedTemporal' para marcar que esos asientos estan seleccionados pero no comfirmados, esto para evitar que otros usuarios puedan seleccionar esos asientos mientras el usuario actual esta en el proceso de compra o reservación, pero sin marcar esos asientos como ocupados hasta que el usuario confirme la compra o reservación, si el usuario no confirma la compra o reservación y se sale del proceso, se eliminaran esos registros de asientos seleccionados temporalmente para liberar esos asientos nuevamente
     const registerSeatsSelected = async () => {
         return window.electron.tickets.insertSelectedSeats({
             customerId: state.customer?.id || 0,
             price: destinationSelected?.baseFare || 0,
             scheduleId: state.idSchedule,
             seatNumbers: seatsSelected,
+            return_date: state.returnDate || undefined
         });
     }
 
     const handleRegisterTicketAtBack = async () => {
-        // const asientosARegistrar = seatsNumberToRegister();
-        // console.log({ asientosARegistrar, seatsSelected, seatsHistory: state.seatsHistory });
-        // if (asientosARegistrar.length === 0) {
-        //     return;
-        // }
-
         await deletedTicketNotcomfirmed();
-        // const result = await registerSeatsSelected();
-        // console.log({ insertSelectedSeats: result });
-
-
-        // if (!result.ok) {
-        //     showNofification({
-        //         typeAlert: 'error',
-        //         title: 'Error al registrar asientos',
-        //         message: result.error?.message || 'No fue posible registrar los asientos seleccionados, intenta nuevamente'
-        //     })
-
-        //     return;
-
-        // }
-        //actualizar estato de los asientos para reflejar que los asientos seleccionados ya no estan disponibles
 
         //agregar los asientos al historial de asientos seleccionados
         dispatch({

@@ -28,13 +28,6 @@ export function registerTicketsHandlers() {
     console.log("init process insertSelectedSeats", ticketInsert);
 
     try {
-      // handleCheckSession().then(({ data }) => {
-      //   if (data) {
-      //     userLoged = data;
-      //   }
-      // });
-
-
       const insertedTickets = await ticketsRepo.insertSelectedSeats(ticketInsert, userLoged?.id || 0);
       return { ok: true, error: null, data: insertedTickets }
     } catch (error: any) {
