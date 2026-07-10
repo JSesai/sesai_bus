@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Button } from '../../components/ui/button';
 import { Separator } from '../../components/ui/separator';
 
-import { User, Phone, Mail, Calendar, CreditCard, Armchair, X } from 'lucide-react'
+import { User, Phone, Mail, Calendar, CreditCard, Armchair, X, MapPin, Clock, CrossIcon, TicketX } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { StatusBadge } from './StatusBadge';
@@ -17,16 +17,12 @@ interface ReservationDetailProps {
 export function ReservationDetail({ reservation, onPayment, onClose, }: ReservationDetailProps) {
     console.log('reservation detail ->', reservation);
 
-    const { customer_name, customer_phone, reservation_date, departure_time, cityName, seats, total_amount, ticket_status } = reservation;
+    const { customer_name, customer_phone, reservation_date, departure_time, cityName: cityNameDestination, seats, total_amount, ticket_status, origin, return_date } = reservation;
 
-    const formattedDate = format(new Date(reservation_date), "EEEE, d 'de' MMMM 'de' yyyy", {
-        locale: es,
-    })
-    const formattedTime = format(new Date(departure_time), 'HH:mm')
 
     return (
         <Card className="h-fit sticky top-4">
-            <CardHeader className="pb-4">
+            <CardHeader >
                 <div className="flex items-start justify-between">
                     <CardTitle className="text-lg">Detalle de Reservación</CardTitle>
                     <Button
@@ -40,7 +36,9 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                     </Button>
                 </div>
             </CardHeader>
-            <CardContent className="space-y-6">
+
+            <CardContent className="space-y-3">
+
                 {/* Customer Information */}
                 <div className="space-y-3">
                     <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
@@ -55,30 +53,50 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                             <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
                             <span className="text-foreground">{customer_phone}</span>
                         </div>
-                        {/* {customer.email && (
-                            <div className="flex items-center gap-3 text-sm">
-                                <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
-                                <span className="text-foreground truncate">{customer.email}</span>
-                            </div>
-                        )} */}
+
                     </div>
                 </div>
 
                 <Separator />
 
-                {/* Event Information */}
+                {/* travel Information */}
                 <div className="space-y-3">
                     <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                        Evento
+                        Información del Viaje ({return_date ? 'Redondo' : 'Solo Ida'})
                     </h4>
-                    <div className="space-y-2">
-                        <p className="font-medium text-foreground text-balance">{cityName}</p>
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                            <Calendar className="h-4 w-4 shrink-0" />
-                            <span className="capitalize">{formattedDate}</span>
+                    <div className="flex items-start gap-3">
+                        <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                        <div className="text-sm">
+                            <p className="text-muted-foreground">Ruta</p>
+                            <p className="font-medium text-foreground">{origin} → {cityNameDestination}</p>
                         </div>
-                        <p className="text-sm text-muted-foreground ml-7">{formattedTime} hrs</p>
                     </div>
+                    <div className="flex items-start gap-3">
+                        <Calendar className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                        <div className="text-sm">
+                            <p className="text-muted-foreground">Fecha de salida</p>
+                            <p className="font-medium text-foreground">{reservation_date}</p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                        <Clock className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                        <div className="text-sm">
+                            <p className="text-muted-foreground">Hora de salida</p>
+                            <p className="font-medium text-foreground">{departure_time}</p>
+                        </div>
+                    </div>
+
+                    {/* si es redondo, mostrar fecha de regreso */}
+                    {return_date && <div className="flex items-start gap-3">
+                        <Calendar className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                        <div className="text-sm">
+                            <p className="text-muted-foreground">Fecha de regreso</p>
+                            <p className="font-medium text-foreground">{reservation_date}</p>
+                        </div>
+                    </div>
+                    }
+
                 </div>
 
                 <Separator />
@@ -107,7 +125,7 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <span className="text-sm font-medium text-muted-foreground">Estado</span>
-                        <StatusBadge status={status} />
+                        <StatusBadge status={ticket_status} />
                     </div>
                     <div className="flex items-center justify-between">
                         <span className="text-lg font-medium text-foreground">Total</span>
@@ -118,14 +136,14 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                 </div>
 
                 {/* Payment Button */}
-                {ticket_status === 'pending' && (
+                {ticket_status === 'reserved' && (
                     <Button onClick={onPayment} className="w-full" size="lg">
                         <CreditCard className="mr-2 h-4 w-4" />
                         Realizar Pago
                     </Button>
                 )}
 
-                {ticket_status === 'confirmed' && (
+                {ticket_status === 'occupied' && (
                     <div className="rounded-lg bg-status-confirmed/20 border border-status-confirmed p-3 text-center">
                         <p className="text-sm font-medium text-status-confirmed-foreground">
                             Esta reservación ya fue confirmada
@@ -133,13 +151,19 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                     </div>
                 )}
 
-                {ticket_status === 'cancelled' && (
+                {ticket_status === 'cancelled' ? (
                     <div className="rounded-lg bg-status-cancelled/20 border border-status-cancelled p-3 text-center">
                         <p className="text-sm font-medium text-status-cancelled-foreground">
                             Esta reservación fue cancelada
                         </p>
                     </div>
-                )}
+                ) :
+                    //cambiar color a rojo
+                    <Button variant={'destructive'} onClick={() => console.log('mete la cancelacion')} className="w-full" size="lg" >
+                        <TicketX className="mr-2 h-4 w-4" />
+                        Cancelar reservación
+                    </Button>
+                }
             </CardContent>
         </Card>
     )

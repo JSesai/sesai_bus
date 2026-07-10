@@ -80,7 +80,7 @@ export interface Reservation {
     schedule_id: number;
     seats: string;
     terminalName: string;
-    ticket_status: string;
+    ticket_status: SeatData['status'];
     total_amount: number;
 }
 

@@ -1,24 +1,21 @@
-import { useState, useMemo, useLayoutEffect } from 'react'
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
-import { ReservationDetail } from './ReservationDetail'
-import { Button } from '../../components/ui/button'
-import { Input } from '../../components/ui/input'
-import { Calendar } from '../../components/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger, } from '../../components/ui/popover'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '../../components/ui/select'
-import { TicketCheck, Search, Filter, RefreshCw, CalendarIcon, X } from 'lucide-react'
-import { cn } from '../../lib/utils'
-import { useReservation, type Reservation } from '../../auth/context/ReservationContext'
-import { dateInFormatAMD } from '../../../shared/utils/helpers'
-import { ReservationTable } from './ReservationTable'
-import { CalendarCustom } from './CalendarCustom'
+import { useState, useMemo, useLayoutEffect } from 'react';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { ReservationDetail } from './ReservationDetail';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '../../components/ui/select';
+import { TicketCheck, Search, Filter, RefreshCw } from 'lucide-react'
+import { useReservation, type Reservation } from '../../auth/context/ReservationContext';
+import { dateInFormatAMD } from '../../../shared/utils/helpers';
+import { ReservationTable } from './ReservationTable';
+import { CalendarCustom } from './CalendarCustom';
 
 export type ReservationStatus = SeatData['status']
 
 
 
-type StatusFilter = 'all' | 'roundTrip' | ReservationStatus
+type StatusFilter = 'all' | 'roundTrip' | 'sencillo' | ReservationStatus
 
 export default function ComfirmationList() {
 
@@ -43,7 +40,7 @@ export default function ComfirmationList() {
                 res.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 res.customer_phone.includes(searchTerm)
 
-            const matchesStatus = statusFilter === 'all' || res.ticket_status === statusFilter || (statusFilter === 'roundTrip' && res.return_date !== null);
+            const matchesStatus = statusFilter === 'all' || res.ticket_status === statusFilter || (statusFilter === 'roundTrip' && res.return_date !== null) || (statusFilter === 'sencillo' && res.return_date === null);
             const matchesDate = res.reservation_date
 
             return matchesSearch && matchesStatus && matchesDate
@@ -212,6 +209,7 @@ export default function ComfirmationList() {
                                     <SelectItem value="reserved">Pendientes</SelectItem>
                                     <SelectItem value="occupied">Confirmadas</SelectItem>
                                     <SelectItem value="roundTrip">Redondos</SelectItem>
+                                    <SelectItem value="sencillo">Sencillos</SelectItem>
                                     <SelectItem value="cancelled">Canceladas</SelectItem>
                                 </SelectContent>
                             </Select>

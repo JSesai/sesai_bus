@@ -29,7 +29,7 @@ export function OrderSummary({ onContinue, selectedSeats, pricePerSeat, tripInfo
             {/* Trip info */}
             <div className="space-y-3 pb-4 border-b border-border">
                 <div className="flex items-start gap-3">
-                    <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                     <div className="text-sm">
                         <p className="text-muted-foreground">Ruta</p>
                         <p className="font-medium text-foreground">{tripInfo.origin} → {tripInfo.destination}</p>
@@ -37,7 +37,7 @@ export function OrderSummary({ onContinue, selectedSeats, pricePerSeat, tripInfo
                 </div>
 
                 <div className="flex items-start gap-3">
-                    <Calendar className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <Calendar className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                     <div className="text-sm">
                         <p className="text-muted-foreground">Fecha</p>
                         <p className="font-medium text-foreground">{tripInfo.date}</p>
@@ -45,7 +45,7 @@ export function OrderSummary({ onContinue, selectedSeats, pricePerSeat, tripInfo
                 </div>
 
                 <div className="flex items-start gap-3">
-                    <Clock className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <Clock className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                     <div className="text-sm">
                         <p className="text-muted-foreground">Hora de salida</p>
                         <p className="font-medium text-foreground">{tripInfo.time}</p>
