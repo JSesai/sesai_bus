@@ -1,12 +1,9 @@
 import { useState } from "react"
 import AgencyStep from "./AgencyStep"
 import BusesStep from "./BusesStep"
-// import RoutesStep from "./steps/RoutesStep"
-// import SchedulesStep from "./steps/SchedulesStep"
 import FinishStep from "./FinishStep"
 import { MonitorCog } from "lucide-react"
 import RoutesStep from "./RoutesStep"
-import SchedulesStep from "./SchedulesStep"
 import DriverStep from "./DriverStep"
 
 export type handlerSteps = {
@@ -19,7 +16,6 @@ const steps = [
     "Autobuses",
     "Rutas",
     "operadores",
-    "Horarios",
     "Finalizar"
 ]
 
@@ -63,8 +59,7 @@ export default function SetupWizard() {
             {step === 1 && <BusesStep onNext={next} onBack={back} />}
             {step === 2 && <RoutesStep onNext={next} onBack={back} />}
             {step === 3 && <DriverStep onNext={next} onBack={back} />}
-            {step === 4 && <SchedulesStep onNext={next} onBack={back} />}
-            {step === 5 && <FinishStep />}
+            {step === 4 && <FinishStep />}
         </div>
     )
 }

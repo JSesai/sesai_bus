@@ -12,6 +12,17 @@ interface ReservationTableProps {
     onSelect: (reservation: Reservation) => void
 }
 
+const nameShort = (name: string) => {
+    const parts = name.split(' ');
+    if (parts.length === 1) {
+        return parts[0];
+    } else if (parts.length === 2) {
+        return `${parts[0]} ${parts[1][0]}.`;
+    } else {
+        return `${parts[0]} ${parts[1]}. ${parts[2][0]}.`;
+    }
+}
+
 export function ReservationTable({
     reservations,
     selectedId,
@@ -57,7 +68,7 @@ export function ReservationTable({
                                 >
                                     <TableCell className="font-medium text-foreground">
                                         <div className="truncate max-w-[180px]">
-                                            {reservation.customer_name}
+                                            {nameShort(reservation.customer_name)}
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-muted-foreground">
