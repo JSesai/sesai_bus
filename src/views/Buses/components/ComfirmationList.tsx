@@ -1,15 +1,17 @@
-import { useState, useMemo, useLayoutEffect } from 'react';
-import { format } from 'date-fns';
+import { useState, useMemo, useLayoutEffect, useEffect } from 'react';
+import { format, set } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ReservationDetail } from './ReservationDetail';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '../../components/ui/select';
-import { TicketCheck, Search, Filter, RefreshCw } from 'lucide-react'
+import { TicketCheck, Search, Filter, RefreshCw, CreditCard, HandCoins, Banknote, LucideBanknoteArrowDown } from 'lucide-react'
 import { useReservation, type Reservation } from '../../auth/context/ReservationContext';
 import { dateInFormatAMD } from '../../../shared/utils/helpers';
 import { ReservationTable } from './ReservationTable';
 import { CalendarCustom } from './CalendarCustom';
+import { Dialog, DialogContent, DialogTitle } from '../../components/ui/dialog';
+import PayForm from './PayForm';
 
 export type ReservationStatus = SeatData['status']
 
@@ -20,14 +22,19 @@ type StatusFilter = 'all' | 'roundTrip' | 'sencillo' | ReservationStatus
 export default function ComfirmationList() {
 
 
-    const { getReservationsByDate, reservations } = useReservation();
+    const { getReservationsByDate, reservations, showNofification, payReservation } = useReservation();
 
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
     const [showPayment, setShowPayment] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
-    const [open, setOpen] = useState(false)
+    const [paymentMethod, setPaymentMethod] = useState<Payment['method']>("cash")
+
+    const [cashReceived, setCashReceived] = useState("");
+
+
+
 
     const dateAMD = useMemo(() => {
         return dateInFormatAMD(selectedDate ? selectedDate.toISOString() : '')
@@ -104,13 +111,77 @@ export default function ComfirmationList() {
         setSelectedDate(undefined)
     }
 
+    const handleCashReceivedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value.replace(/[^\d.]/g, "")
+        // Only allow one decimal point
+        const parts = value.split(".")
+        if (parts.length > 2) return
+        if (parts[1]?.length > 2) return
+        setCashReceived(value)
+    }
+
+    const total = selectedReservation?.total_amount || 0
+    const serviceFee = total * 0.05
+    const finalTotal = total + serviceFee
+
+    const cashReceivedNumber = parseFloat(cashReceived) || 0
+    const change = useMemo(() => {
+        return cashReceivedNumber - finalTotal
+    }, [cashReceivedNumber, finalTotal])
+
+    const canCompleteCashPayment = cashReceivedNumber >= finalTotal
+
+    const quickCashAmounts = useMemo(() => {
+        const rounded = Math.ceil(finalTotal / 100) * 100
+        return [rounded, rounded + 100, rounded + 200, Math.ceil(finalTotal)]
+    }, [finalTotal])
 
 
+    const handlePayReservation = async () => {
+
+        try {
+            //logica de pago
+            if (selectedReservation) {
+                await payReservation(selectedReservation);
+                //cerrar modal de pago
+                setShowPayment(false);
+                setSelectedReservation(null);
+            }
+
+            //impresion de ticket
+
+
+            //cerrar modal
+
+        } catch (error) {
+            console.error('Error al procesar el pago de la reservación:', error);
+            showNofification({
+                typeAlert: 'error',
+                title: 'Error al procesar el pago',
+                message: 'Ocurrió un error al procesar el pago de la reservación. Por favor, inténtelo de nuevo.'
+            })
+        }
+
+
+
+
+    }
 
     useLayoutEffect(() => {
         getReservationsByDate(dateAMD)
     }, [selectedDate]);
 
+    {/* mostrar mensaje de metodo no implentado si el metodo de pago es tarjeta */ }
+    useEffect(() => {
+
+        if (paymentMethod === "card") {
+            showNofification({
+                typeAlert: 'info',
+                title: 'Función no implementada',
+                message: 'La función de cobro con tarjeta no está implementada en esta versión.'
+            })
+        }
+    }, [paymentMethod])
 
     return (
         <div className="bg-background">
@@ -256,18 +327,45 @@ export default function ComfirmationList() {
                 </div>
             </main>
 
-            {/* Payment Dialog */}
-            {/* <Dialog open={showPayment} onOpenChange={setShowPayment}>
-                <DialogContent className="sm:max-w-md p-0 gap-0 border-0 bg-transparent shadow-none">
+            {/* Modal del pago de la reservacion */}
+            <Dialog open={showPayment} onOpenChange={setShowPayment}>
+                <DialogContent className="sm:max-w-md p-0 gap-0 border-0 bg-transparent shadow-2xl">
                     <DialogTitle className="sr-only">Realizar Pago</DialogTitle>
                     {selectedReservation && (
-                        <h1>reservationsumary</h1>
-                        // <OrderSummary
-                           
-                        // />
+                        <div>
+                            <PayForm
+                                handleSubmit={handlePayReservation}
+                                canCompleteCashPayment={canCompleteCashPayment}
+                                cashReceived={cashReceived}
+                                handleCashReceivedChange={handleCashReceivedChange}
+                                cashReceivedNumber={cashReceivedNumber}
+                                change={change}
+                                finalTotal={finalTotal}
+                                paymentMethod={paymentMethod}
+                                setPaymentMethod={setPaymentMethod}
+                                quickCashAmounts={quickCashAmounts}
+                                setCashReceived={setCashReceived}
+
+                            />
+
+                            <div>
+                                <Button
+                                    onClick={handlePayReservation}
+                                    className="w-full mt-2"
+                                    size="lg"
+                                    disabled={!canCompleteCashPayment}
+                                >
+                                    {paymentMethod === "cash" ? <LucideBanknoteArrowDown className="w-4 h-4 mr-2" /> : <CreditCard className="w-4 h-4 mr-2" />}
+
+                                    Confimar pago
+                                </Button>
+                            </div>
+                        </div>
+
+
                     )}
                 </DialogContent>
-            </Dialog> */}
+            </Dialog>
         </div>
     )
 }

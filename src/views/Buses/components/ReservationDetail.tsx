@@ -1,10 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Separator } from '../../components/ui/separator';
-
-import { User, Phone, Mail, Calendar, CreditCard, Armchair, X, MapPin, Clock, CrossIcon, TicketX } from 'lucide-react'
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { User, Phone, Calendar, CreditCard, Armchair, X, MapPin, Clock, TicketX } from 'lucide-react';
 import { StatusBadge } from './StatusBadge';
 import type { Reservation } from '../../auth/context/ReservationContext';
 
@@ -104,10 +101,10 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                 {/* Seats */}
                 <div className="space-y-3">
                     <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                        Asientos Reservados ({seats.length})
+                        Asientos Reservados ({seats.split(",").length})
                     </h4>
                     <div className="flex flex-wrap gap-2">
-                        {[seats].map((seat) => (
+                        {seats.split(",").map((seat) => (
                             <span
                                 key={seat}
                                 className="inline-flex items-center gap-1.5 rounded-md bg-secondary px-2.5 py-1.5 text-sm font-medium text-secondary-foreground"

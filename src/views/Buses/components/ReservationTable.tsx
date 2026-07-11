@@ -26,6 +26,7 @@ export function ReservationTable({
                         <TableHead className="w-[130px]">Teléfono</TableHead>
                         <TableHead className="w-[130px]">Fecha Salida</TableHead>
                         <TableHead className="w-[120px]">Tipo</TableHead>
+                        <TableHead className="w-[120px]">#Bus</TableHead>
                         <TableHead className="w-[120px]">Asientos</TableHead>
                         <TableHead className="w-[100px] text-right">Monto Total</TableHead>
                         <TableHead className="w-[100px] text-center">Estado</TableHead>
@@ -42,7 +43,7 @@ export function ReservationTable({
                             </TableCell>
                         </TableRow>
                     ) : (
-                        reservations.map((reservation) => {
+                        reservations.map((reservation: Reservation) => {
                             const isSelected = selectedId === reservation.id
                             return (
                                 <TableRow
@@ -80,6 +81,14 @@ export function ReservationTable({
                                             <div className="text-xs">
                                                 {reservation.return_date}
                                             </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-muted-foreground">
+                                        <div className="space-y-0.5">
+                                            <div className="text-center">
+                                                {reservation.vehicle_number}
+                                            </div>
+
                                         </div>
                                     </TableCell>
                                     <TableCell>

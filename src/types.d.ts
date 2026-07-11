@@ -131,6 +131,7 @@ interface Route {
   contactPhone: string;
   distanceFromOriginKm: number;
   baseFare: number;
+  baseFareRoundTrip: number;
   estimatedTravelTime: string | number;
   remarks: string;
   status: StatusType

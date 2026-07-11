@@ -5,7 +5,7 @@ import { createContext, useContext, useMemo, useReducer, useState } from "react"
 import { useDashboard } from "./DashBoardContext";
 import { formatDayMonth, getDayName } from "../../../shared/utils/helpers";
 import showAlert, { type PropsModal } from "../../Modals/Modals";
-import { Armchair, BookOpenCheck, Calendars, Contact, HandCoins, NotebookPen, TicketsPlane, UnfoldHorizontal, Users } from "lucide-react";
+import { Armchair, BookOpenCheck, Calendars, Contact, HandCoins, NotebookPen, UnfoldHorizontal, Users } from "lucide-react";
 import type { Step } from "../../Buses/components/Steper";
 import { toast } from "sonner";
 import { initialStateTrip, tripReducer, type ActionTripReducer, type TripState } from "../../Buses/reducers/tripReducer";

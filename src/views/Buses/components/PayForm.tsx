@@ -14,12 +14,12 @@ import { Input } from "../../components/ui/input"
 
 interface PropsPayForm {
     handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-    handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleInputChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     paymentMethod: string;
     setPaymentMethod: (method: Payment['method']) => void;
-    formData: {
+    formData?: {
         name: string;
-        email: string;
+        email?: string;
         phone: string;
     };
     cashReceived: string;
@@ -134,7 +134,7 @@ export default function PayForm(props: PropsPayForm) {
                                         value={''}
                                         onChange={(e) => {
                                             e.target.value = formatCardNumber(e.target.value)
-                                            handleInputChange(e)
+                                            handleInputChange?.(e)
                                         }}
                                         className="pl-10"
                                         maxLength={19}
@@ -154,7 +154,7 @@ export default function PayForm(props: PropsPayForm) {
                                         value={''}
                                         onChange={(e) => {
                                             e.target.value = formatExpiry(e.target.value)
-                                            handleInputChange(e)
+                                            handleInputChange?.(e)
                                         }}
                                         maxLength={5}
                                         required={paymentMethod === "card"}
@@ -171,7 +171,7 @@ export default function PayForm(props: PropsPayForm) {
                                         value={''}
                                         onChange={(e) => {
                                             e.target.value = e.target.value.replace(/\D/g, "").substr(0, 4)
-                                            handleInputChange(e)
+                                            handleInputChange?.(e)
                                         }}
                                         maxLength={4}
                                         required={paymentMethod === "card"}
@@ -181,7 +181,7 @@ export default function PayForm(props: PropsPayForm) {
                             </div>
 
                             <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                                <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 mt-0.5">
                                     <CheckCircle2 className="w-3 h-3 text-green-500" />
                                 </div>
                                 <p className="text-xs text-muted-foreground">
@@ -270,65 +270,74 @@ export default function PayForm(props: PropsPayForm) {
                 </div>
 
                 {/* Passenger Info */}
-                <div className="bg-card rounded-xl border border-border p-6 space-y-5">
-                    <div className="flex items-center gap-2 text-foreground">
-                        <User className="w-5 h-5" />
-                        <h2 className="font-semibold">Datos del Pasajero</h2>
-                    </div>
+                {
+                    formData && (
+                        <div className="bg-card rounded-xl border border-border p-6 space-y-5">
+                            <div className="flex items-center gap-2 text-foreground">
+                                <User className="w-5 h-5" />
+                                <h2 className="font-semibold">Datos del Pasajero</h2>
+                            </div>
 
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Nombre completo</Label>
-                            <div className="relative">
-                                <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                <Input
-                                    id="name"
-                                    name="name"
-                                    placeholder="Juan Pérez García"
-                                    value={formData.name}
-                                    onChange={handleInputChange}
-                                    className="pl-10"
-                                    required
-                                />
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="name">Nombre completo</Label>
+                                    <div className="relative">
+                                        <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                        <Input
+                                            id="name"
+                                            name="name"
+                                            placeholder="Juan Pérez García"
+                                            value={formData.name}
+                                            onChange={handleInputChange}
+                                            className="pl-10"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {formData.email && (
+                                        <div className="space-y-2">
+                                            <Label htmlFor="email">Correo electrónico</Label>
+                                            <div className="relative">
+                                                <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                                <Input
+                                                    id="email"
+                                                    name="email"
+                                                    type="email"
+                                                    placeholder="correo@ejemplo.com"
+                                                    value={formData.email}
+                                                    onChange={handleInputChange}
+                                                    className="pl-10"
+                                                />
+                                            </div>
+                                        </div>
+                                    )
+
+                                    }
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="phone">Teléfono</Label>
+                                        <div className="relative">
+                                            <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                            <Input
+                                                id="phone"
+                                                name="phone"
+                                                type="tel"
+                                                placeholder="+52 55 1234 5678"
+                                                value={formData.phone}
+                                                onChange={handleInputChange}
+                                                className="pl-10"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="email">Correo electrónico</Label>
-                                <div className="relative">
-                                    <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                    <Input
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        placeholder="correo@ejemplo.com"
-                                        value={formData.email}
-                                        onChange={handleInputChange}
-                                        className="pl-10"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="phone">Teléfono</Label>
-                                <div className="relative">
-                                    <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                    <Input
-                                        id="phone"
-                                        name="phone"
-                                        type="tel"
-                                        placeholder="+52 55 1234 5678"
-                                        value={formData.phone}
-                                        onChange={handleInputChange}
-                                        className="pl-10"
-                                        required
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    )
+                }
 
 
             </form>

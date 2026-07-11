@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react"
+import { useLayoutEffect, useState } from "react"
 import {
     Clock,
     MapPin,
@@ -255,7 +255,7 @@ function TripCard({ trip, origin, destination, discount, originalPrice, price,
 
 export function SelectorSchedule() {
 
-    const { scheduleToSelection, cityOrigin, cityDestination, destinationSelected, dispatch, handleNext } = useTicket();
+    const { scheduleToSelection, cityOrigin, cityDestination, destinationSelected, isRoundTrip, dispatch, handleNext } = useTicket();
     const { destinations } = useDashboard();
 
     const [sortBy, setSortBy] = useState<SortOption>("departure")
@@ -292,7 +292,11 @@ export function SelectorSchedule() {
                         originTerminal={trip.terminal_origin}
                         destinationTerminal={trip.terminal_destination}
                         originalPrice={999}
-                        price={destinations.find((d) => d.id === destinationSelected?.id)?.baseFare || 0}
+                        price={isRoundTrip ?
+                            destinations.find((d) => d.id === destinationSelected?.id)?.baseFareRoundTrip || 0
+                            :
+                            destinations.find((d) => d.id === destinationSelected?.id)?.baseFare || 0
+                        }
                         estimatedTravelTime={String(destinationSelected?.estimatedTravelTime ?? '')}
 
 

@@ -29,6 +29,7 @@ const initialStateForm: Route = {
   contactPhone: "",
   distanceFromOriginKm: 0,
   baseFare: 0,
+  baseFareRoundTrip: 0,
   estimatedTravelTime: "",
   remarks: "",
   origin: "",
@@ -72,6 +73,7 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
         address: 'av Reforma 222',
         contactPhone: '5522552255',
         baseFare: 250,
+        baseFareRoundTrip: 450,
         origin: agency?.city || "city",
         distanceFromOriginKm: 100,
         estimatedTravelTime: '08:22',
@@ -229,6 +231,26 @@ export default function DestinoForm({ initialData, onCancel, isEditing = false, 
                   placeholder="850"
                   value={formData.baseFare}
                   onChange={(e) => handleChange("baseFare", Number.parseFloat(e.target.value) || 0)}
+                  className="pl-10"
+                  required
+                  disabled={isLoading}
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="precioBase" className="text-sm font-medium">
+                Precio redondo ($) <span className="text-destructive">*</span>
+              </Label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="precioBase"
+                  type="number"
+                  placeholder="850"
+                  value={formData.baseFareRoundTrip}
+                  onChange={(e) => handleChange("baseFareRoundTrip", Number.parseFloat(e.target.value) || 0)}
                   className="pl-10"
                   required
                   disabled={isLoading}

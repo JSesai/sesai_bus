@@ -145,8 +145,12 @@ export default function DestinationsManager({ configInitial = false }: { configI
                   <p className="font-semibold text-sm">{destino.distanceFromOriginKm} km</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-muted-foreground">Precio base</p>
+                  <p className="text-xs text-muted-foreground">Costo base</p>
                   <p className="font-semibold text-sm">${destino.baseFare}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground">Costo redondo</p>
+                  <p className="font-semibold text-sm">${destino.baseFareRoundTrip}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground">Tiempo</p>

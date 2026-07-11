@@ -183,9 +183,11 @@ export const ticketsRepo = {
       const sql = `
         SELECT 
           c.name AS customer_name,
+          c.id AS customer_id,
           c.phone AS customer_phone,
           s.id AS schedule_id,
           s.departure_time,
+          s.vehicle_number,
           r.origin,
           r.cityName,
           r.terminalName,

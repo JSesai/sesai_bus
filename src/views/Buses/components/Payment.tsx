@@ -1,16 +1,5 @@
 
-import { useState, useMemo } from "react"
-
-import {
-    CreditCard,
-    User,
-    Mail,
-    Phone, CheckCircle2, Banknote,
-    Coins,
-    Receipt
-} from "lucide-react"
-import { Label } from "../../components/ui/label"
-import { Input } from "../../components/ui/input"
+import { useState, useMemo } from "react";
 import { useTicket } from "../../auth/context/TicketContext"
 import { formatDateDisplay } from "../../../shared/utils/helpers"
 import { OrderSummary } from "./OrderSummary"
