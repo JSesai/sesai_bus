@@ -318,6 +318,28 @@ interface BiometricService {
   authenticate(): Promise<string | null>;
 }
 
+interface TicketPrintData {
+  agencyName: string;
+  agencyCity: string;
+  agencyPhone: string;
+  origin: string;
+  destination: string;
+  date: string;
+  time: string;
+  passengerName: string;
+  passengerPhone: string;
+  seatNumbers: number[];
+  totalAmount: number;
+  isRoundTrip: boolean;
+  returnDate?: string;
+  ticketId?: string;
+}
+
+interface PrinterAPI {
+  print: (ticketData: TicketPrintData) => Promise<{ ok: boolean; method: "printer" | "pdf"; pdfData?: string }>;
+  checkStatus: () => Promise<{ connected: boolean }>;
+}
+
 interface Window {
   electron: {
     users: UsersAPI;
@@ -331,6 +353,6 @@ interface Window {
     biometric: BiometricService;
     appConfig: appConfigAPI;
     processFlow: ProcessFlowAPI;
-
+    printer: PrinterAPI;
   };
 }

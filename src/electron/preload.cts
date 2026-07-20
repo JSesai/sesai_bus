@@ -97,6 +97,11 @@ const processFlowAPI: ProcessFlowAPI = {
   processConfirmedReservation: (props: IProcessConfirmedReservation) => ipcRenderer.invoke("processConfirmedReservation", props)
 }
 
+const printerAPI: PrinterAPI = {
+  print: (ticketData: TicketPrintData) => ipcRenderer.invoke("printer:print", ticketData),
+  checkStatus: () => ipcRenderer.invoke("printer:checkStatus"),
+}
+
 contextBridge.exposeInMainWorld("electron", {
   users: usersAPI,
   agency: agencyAPI,
@@ -108,5 +113,6 @@ contextBridge.exposeInMainWorld("electron", {
   payments: paymetsAPI,
   processFlow: processFlowAPI,
   biometric: biometricAPI,
-  appConfig: appConfiAPI
+  appConfig: appConfiAPI,
+  printer: printerAPI
 });

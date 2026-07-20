@@ -17,6 +17,7 @@ import { registerBiometricHandlers } from "./db/handlers/biometricHandlers.js";
 import { seedAppConfig, seedInitialUser } from "./db/seed.js";
 import { registerAppConfigHandlers } from "./db/handlers/appConfigHandlers.js";
 import { registerProcessFlowHandlers } from "./db/handlers/processFlowHandlers.js";
+import { registerPrinterHandlers } from "./service/printer/printer.service.js";
 
 
 
@@ -56,6 +57,7 @@ app.whenReady().then(async () => {
     registerPaymentsHandlers();
     registerBiometricHandlers();
     registerProcessFlowHandlers();
+    registerPrinterHandlers();
 
     //seed
     await seedInitialUser();

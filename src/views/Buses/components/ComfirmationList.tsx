@@ -7,6 +7,7 @@ import { Input } from '../../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '../../components/ui/select';
 import { TicketCheck, Search, Filter, RefreshCw, CreditCard, HandCoins, Banknote, LucideBanknoteArrowDown } from 'lucide-react'
 import { useReservation, type Reservation } from '../../auth/context/ReservationContext';
+import { useDashboard } from '../../auth/context/DashBoardContext';
 import { dateInFormatAMD } from '../../../shared/utils/helpers';
 import { ReservationTable } from './ReservationTable';
 import { CalendarCustom } from './CalendarCustom';
@@ -23,6 +24,7 @@ export default function ComfirmationList() {
 
 
     const { getReservationsByDate, reservations, showNofification, payReservation } = useReservation();
+    const { agency } = useDashboard();
 
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
     const [showPayment, setShowPayment] = useState(false)
@@ -143,6 +145,34 @@ export default function ComfirmationList() {
             //logica de pago
             if (selectedReservation) {
                 await payReservation(selectedReservation);
+
+                const ticketPrintData: TicketPrintData = {
+                    agencyName: agency?.name || '',
+                    agencyCity: agency?.city || '',
+                    agencyPhone: agency?.phone || '',
+                    origin: selectedReservation.origin,
+                    destination: selectedReservation.cityName,
+                    date: selectedReservation.reservation_date,
+                    time: selectedReservation.departure_time,
+                    passengerName: selectedReservation.customer_name,
+                    passengerPhone: selectedReservation.customer_phone,
+                    seatNumbers: selectedReservation.seats.split(',').map(s => parseInt(s.trim(), 10)),
+                    totalAmount: selectedReservation.total_amount,
+                    isRoundTrip: !!selectedReservation.return_date,
+                    returnDate: selectedReservation.return_date || undefined,
+                };
+
+                window.electron.printer.print(ticketPrintData).then((result) => {
+                    if (result.method === "pdf" && result.pdfData) {
+                        const link = document.createElement("a");
+                        link.href = result.pdfData;
+                        link.download = `ticket_${ticketPrintData.passengerName.replace(/\s+/g, "_")}_${Date.now()}.pdf`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                }).catch(() => {});
+
                 //cerrar modal de pago
                 setShowPayment(false);
                 setSelectedReservation(null);

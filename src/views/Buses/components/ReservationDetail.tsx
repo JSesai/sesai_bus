@@ -1,8 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Separator } from '../../components/ui/separator';
-import { User, Phone, Calendar, CreditCard, Armchair, X, MapPin, Clock, TicketX } from 'lucide-react';
+import { User, Phone, Calendar, CreditCard, Armchair, X, MapPin, Clock, TicketX, Printer } from 'lucide-react';
 import { StatusBadge } from './StatusBadge';
+import { TicketPreviewModal } from './TicketPreviewModal';
+import { useState } from 'react';
+import { useDashboard } from '../../auth/context/DashBoardContext';
 import type { Reservation } from '../../auth/context/ReservationContext';
 
 interface ReservationDetailProps {
@@ -15,7 +18,12 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
     console.log('reservation detail ->', reservation);
 
     const { customer_name, customer_phone, reservation_date, departure_time, cityName: cityNameDestination, seats, total_amount, ticket_status, origin, return_date } = reservation;
+    const { agency } = useDashboard();
+    const [showTicketModal, setShowTicketModal] = useState(false);
 
+    const handleReprint = () => {
+        setShowTicketModal(true);
+    };
 
     return (
         <Card className="h-fit sticky top-4">
@@ -141,11 +149,17 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                 )}
 
                 {ticket_status === 'occupied' && (
-                    <div className="rounded-lg bg-status-confirmed/20 border border-status-confirmed p-3 text-center">
-                        <p className="text-sm font-medium text-status-confirmed-foreground">
-                            Esta reservación ya fue confirmada
-                        </p>
-                    </div>
+                    <>
+                        <div className="rounded-lg bg-status-confirmed/20 border border-status-confirmed p-3 text-center">
+                            <p className="text-sm font-medium text-status-confirmed-foreground">
+                                Esta reservación ya fue confirmada
+                            </p>
+                        </div>
+                        <Button onClick={handleReprint} className="w-full" size="lg" variant="outline">
+                            <Printer className="mr-2 h-4 w-4" />
+                            Reimprimir Ticket
+                        </Button>
+                    </>
                 )}
 
                 {ticket_status === 'cancelled' ? (
@@ -162,6 +176,27 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                     </Button>
                 }
             </CardContent>
+
+            {/* Ticket Preview Modal */}
+            <TicketPreviewModal
+                open={showTicketModal}
+                onClose={() => setShowTicketModal(false)}
+                ticketData={{
+                    agencyName: agency?.name || '',
+                    agencyCity: agency?.city || '',
+                    agencyPhone: agency?.phone || '',
+                    origin,
+                    destination: cityNameDestination,
+                    date: reservation_date,
+                    time: departure_time,
+                    passengerName: customer_name,
+                    passengerPhone: customer_phone,
+                    seatNumbers: seats.split(',').map(s => parseInt(s.trim(), 10)),
+                    totalAmount: total_amount,
+                    isRoundTrip: !!return_date,
+                    returnDate: return_date || undefined,
+                }}
+            />
         </Card>
     )
 }

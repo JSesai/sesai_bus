@@ -400,6 +400,35 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
         if (!updateStatusTicket) return;
 
+        const originAgency = agencies?.find((a) => a.id === state.idOrigin);
+
+        const ticketPrintData: TicketPrintData = {
+            agencyName: originAgency?.name || '',
+            agencyCity: originAgency?.city || '',
+            agencyPhone: originAgency?.phone || '',
+            origin: cityOrigin,
+            destination: cityDestination,
+            date: state.departureDate,
+            time: selectedSchedule?.departure_time || '',
+            passengerName: state.customer?.name || '',
+            passengerPhone: state.customer?.phone || '',
+            seatNumbers: seatsSelected,
+            totalAmount: destinationSelected?.baseFare ? destinationSelected.baseFare * seatsSelected.length : 0,
+            isRoundTrip,
+            returnDate: state.returnDate,
+        };
+
+        window.electron.printer.print(ticketPrintData).then((result) => {
+            if (result.method === "pdf" && result.pdfData) {
+                const link = document.createElement("a");
+                link.href = result.pdfData;
+                link.download = `ticket_${ticketPrintData.passengerName.replace(/\s+/g, "_")}_${Date.now()}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }).catch(() => {});
+
         showAlert({
             typeAlert: 'success',
             title: 'Venta realizada',
