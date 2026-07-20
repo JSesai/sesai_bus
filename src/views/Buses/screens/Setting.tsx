@@ -1,4 +1,4 @@
-import { Bus, MapPin, Clock, Users, IdCardLanyard, HousePlug } from "lucide-react";
+import { Bus, MapPin, Clock, Users, IdCardLanyard, HousePlug, Settings } from "lucide-react";
 import { MenuCard } from "../components/MenuCard";
 
 export type MenuItemSettings = {
@@ -73,6 +73,16 @@ const menuItems: MenuItemSettings[] = [
         hoverColor: "hover:border-cyan-500",
         accessRol: ["developer", "manager"]
 
+    },
+    {
+        title: "General",
+        description: "Configuración general del sistema",
+        icon: Settings,
+        path: "/dashboard/general-setting",
+        color: "text-slate-600",
+        bgColor: "bg-slate-500/10",
+        hoverColor: "hover:border-slate-500",
+        accessRol: ["developer", "manager"]
     },
 ]
 

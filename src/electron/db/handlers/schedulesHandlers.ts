@@ -1,5 +1,6 @@
 import { ipcMain } from "electron";
 import { schedulesRepo } from "../repositories/schedulesRepo.js";
+import { appConfigRepo } from "../repositories/appConfigRepo.js";
 import { ScheduleError } from "../../../shared/errors/customError.js";
 import { isCurrentAgency, isSuperUser } from "../../utils/helpers.js";
 
@@ -42,6 +43,22 @@ export function registerSchedulesHandlers() {
             }
             const isAgencyLocal = await isCurrentAgency(schedule.agency_id_origin);
             if (!isAgencyLocal && !isSuperUser()) throw new ScheduleError("No se pudo agregar horario.", "No tienes permisos para agregar horarios de otras agencias.");
+
+            const config = await appConfigRepo.getConfig() as any;
+            const minAdvance = config?.min_advance_minutes ?? 30;
+            const today = new Date().toISOString().split("T")[0];
+            if (schedule.dateDeparture === today) {
+                const now = new Date();
+                const [h, m] = [now.getHours(), now.getMinutes() + minAdvance];
+                const minDeparture = `${String(Math.floor(h + m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+                if (schedule.departure_time < minDeparture) {
+                    throw new ScheduleError(
+                        "Hora de salida no válida",
+                        `Para salidas del día de hoy se requiere al menos ${minAdvance} minutos de anticipación. Hora mínima permitida: ${minDeparture}`
+                    );
+                }
+            }
+
             const scheduleResponse = await schedulesRepo.add(schedule);
             console.log('schedules create ->', scheduleResponse);
 
@@ -74,6 +91,22 @@ export function registerSchedulesHandlers() {
             console.log('init process update schedule', schedule);
             if (!schedule.route_id || !schedule.driver_id || !schedule.departure_time || !schedule.bus_id || !schedule.arrival_time || !schedule.agency_id_origin)
                 throw new ScheduleError("No se pudo actualizar horario faltan datos por  completar")
+
+            const config = await appConfigRepo.getConfig() as any;
+            const minAdvance = config?.min_advance_minutes ?? 30;
+            const today = new Date().toISOString().split("T")[0];
+            if (schedule.dateDeparture === today) {
+                const now = new Date();
+                const [h, m] = [now.getHours(), now.getMinutes() + minAdvance];
+                const minDeparture = `${String(Math.floor(h + m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+                if (schedule.departure_time < minDeparture) {
+                    throw new ScheduleError(
+                        "Hora de salida no válida",
+                        `Para salidas del día de hoy se requiere al menos ${minAdvance} minutos de anticipación. Hora mínima permitida: ${minDeparture}`
+                    );
+                }
+            }
+
             const scheduleResponse = await schedulesRepo.update(schedule);
             console.log('schedules update ->', scheduleResponse);
 

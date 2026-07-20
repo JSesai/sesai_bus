@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
@@ -10,6 +10,7 @@ import { useSearchParams } from "react-router-dom";
 import { ScheduleError } from "../../../shared/errors/customError";
 import { minDateToday, oneMontFromToday, sumarHorasYMinutos } from "../../../shared/utils/helpers";
 import SelectorsOriginDestination from "./SelectorsOriginDestination";
+import { toast } from "sonner";
 
 
 
@@ -50,10 +51,31 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
   );
 
   const [isLoading] = useState(false)
+  const [minAdvanceMinutes, setMinAdvanceMinutes] = useState(30);
+
+  useEffect(() => {
+    window.electron.appConfig.getAppConfig().then((res) => {
+      if (res.ok && res.data) setMinAdvanceMinutes(res.data.min_advance_minutes ?? 30);
+    });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const today = new Date().toISOString().split("T")[0];
+    if (formData.dateDeparture === today) {
+      const now = new Date();
+      const [h, m] = [now.getHours(), now.getMinutes() + minAdvanceMinutes];
+      const minDeparture = `${String(Math.floor(h + m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+      if (formData.departure_time < minDeparture) {
+        toast.error("Hora de salida no válida", {
+          description: `Para salidas del día de hoy se requiere al menos ${minAdvanceMinutes} minutos de anticipación. Hora mínima permitida: ${minDeparture}`,
+          duration: 10_000,
+          position: 'top-center'
+        });
+        return;
+      }
+    }
 
     const successRegister = await handleRegisterSchedules(formData, isEditing);
     if (!successRegister) return;

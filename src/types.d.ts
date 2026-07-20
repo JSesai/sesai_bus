@@ -303,6 +303,7 @@ interface AppConfig {
   routes_configured: number;
   schedules_configured: number;
   initial_setup_completed: number;
+  min_advance_minutes: number;
   created_at: string;
 }
 

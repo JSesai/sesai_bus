@@ -20,6 +20,7 @@ import Buses from "../Buses/screens/Buses";
 import { BusesSetting } from "../Buses/screens/BusesSetting";
 import { BusDailyAssignment } from "../Buses/components/BusDailyAssignment";
 import AgencieForm from "../Buses/components/AgencieForm";
+import GeneralSetting from "../Buses/components/GeneralSetting";
 import { TicketProvider } from "../auth/context/TicketContext";
 import SetupWizard from "../Buses/screens/SetupWizard";
 import SetupLayout from "../shared/layouts/SetupLayout";
@@ -47,7 +48,8 @@ export const routeDirectory = {
         destinations: "/dashboard/destinations",
         schedules: "/dashboard/schedules",
         employees: "/dashboard/employees",
-        customers: "/dashboard/customers"
+        customers: "/dashboard/customers",
+        generalSetting: "/dashboard/general-setting"
     },
 
 
@@ -93,6 +95,7 @@ export function AppRouter() {
                                     <Route path="employees" element={<Employees />} />
                                     <Route path="customers" element={<Customers />} />
                                     <Route path="agencies" element={<Agencies />} />
+                                    <Route path="general-setting" element={<GeneralSetting />} />
                                     <Route path="confirmation-reservation" element={<ComfirmationList />} />
                                 </Route>
 
