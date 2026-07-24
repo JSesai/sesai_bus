@@ -24,8 +24,9 @@ export const appConfigRepo = {
                   buses_configured,
                   routes_configured,
                   schedules_configured,
-                  initial_setup_completed
-                ) VALUES (1, 0, 0, 0, 0, 0)
+                  initial_setup_completed,
+                  service_fee_percent
+                ) VALUES (1, 0, 0, 0, 0, 0, 0)
                 `,
                 function (err) {
                     if (err) reject(err);

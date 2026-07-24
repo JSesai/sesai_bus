@@ -1,56 +1,70 @@
-import { Bell, Moon, Search, Sun, LogOut, User, BusFront } from "lucide-react";
+import { Bell, Moon, Search, Sun, LogOut, User, BusFront, Menu } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "../../components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../components/ui/tooltip"
-import { useState } from "react"
 import { useAuth } from "../../auth/context/AuthContext"
 import { getInitials, translateRole } from "../../../shared/utils/helpers"
 import { useDashboard } from "../../auth/context/DashBoardContext";
 
+declare const __APP_VERSION__: string
+
 export default function DashboardHeader() {
   const { userLogged, logout } = useAuth();
 
-  const { theme, setTheme } = useDashboard();
+  const { theme, setTheme, setSidebarOpen } = useDashboard();
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   }
 
   const handleLogout = async () => {
-    await logout() // limpia sesión, token, store, etc.
+    await logout()
   }
 
   return (
-    <header className="flex items-center justify-between py-4 border-b border-slate-700/50 mb-6">
-      {/* Logo */}
+    <header className="flex items-center justify-between py-4 border-b border-border mb-4 md:mb-6">
+      {/* Logo + Hamburger */}
       <div className="flex items-center space-x-2">
-        <BusFront className="h-8 w-8 text-cyan-500" />
-        <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-          Taquilla Demo
-        </span>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden text-muted-foreground hover:text-foreground"
+          onClick={() => setSidebarOpen(true)}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+        <div className="flex flex-col">
+          <div className="flex items-center space-x-2">
+            <BusFront className="h-7 w-7 md:h-8 md:w-8 text-accent-brand" />
+            <span className="text-lg md:text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+              Taquilla Demo
+            </span>
+          </div>
+          <span className="text-[10px] font-mono text-muted-foreground/60 ml-9">v{__APP_VERSION__}</span>
+        </div>
       </div>
 
       {/* Right */}
-      <div className="flex items-center space-x-6">
+      <div className="flex items-center space-x-2 md:space-x-6">
         {/* Search */}
-        <div className="hidden md:flex items-center space-x-1 rounded-full px-3 py-1.5 border  bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
-          <Search className="h-4 w-4 text-slate-700 dark:text-slate-400" />
+        <div className="hidden md:flex items-center space-x-1 rounded-full px-3 py-1.5 border bg-muted/50 border-border backdrop-blur-sm">
+          <Search className="h-4 w-4 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search systems..."
-            className="bg-transparent border-none focus:outline-none text-sm w-40 placeholder:text-slate-500"
+            placeholder="Buscar..."
+            className="bg-transparent border-none focus:outline-none text-sm w-40 placeholder:text-muted-foreground"
           />
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-1 md:space-x-3">
           {/* Notifications */}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative text-slate-700 dark:text-slate-400 hover:text-slate-100">
+                <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
                   <Bell className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 h-2 w-2 bg-cyan-500 rounded-full animate-pulse"></span>
+                  <span className="absolute -top-1 -right-1 h-2 w-2 bg-accent-brand rounded-full animate-pulse"></span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -67,7 +81,7 @@ export default function DashboardHeader() {
                   variant="ghost"
                   size="icon"
                   onClick={toggleTheme}
-                  className="text-slate-700 dark:text-slate-400 hover:text-slate-300"
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   {theme === "dark" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
                 </Button>
@@ -84,7 +98,7 @@ export default function DashboardHeader() {
               <button className="outline-none">
                 <Avatar className="cursor-pointer">
                   <AvatarImage src="/placeholder.svg" />
-                  <AvatarFallback className="bg-slate-700 text-cyan-500">
+                  <AvatarFallback className="bg-muted text-accent-brand">
                     {getInitials(userLogged?.name || "")}
                   </AvatarFallback>
                 </Avatar>
@@ -95,7 +109,7 @@ export default function DashboardHeader() {
               <DropdownMenuLabel>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">{userLogged?.name}</span>
-                  <span className="text-xs text-slate-700 dark:text-slate-400">{translateRole(userLogged?.role)}</span>
+                  <span className="text-xs text-muted-foreground">{translateRole(userLogged?.role)}</span>
                 </div>
               </DropdownMenuLabel>
 

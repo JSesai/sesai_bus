@@ -1,6 +1,7 @@
 
 import { useState, useMemo } from "react";
 import { useTicket } from "../../auth/context/TicketContext"
+import { useDashboard } from "../../auth/context/DashBoardContext"
 import { formatDateDisplay } from "../../../shared/utils/helpers"
 import { OrderSummary } from "./OrderSummary"
 import PayForm from "./PayForm"
@@ -11,8 +12,10 @@ export default function Payment() {
 
     const { state, seatsSelected: selectedSeats, destinationSelected, cityOrigin, cityDestination, selectedSchedule, seats,
         handleConfirmTicketSale, handleTicketSaleCard, totalPassengers, showNofification,
+        discountedPricePerSeat,
     } = useTicket();
-    const pricePerSeat = Number(destinationSelected?.baseFare) ?? 0;
+    const { serviceFeePercent } = useDashboard();
+    const pricePerSeat = discountedPricePerSeat;
 
 
     const [paymentMethod, setPaymentMethod] = useState<Payment['method']>("cash")
@@ -26,7 +29,7 @@ export default function Payment() {
     })
 
     const total = selectedSeats.length * pricePerSeat
-    const serviceFee = total * 0.05
+    const serviceFee = total * (serviceFeePercent / 100)
     const finalTotal = total + serviceFee
 
     const cashReceivedNumber = parseFloat(cashReceived) || 0
@@ -54,7 +57,8 @@ export default function Payment() {
 
     const quickCashAmounts = useMemo(() => {
         const rounded = Math.ceil(finalTotal / 100) * 100
-        return [rounded, rounded + 100, rounded + 200, Math.ceil(finalTotal)]
+        const amounts = new Set([rounded, rounded + 100, rounded + 200, Math.ceil(finalTotal)])
+        return [...amounts]
     }, [finalTotal])
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -110,7 +114,8 @@ export default function Payment() {
 
                         <OrderSummary
                             selectedSeats={seats.filter((s) => s.status === "selected").map((s) => s.seat_number)}
-                            pricePerSeat={Number(destinationSelected?.baseFare) || 0}
+                            pricePerSeat={discountedPricePerSeat}
+                            serviceFeePercent={serviceFeePercent}
                             onContinue={paymentMethod === 'cash' ? handleConfirmTicketSale : handleTicketSaleCard}
                             disabledContinue={paymentMethod === "cash" ? !canCompleteCashPayment : false}
                             tripInfo={{

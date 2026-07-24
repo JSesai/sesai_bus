@@ -180,7 +180,9 @@ interface ScheduleAPI {
   deleteSchedule: (id: Schedule['id']) => Promise<void>;
   getVehicleSeatStatus: (idSchedule: Schedule['id']) => Promise<ResponseElectronGeneric>;
   addDiscount: (discount: Discount) => Promise<ResponseElectronGeneric>;
-
+  getDiscountsByDate: (date: string) => Promise<ResponseElectronGeneric>;
+  updateDiscountStatus: (discountId: number, status: 'active' | 'inactive') => Promise<ResponseElectronGeneric>;
+  getDiscountBySchedule: (scheduleId: number) => Promise<ResponseElectronGeneric>;
 }
 
 interface Customer {
@@ -225,6 +227,7 @@ interface TicketAPI {
   updateTicketStatus: (scheduleId: number, seatNumbers: SeatData['seat_number'][], newStatus: SeatData['status']) => Promise<ResponseElectronGeneric>;
   getReservationsByDate: (dateReservation: string) => Promise<ResponseElectronGeneric>;
   deletedTicketNotcomfirmed: (id: User['id']) => Promise<ResponseElectronGeneric>;
+  reassignSeats: (scheduleId: number, customerId: number, oldSeatNumbers: number[], newSeatNumbers: number[]) => Promise<ResponseElectronGeneric>;
 
 }
 
@@ -304,6 +307,7 @@ interface AppConfig {
   schedules_configured: number;
   initial_setup_completed: number;
   min_advance_minutes: number;
+  service_fee_percent: number;
   created_at: string;
 }
 
@@ -328,11 +332,11 @@ interface TicketPrintData {
   date: string;
   time: string;
   passengerName: string;
-  passengerPhone: string;
   seatNumbers: number[];
   totalAmount: number;
   isRoundTrip: boolean;
   returnDate?: string;
+  purchaseDate?: string;
   ticketId?: string;
 }
 

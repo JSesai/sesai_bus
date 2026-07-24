@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS app_config (
     schedules_configured INTEGER DEFAULT 0,
     initial_setup_completed INTEGER DEFAULT 0,
     min_advance_minutes INTEGER DEFAULT 30,
+    service_fee_percent INTEGER DEFAULT 0,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP, 
     status TEXT NOT NULL DEFAULT 'active'
 

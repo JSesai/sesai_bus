@@ -13,6 +13,7 @@ import { ReservationTable } from './ReservationTable';
 import { CalendarCustom } from './CalendarCustom';
 import { Dialog, DialogContent, DialogTitle } from '../../components/ui/dialog';
 import PayForm from './PayForm';
+import { ReassignSeatDialog } from './ReassignSeatDialog';
 
 export type ReservationStatus = SeatData['status']
 
@@ -24,10 +25,11 @@ export default function ComfirmationList() {
 
 
     const { getReservationsByDate, reservations, showNofification, payReservation } = useReservation();
-    const { agency } = useDashboard();
+    const { agency, serviceFeePercent } = useDashboard();
 
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
     const [showPayment, setShowPayment] = useState(false)
+    const [showReassignDialog, setShowReassignDialog] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
@@ -96,6 +98,14 @@ export default function ComfirmationList() {
         setShowPayment(false)
     }
 
+    const handleOpenReassign = () => {
+        setShowReassignDialog(true)
+    }
+
+    const handleCloseReassign = () => {
+        setShowReassignDialog(false)
+    }
+
     const handlePaymentComplete = () => {
 
     }
@@ -123,7 +133,7 @@ export default function ComfirmationList() {
     }
 
     const total = selectedReservation?.total_amount || 0
-    const serviceFee = total * 0.05
+    const serviceFee = total * (serviceFeePercent / 100)
     const finalTotal = total + serviceFee
 
     const cashReceivedNumber = parseFloat(cashReceived) || 0
@@ -135,7 +145,8 @@ export default function ComfirmationList() {
 
     const quickCashAmounts = useMemo(() => {
         const rounded = Math.ceil(finalTotal / 100) * 100
-        return [rounded, rounded + 100, rounded + 200, Math.ceil(finalTotal)]
+        const amounts = new Set([rounded, rounded + 100, rounded + 200, Math.ceil(finalTotal)])
+        return [...amounts]
     }, [finalTotal])
 
 
@@ -155,11 +166,11 @@ export default function ComfirmationList() {
                     date: selectedReservation.reservation_date,
                     time: selectedReservation.departure_time,
                     passengerName: selectedReservation.customer_name,
-                    passengerPhone: selectedReservation.customer_phone,
                     seatNumbers: selectedReservation.seats.split(',').map(s => parseInt(s.trim(), 10)),
                     totalAmount: selectedReservation.total_amount,
                     isRoundTrip: !!selectedReservation.return_date,
                     returnDate: selectedReservation.return_date || undefined,
+                    purchaseDate: new Date().toISOString(),
                 };
 
                 window.electron.printer.print(ticketPrintData).then((result) => {
@@ -351,6 +362,7 @@ export default function ComfirmationList() {
                                 reservation={selectedReservation}
                                 onPayment={handleOpenPayment}
                                 onClose={handleCloseDetail}
+                                onReassign={handleOpenReassign}
                             />
                         </div>
                     )}
@@ -396,6 +408,15 @@ export default function ComfirmationList() {
                     )}
                 </DialogContent>
             </Dialog>
+
+            {/* Dialog de reasignación de asientos */}
+            {selectedReservation && (
+                <ReassignSeatDialog
+                    open={showReassignDialog}
+                    onClose={handleCloseReassign}
+                    reservation={selectedReservation}
+                />
+            )}
         </div>
     )
 }

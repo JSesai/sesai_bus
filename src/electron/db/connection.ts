@@ -13,6 +13,14 @@ function runMigrations(database: sqlite3.Database) {
             }
         }
     );
+    database.run(
+        "ALTER TABLE app_config ADD COLUMN service_fee_percent INTEGER DEFAULT 0",
+        (err) => {
+            if (err && !err.message.includes("duplicate column")) {
+                console.error("Error en migración service_fee_percent:", err);
+            }
+        }
+    );
 }
 
 export function getDB(): sqlite3.Database {

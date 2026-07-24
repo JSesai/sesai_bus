@@ -7,10 +7,10 @@ export interface TicketPrintData {
   date: string;
   time: string;
   passengerName: string;
-  passengerPhone: string;
   seatNumbers: number[];
   totalAmount: number;
   isRoundTrip: boolean;
   returnDate?: string;
+  purchaseDate?: string;
   ticketId?: string;
 }

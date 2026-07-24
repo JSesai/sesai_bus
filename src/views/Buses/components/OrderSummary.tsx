@@ -4,6 +4,7 @@ import { Ticket, CreditCard, MapPin, Calendar, Clock } from "lucide-react"
 interface OrderSummaryProps {
     selectedSeats: number[];
     pricePerSeat: number;
+    serviceFeePercent: number;
     onContinue: () => void;
     disabledContinue?: boolean;
     tripInfo: {
@@ -16,8 +17,10 @@ interface OrderSummaryProps {
     }
 }
 
-export function OrderSummary({ onContinue, selectedSeats, pricePerSeat, tripInfo, disabledContinue = false }: OrderSummaryProps) {
-    const total = selectedSeats.length * pricePerSeat
+export function OrderSummary({ onContinue, selectedSeats, pricePerSeat, serviceFeePercent, tripInfo, disabledContinue = false }: OrderSummaryProps) {
+    const subtotal = selectedSeats.length * pricePerSeat
+    const serviceFee = subtotal * (serviceFeePercent / 100)
+    const total = subtotal + serviceFee
 
     return (
         <div className="bg-card rounded-xl border border-border p-6 space-y-5">
@@ -73,8 +76,18 @@ export function OrderSummary({ onContinue, selectedSeats, pricePerSeat, tripInfo
             </div>
 
             {/* Total */}
-            <div className="pt-4 border-t border-border">
-                <div className="flex justify-between items-center">
+            <div className="pt-4 border-t border-border space-y-2">
+                <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Subtotal ({selectedSeats.length} × ${pricePerSeat.toFixed(2)})</span>
+                    <span className="font-medium text-foreground">${subtotal.toFixed(2)}</span>
+                </div>
+                {serviceFeePercent > 0 && (
+                    <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Cargo por servicio ({serviceFeePercent}%)</span>
+                        <span className="font-medium text-foreground">${serviceFee.toFixed(2)}</span>
+                    </div>
+                )}
+                <div className="flex justify-between items-center pt-2 border-t border-border">
                     <span className="text-lg font-semibold text-foreground">Total</span>
                     <span className="text-2xl font-bold text-primary">${total.toFixed(2)}</span>
                 </div>

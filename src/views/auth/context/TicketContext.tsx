@@ -1,7 +1,7 @@
 
 
 
-import { createContext, useContext, useMemo, useReducer, useState } from "react";
+import { createContext, useContext, useLayoutEffect, useMemo, useReducer, useState } from "react";
 import { useDashboard } from "./DashBoardContext";
 import { formatDayMonth, getDayName } from "../../../shared/utils/helpers";
 import showAlert, { type PropsModal } from "../../Modals/Modals";
@@ -55,9 +55,12 @@ type TicketContextType = {
         available: string;
         selected: string;
         occupied: string;
+        reserved: string;
         selectedTemporal: string;
     };
     isDateReturnValid: boolean;
+    scheduleDiscount: Discount | null;
+    discountedPricePerSeat: number;
 
     //methods
     resetSteps: () => void;
@@ -88,6 +91,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     const [currentStep, setCurrentStep] = useState<stepsTicketOffice>(stepsTicketOffice.originAndDestinationSelection);
     const [seats, setSeats] = useState<SeatData[]>([]);
     const [stepCompletedSelectedSeats, setStepCompletedSelectedSeats] = useState(false);
+    const [scheduleDiscount, setScheduleDiscount] = useState<Discount | null>(null);
 
 
 
@@ -100,6 +104,15 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     const isRoundTrip = state.travelType === 'round-trip';
     const isReservation = state.bookingType === 'reserve';
     const isDateReturnValid = state.returnDate ? new Date(state.returnDate) >= new Date(state.departureDate) : true;
+    const baseFare = Number(destinationSelected?.baseFare) || 0;
+    const discountedPricePerSeat = useMemo(() => {
+        if (!scheduleDiscount) return baseFare;
+        const discountValue = Number(scheduleDiscount.value) || 0;
+        if (scheduleDiscount.discount_type === 'percentage') {
+            return Math.max(0, baseFare * (1 - discountValue / 100));
+        }
+        return Math.max(0, baseFare - discountValue);
+    }, [scheduleDiscount, baseFare]);
     const stepCompletedTravelTypeAndBookingType = !!(state.bookingType && state.travelType);
     const stepCompletedOrigenDestination = !!(state.idOrigin && state.idDestination);
 
@@ -136,10 +149,11 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
 
     const seatColors = {
-        available: "bg-green-200",
-        selected: "bg-sky-600",
-        occupied: "bg-gray-200",
-        selectedTemporal: "bg-yellow-400",
+        available: "bg-seat-available",
+        selected: "bg-seat-selected",
+        occupied: "bg-seat-occupied",
+        reserved: "bg-seat-reserved",
+        selectedTemporal: "bg-seat-temporal",
     }
     console.warn({ destinationSelected });
 
@@ -150,6 +164,20 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     console.warn({ destinations });
     console.warn({ state });
     console.warn("value destination a setear es:::", state.idDestination);
+
+    useLayoutEffect(() => {
+        if (!state.idSchedule) {
+            setScheduleDiscount(null);
+            return;
+        }
+        window.electron.schedules.getDiscountBySchedule(state.idSchedule).then((res) => {
+            if (res.ok) {
+                setScheduleDiscount(res.data);
+            } else {
+                setScheduleDiscount(null);
+            }
+        });
+    }, [state.idSchedule]);
 
     const numberDeparturesToday = scheduleToSelection.length;
 
@@ -313,7 +341,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     const registerSeatsSelected = async () => {
         return window.electron.tickets.insertSelectedSeats({
             customerId: state.customer?.id || 0,
-            price: destinationSelected?.baseFare || 0,
+            price: discountedPricePerSeat,
             scheduleId: state.idSchedule,
             seatNumbers: seatsSelected,
             return_date: state.returnDate || undefined
@@ -392,7 +420,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         const updateStatusTicket = await window.electron.processFlow.processConfirmedPurchase({
             customerId: state.customer?.id || 0,
             scheduleId: state.idSchedule,
-            totalAmount: destinationSelected?.baseFare ? destinationSelected.baseFare * seatsSelected.length : 0,
+            totalAmount: discountedPricePerSeat * seatsSelected.length,
             paymentMethod: 'cash',
             seatNumbers: seatsSelected
         })
@@ -411,11 +439,11 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             date: state.departureDate,
             time: selectedSchedule?.departure_time || '',
             passengerName: state.customer?.name || '',
-            passengerPhone: state.customer?.phone || '',
             seatNumbers: seatsSelected,
-            totalAmount: destinationSelected?.baseFare ? destinationSelected.baseFare * seatsSelected.length : 0,
+            totalAmount: discountedPricePerSeat * seatsSelected.length,
             isRoundTrip,
             returnDate: state.returnDate,
+            purchaseDate: new Date().toISOString(),
         };
 
         window.electron.printer.print(ticketPrintData).then((result) => {
@@ -487,7 +515,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         })
     }
 
-    const backgrounTiketSale = 'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 border-b border-slate-200 dark:border-slate-700/50 transition-colors';
+    const backgrounTiketSale = 'bg-card text-card-foreground border border-border transition-colors';
     return (
         <TicketContext.Provider value={{
             stepsTicketSale,
@@ -516,6 +544,8 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             seatColors,
             stepCompletedSelectedSeats,
             seatsSelected,
+            scheduleDiscount,
+            discountedPricePerSeat,
 
             dispatch,
             showModalAlert: showAlert,

@@ -5,9 +5,12 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Settings, Save } from "lucide-react";
 import { toast } from "sonner";
+import { useDashboard } from "../../auth/context/DashBoardContext";
 
 export default function GeneralSetting() {
+  const { loadAppConfig } = useDashboard();
   const [minAdvanceMinutes, setMinAdvanceMinutes] = useState(30);
+  const [serviceFeePercent, setServiceFeePercent] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -15,6 +18,7 @@ export default function GeneralSetting() {
     window.electron.appConfig.getAppConfig().then((res) => {
       if (res.ok && res.data) {
         setMinAdvanceMinutes(res.data.min_advance_minutes ?? 30);
+        setServiceFeePercent(res.data.service_fee_percent ?? 0);
       }
       setIsLoading(false);
     });
@@ -28,12 +32,23 @@ export default function GeneralSetting() {
       });
       return;
     }
+    if (serviceFeePercent < 0 || serviceFeePercent > 100) {
+      toast.error("Valor no válido", {
+        description: "El porcentaje de cargo por servicio debe estar entre 0 y 100",
+        position: "top-center",
+      });
+      return;
+    }
     setIsSaving(true);
     try {
-      const res = await window.electron.appConfig.updateAppConfig({ min_advance_minutes: minAdvanceMinutes });
+      const res = await window.electron.appConfig.updateAppConfig({
+        min_advance_minutes: minAdvanceMinutes,
+        service_fee_percent: serviceFeePercent,
+      });
       if (res.ok) {
+        await loadAppConfig();
         toast.success("Configuración guardada", {
-          description: `Se requiere al menos ${minAdvanceMinutes} minutos de anticipación para crear salidas del día de hoy`,
+          description: `Cargo por servicio: ${serviceFeePercent}% | Anticipación: ${minAdvanceMinutes} min`,
           position: "top-center",
         });
       } else {
@@ -78,6 +93,28 @@ export default function GeneralSetting() {
             <span className="text-sm text-muted-foreground">minutos</span>
           </div>
         </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="serviceFee" className="text-base font-medium">
+            Cargo por servicio
+          </Label>
+          <p className="text-sm text-muted-foreground">
+            Porcentaje adicional que se cobra sobre el subtotal del boleto. Se muestra desglosado en el resumen de compra. Configurar en 0 para no cobrar.
+          </p>
+          <div className="flex items-center gap-3 mt-3">
+            <Input
+              id="serviceFee"
+              type="number"
+              min="0"
+              max="100"
+              value={serviceFeePercent}
+              onChange={(e) => setServiceFeePercent(Number(e.target.value))}
+              className="h-11 w-32"
+            />
+            <span className="text-sm text-muted-foreground">%</span>
+          </div>
+        </div>
+
         <Button onClick={handleSave} disabled={isSaving} className="h-11">
           <Save size={16} className="mr-2" />
           {isSaving ? "Guardando..." : "Guardar"}

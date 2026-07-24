@@ -24,10 +24,15 @@ type DashboardContextType = {
   numberRegisteredDriver: number;
   theme: Theme;
   backgrounDynamic: string;
+  discounts: Discount[];
+  sidebarOpen: boolean;
+  serviceFeePercent: number;
 
   //methods
   loadSystemInformation: () => Promise<void>;
+  loadAppConfig: () => Promise<void>;
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
+  setSidebarOpen: (open: boolean) => void;
   handleRegisterBus: (dataBus: Bus, editingBus?: boolean, configInitial?: boolean) => Promise<boolean>;
   handleUpdateStatus: (dataBus: Bus, configInitial?: boolean) => Promise<boolean>;
   handleGetBuses: () => Promise<void>
@@ -37,6 +42,7 @@ type DashboardContextType = {
   handleRegisterUser: (user: UserForm, configInitial: boolean, isEditing: boolean) => Promise<boolean>;
   showConfetti: () => void;
   handleAddDiscount: (discount: Discount) => Promise<boolean>;
+  getDiscountsByDate: (date: string) => Promise<void>;
 
 };
 
@@ -53,8 +59,15 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [runningSchedules, setRunningSchedules] = useState<ScheduleData[]>([]);
   const [employees, setEmployees] = useState<UserSample[]>([]);
   const [theme, setTheme] = useState<Theme>("dark");
+  const [discounts, setDiscounts] = useState<Discount[]>([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [serviceFeePercent, setServiceFeePercent] = useState(0);
 
-
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove("light", "dark");
+    root.classList.add(theme);
+  }, [theme]);
 
   //mostrar confetti 
   const showConfetti = () => {
@@ -547,22 +560,34 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   //manejador para agregar descuentos a salidas
   const handleAddDiscount = async (discount: Discount): Promise<boolean> => {
 
-    const addDiscount = await window.electron.schedules.addDiscount(discount);
-    if (addDiscount) {
-      toast.error(addDiscount.error?.message, {
+    const result = await window.electron.schedules.addDiscount(discount);
+    if (!result.ok) {
+      toast.error(result.error?.message, {
         richColors: true,
-        description: addDiscount.error?.detail,
+        description: result.error?.detail,
         duration: 10_000,
         position: 'top-center'
       })
       return false;
     }
 
-    console.log({ addDiscount });
+    toast.success("Descuento aplicado", {
+      description: "El descuento se ha registrado correctamente",
+      richColors: true,
+      duration: 5_000,
+      position: 'top-center'
+    });
 
+    return true;
+  }
 
-    return false;
-
+  const getDiscountsByDate = async (date: string): Promise<void> => {
+    const result = await window.electron.schedules.getDiscountsByDate(date);
+    if (!result.ok) {
+      console.error('Error al obtener descuentos:', result.error?.message);
+      return;
+    }
+    setDiscounts(result.data || []);
   }
 
   //obtener salidas basadas en bus_daily_assignments
@@ -572,8 +597,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const loadSystemInformation = async () => {
     try {
       setIsLoading(true);
-      //multiples peticiones para traer informacion del sistema busesm horarios, clientes, ventas, etc...
-      const results = await Promise.allSettled([getAgency(), handleGetBuses(), handleGetRoutes(), handleGetSchedules(), getEmployees(), getAgencies()]);
+      const results = await Promise.allSettled([getAgency(), handleGetBuses(), handleGetRoutes(), handleGetSchedules(), getEmployees(), getAgencies(), loadAppConfig()]);
       results.forEach((result, index) => {
 
         if (result.status === "fulfilled") {
@@ -590,6 +614,17 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
     }
 
+  }
+
+  const loadAppConfig = async () => {
+    try {
+      const res = await window.electron.appConfig.getAppConfig();
+      if (res.ok && res.data) {
+        setServiceFeePercent(res.data.service_fee_percent ?? 0);
+      }
+    } catch (error) {
+      console.log('error al obtener app config', error);
+    }
   }
 
 
@@ -614,8 +649,9 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       showConfetti,
       setTheme,
       handleAddDiscount,
+      getDiscountsByDate,
       theme,
-      backgrounDynamic: 'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 border-b border-slate-200 dark:border-slate-700/50 transition-colors',
+      backgrounDynamic: 'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#1e293b] dark:to-[#0f172a] p-6 border-b border-border transition-colors',
       destinations,
       runningSchedules,
       vehicles,
@@ -623,11 +659,16 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       agency,
       agencies,
+      discounts,
+      sidebarOpen,
+      setSidebarOpen,
       numberRegisteredVehicles: vehicles.length,
       numberRegisteredDestinations: destinations.length,
       numberRegisterSchedule: runningSchedules.length,
       driverEmployees,
-      numberRegisteredDriver: driverEmployees.length
+      numberRegisteredDriver: driverEmployees.length,
+      serviceFeePercent,
+      loadAppConfig
 
 
     }}>

@@ -2,6 +2,7 @@ import { useState, useLayoutEffect } from "react"
 import { BusLayout } from "../BusLayout/BusLayout"
 import { SeatLegend } from "./SeatLegend"
 import { useTicket } from "../../auth/context/TicketContext"
+import { useDashboard } from "../../auth/context/DashBoardContext"
 import { Card } from "../../components/ui/card"
 import { OrderSummary } from "./OrderSummary"
 import { formatDateDisplay } from "../../../shared/utils/helpers"
@@ -9,8 +10,10 @@ import { formatDateDisplay } from "../../../shared/utils/helpers"
 export function SeatSelection() {
 
     const { handleSeatSelect, backgrounTiketSale, seats, state, cityOrigin, cityDestination,
-        destinationSelected, totalPassengers, selectedSchedule, getSeatStatus, handleRegisterTicket
+        destinationSelected, totalPassengers, selectedSchedule, getSeatStatus, handleRegisterTicket,
+        discountedPricePerSeat
     } = useTicket();
+    const { serviceFeePercent } = useDashboard();
     const [totalSeats] = useState(seats.length || 0);
     const [seatsPerRow] = useState(4)
 
@@ -24,7 +27,7 @@ export function SeatSelection() {
 
 
     return (
-        <Card className={`${backgrounTiketSale} dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden `}>
+        <Card className={`${backgrounTiketSale} overflow-hidden`}>
 
             <div className="flex justify-around gap-8">
                 {/* Left column - Bus layout */}
@@ -68,7 +71,8 @@ export function SeatSelection() {
 
                     <OrderSummary
                         selectedSeats={seats.filter((s) => s.status === "selected").map((s) => s.seat_number)}
-                        pricePerSeat={Number(destinationSelected?.baseFare) || 0}
+                        pricePerSeat={discountedPricePerSeat}
+                        serviceFeePercent={serviceFeePercent}
                         onContinue={handleRegisterTicket}
                         disabledContinue={seats.filter((s) => s.status === "selected").map((s) => s.seat_number).length !== totalPassengers}
                         tripInfo={{
