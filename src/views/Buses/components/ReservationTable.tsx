@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "
 import { StatusBadge } from './StatusBadge';
 import { cn } from '../../lib/utils'
 import type { Reservation } from "../../auth/context/ReservationContext";
+import { Sparkles } from 'lucide-react'
 
 
 interface ReservationTableProps {
@@ -118,7 +119,24 @@ export function ReservationTable({
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-right font-medium text-foreground">
-                                        ${reservation.total_amount.toFixed(2)}
+                                        {(() => {
+                                            const numSeats = reservation.seats.split(',').length;
+                                            const originalTotal = reservation.base_fare * numSeats;
+                                            const hasDiscount = originalTotal > reservation.total_amount;
+                                            return (
+                                                <div className="flex flex-col items-end">
+                                                    {hasDiscount && (
+                                                        <div className="text-xs text-muted-foreground line-through">
+                                                            ${originalTotal.toFixed(2)}
+                                                        </div>
+                                                    )}
+                                                    <div className={cn("flex items-center gap-1", hasDiscount && "text-destructive font-bold")}>
+                                                        {hasDiscount && <Sparkles className="w-3 h-3" />}
+                                                        ${reservation.total_amount.toFixed(2)}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <StatusBadge status={reservation.ticket_status} />

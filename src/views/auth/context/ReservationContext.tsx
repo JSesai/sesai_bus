@@ -58,6 +58,7 @@ type ReservationContextType = {
     // handleConfirmTicketSale: () => Promise<void>;
     payReservation: (r: Reservation) => Promise<void>;
     handleConfirmReservation: () => Promise<void>;
+    reassignReservationSeats: (scheduleId: number, customerId: number, oldSeats: number[], newSeats: number[]) => Promise<void>;
 
 };
 
@@ -77,6 +78,7 @@ export interface Reservation {
     terminalName: string;
     ticket_status: SeatData['status'];
     total_amount: number;
+    base_fare: number;
 }
 
 export const ReservationContext = createContext<ReservationContextType | undefined>(undefined);
@@ -204,6 +206,31 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
 
     }
 
+    const reassignReservationSeats = async (scheduleId: number, customerId: number, oldSeats: number[], newSeats: number[]): Promise<void> => {
+        const result = await window.electron.tickets.reassignSeats(scheduleId, customerId, oldSeats, newSeats);
+
+        if (!result.ok) {
+            showNofification({
+                typeAlert: 'error',
+                title: 'Error al reasignar asientos',
+                message: result.error?.message || 'No fue posible reasignar los asientos, intenta nuevamente'
+            });
+            return;
+        }
+
+        showNofification({
+            typeAlert: 'success',
+            title: 'Asientos reasignados',
+            message: 'Los asientos se reasignaron correctamente.'
+        });
+
+        // Refrescar la lista de reservaciones
+        const lastDate = reservations.length > 0 ? reservations[0].reservation_date : '';
+        if (lastDate) {
+            await getReservationsByDate(lastDate);
+        }
+    }
+
     const payReservation = async (params: Reservation) => {
 
 
@@ -240,7 +267,7 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
 
 
 
-    const backgrounTiketSale = 'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 border-b border-slate-200 dark:border-slate-700/50 transition-colors';
+    const backgrounTiketSale = 'bg-card text-card-foreground border border-border transition-colors';
     return (
         <ReservationContext.Provider value={{
             reservations,
@@ -281,7 +308,8 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
             // handleConfirmTicketSale,
             handleConfirmReservation,
             payReservation,
-            getReservationsByDate
+            getReservationsByDate,
+            reassignReservationSeats
 
         }}>
             {children}

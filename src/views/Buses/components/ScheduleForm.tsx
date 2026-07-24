@@ -62,7 +62,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const today = new Date().toISOString().split("T")[0];
+    const today = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
     if (formData.dateDeparture === today) {
       const now = new Date();
       const [h, m] = [now.getHours(), now.getMinutes() + minAdvanceMinutes];

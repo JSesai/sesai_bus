@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useLayoutEffect, useMemo, useState } from "react"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Badge } from "../../components/ui/badge"
@@ -10,16 +10,20 @@ import { useSearchParams } from "react-router-dom"
 import { toCapitalCase } from "../../shared/utils/helpers"
 import { CalendarCustom } from "./CalendarCustom"
 import type { DateRange } from "react-day-picker"
-import { getTodayDate } from "../../../shared/utils/helpers"
+import { getTodayDate, formatDateLong } from "../../../shared/utils/helpers"
 import { useTicket } from "../../auth/context/TicketContext"
 
 
 
 export default function SchedulesManager({ configInitial = false }: { configInitial?: boolean }) {
-  const { numberRegisterSchedule, runningSchedules, handleAddDiscount } = useDashboard();
+  const { numberRegisterSchedule, runningSchedules, handleAddDiscount, discounts, getDiscountsByDate } = useDashboard();
   const { showModalAlert } = useTicket();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [date, setDate] = React.useState<DateRange | Date | undefined>(new Date(getTodayDate()));
+  const todayStr = getTodayDate();
+  const [date, setDate] = React.useState<DateRange | Date | undefined>(() => {
+    const [y, m, d] = todayStr.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  });
 
   const [searchTerm, setSearchTerm] = useState("")
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null)
@@ -36,7 +40,7 @@ export default function SchedulesManager({ configInitial = false }: { configInit
       res.terminal_origin.toUpperCase().includes(searchTerm.toUpperCase())
 
       const matchesStatus = res.status === 'active';
-      const matchesDate = res.dateDeparture === (date instanceof Date ? date.toISOString().split('T')[0] : date);
+      const matchesDate = res.dateDeparture === (date instanceof Date ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}` : date);
 
       return matchesSearch && matchesStatus && matchesDate
     })
@@ -46,37 +50,45 @@ export default function SchedulesManager({ configInitial = false }: { configInit
 
   const handleChangeDate = (selectedDate: Date | DateRange | undefined) => {
     if (selectedDate && 'from' in selectedDate) {
-      setDate(selectedDate.from); // Use the 'from' date if it's a DateRange
+      setDate(selectedDate.from);
     } else {
-      searchTerm && setSearchTerm("") // Clear search term when changing date
-      setDate(selectedDate); // Use the Date directly
+      searchTerm && setSearchTerm("")
+      setDate(selectedDate);
     }
   }
+
+  useLayoutEffect(() => {
+    const dateStr = date instanceof Date ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}` : undefined;
+    if (dateStr) {
+      getDiscountsByDate(dateStr);
+    }
+  }, [date]);
 
 
   const handleToggleActivo = (id: number) => {
   }
 
   const startProcessDiscount = (schedule: Schedule) => {
-    console.log({ schedule });
-
-    //muestra modal para pedir ingresar el porcentaje de descuento a aplicar, luego hace la petición para aplicar el descuento a ese horario
     showModalAlert({
       typeAlert: 'discountInputOptions',
-      callbackAcept: (value) => {
-        console.log({ value });
-        //aqui va la petición para aplicar el descuento al horario, se le pasa el id del horario y el valor del descuento
-        const description = value.discountType === 'percentage' ? `Descuento del ${value.value}% para la salida del ${schedule.departure_time}` : `Descuento de $${value.value} para la salida del ${schedule.departure_time}`;
-        handleAddDiscount({
+      callbackAcept: async (value) => {
+        const description = value.discountType === 'percentage'
+          ? `Descuento del ${value.value}% para la salida del ${schedule.departure_time}`
+          : `Descuento de $${value.value} para la salida del ${schedule.departure_time}`;
+
+        const success = await handleAddDiscount({
           schedule_id: schedule.id || 0,
           description: description,
           discount_type: value.discountType,
-          value: Number(value),
-        })
+          value: Number(value.value),
+        });
+
+        if (success) {
+          const dateStr = schedule.dateDeparture;
+          await getDiscountsByDate(dateStr);
+        }
       }
-
     })
-
   }
 
   const startEdit = (horario: Schedule) => {
@@ -221,9 +233,17 @@ export default function SchedulesManager({ configInitial = false }: { configInit
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <Clock className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">
-                    Descuento: <span className="font-medium text-foreground">{'10%'}</span>
+                    Descuento: <span className="font-medium text-foreground">
+                      {(() => {
+                        const scheduleDiscount = discounts.find((d) => d.schedule_id === schedule.id);
+                        if (!scheduleDiscount) return 'Sin descuento';
+                        return scheduleDiscount.discount_type === 'percentage'
+                          ? `${scheduleDiscount.value}%`
+                          : `$${scheduleDiscount.value}`;
+                      })()}
+                    </span>
                   </span>
                 </div>
               </div>
@@ -235,7 +255,7 @@ export default function SchedulesManager({ configInitial = false }: { configInit
                     <p className="text-xs text-muted-foreground mb-1">Fecha de salida:</p>
                     <div className="flex flex-wrap gap-1">
 
-                      <span className="font-medium text-foreground">{schedule.dateDeparture}</span>
+                      <span className="font-medium text-foreground capitalize">{formatDateLong(schedule.dateDeparture)}</span>
 
 
                     </div>

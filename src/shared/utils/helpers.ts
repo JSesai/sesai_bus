@@ -132,21 +132,28 @@ export const getDayName = (dateStr: string): string => {
 
 export const minDateToday = () => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const minDate = today.toISOString().split("T")[0];
-    return minDate;
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 export const oneMontFromToday = () => {
     const today = new Date();
-    const oneMonthLater = addHours(today, 24 * 30);
-    return oneMonthLater.toISOString().split("T")[0];
+    today.setDate(today.getDate() + 30);
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 export const oneWeekFromToday = () => {
     const today = new Date();
-    const oneWeekLater = addHours(today, 24 * 7);
-    return oneWeekLater.toISOString().split("T")[0];
+    today.setDate(today.getDate() + 7);
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 /**
@@ -177,6 +184,11 @@ export const formatDateDisplay = (dateString: string): string => {
 export const formatDayMonth = (dateString: string): string => {
     const date = parseISO(dateString);
     return format(date, "dd/MM", { locale: es });
+};
+
+export const formatDateLong = (dateString: string): string => {
+    const date = parseISO(dateString);
+    return format(date, "EEEE d 'de' MMMM", { locale: es });
 };
 
 

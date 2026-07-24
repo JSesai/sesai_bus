@@ -1,23 +1,25 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Separator } from '../../components/ui/separator';
-import { User, Phone, Calendar, CreditCard, Armchair, X, MapPin, Clock, TicketX, Printer } from 'lucide-react';
+import { User, Phone, Calendar, CreditCard, Armchair, X, MapPin, Clock, TicketX, Printer, ArrowLeftRight, Sparkles } from 'lucide-react';
 import { StatusBadge } from './StatusBadge';
 import { TicketPreviewModal } from './TicketPreviewModal';
 import { useState } from 'react';
 import { useDashboard } from '../../auth/context/DashBoardContext';
+import { cn } from '../../lib/utils';
 import type { Reservation } from '../../auth/context/ReservationContext';
 
 interface ReservationDetailProps {
     reservation: Reservation
     onPayment: () => void
     onClose: () => void
+    onReassign: () => void
 }
 
-export function ReservationDetail({ reservation, onPayment, onClose, }: ReservationDetailProps) {
+export function ReservationDetail({ reservation, onPayment, onClose, onReassign, }: ReservationDetailProps) {
     console.log('reservation detail ->', reservation);
 
-    const { customer_name, customer_phone, reservation_date, departure_time, cityName: cityNameDestination, seats, total_amount, ticket_status, origin, return_date } = reservation;
+    const { customer_name, customer_phone, reservation_date, departure_time, cityName: cityNameDestination, seats, total_amount, ticket_status, origin, return_date, base_fare } = reservation;
     const { agency } = useDashboard();
     const [showTicketModal, setShowTicketModal] = useState(false);
 
@@ -134,9 +136,26 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                     </div>
                     <div className="flex items-center justify-between">
                         <span className="text-lg font-medium text-foreground">Total</span>
-                        <span className="text-2xl font-bold text-primary">
-                            ${total_amount.toLocaleString('es-MX')}
-                        </span>
+                        <div className="text-right">
+                            {(() => {
+                                const numSeats = seats.split(',').length;
+                                const originalTotal = base_fare * numSeats;
+                                const hasDiscount = originalTotal > total_amount;
+                                return (
+                                    <>
+                                        {hasDiscount && (
+                                            <div className="flex items-center justify-end gap-1.5 text-sm text-muted-foreground line-through">
+                                                <Sparkles className="w-3 h-3" />
+                                                ${originalTotal.toLocaleString('es-MX')}
+                                            </div>
+                                        )}
+                                        <span className={cn("text-2xl font-bold", hasDiscount ? "text-destructive" : "text-primary")}>
+                                            ${total_amount.toLocaleString('es-MX')}
+                                        </span>
+                                    </>
+                                );
+                            })()}
+                        </div>
                     </div>
                 </div>
 
@@ -160,6 +179,13 @@ export function ReservationDetail({ reservation, onPayment, onClose, }: Reservat
                             Reimprimir Ticket
                         </Button>
                     </>
+                )}
+
+                {(ticket_status === 'reserved' || ticket_status === 'occupied') && (
+                    <Button onClick={onReassign} className="w-full" size="lg" variant="outline">
+                        <ArrowLeftRight className="mr-2 h-4 w-4" />
+                        Reasignar Asientos
+                    </Button>
                 )}
 
                 {ticket_status === 'cancelled' ? (

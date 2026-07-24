@@ -178,6 +178,98 @@ export const ticketsRepo = {
     });
   },
 
+  reassignSeats: (
+    scheduleId: number,
+    customerId: number,
+    oldSeatNumbers: number[],
+    newSeatNumbers: number[]
+  ): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (oldSeatNumbers.length === 0 || newSeatNumbers.length === 0) {
+        return reject(new Error("Se requieren asientos anteriores y nuevos para reasignar."));
+      }
+      if (oldSeatNumbers.length !== newSeatNumbers.length) {
+        return reject(new Error("La cantidad de asientos anteriores y nuevos debe ser igual."));
+      }
+
+      const placeholders = newSeatNumbers.map(() => "?").join(", ");
+      const checkSql = `
+        SELECT DISTINCT seat_number FROM tickets
+        WHERE schedule_id = ?
+          AND seat_number IN (${placeholders})
+          AND status NOT IN ('cancelled')
+      `;
+
+      db.get(checkSql, [scheduleId, ...newSeatNumbers], (err, row: any) => {
+        if (err) {
+          return reject(err);
+        }
+        if (row) {
+          return reject(new Error(`El asiento ${row.seat_number} no está disponible.`));
+        }
+
+        // Eliminar tickets cancelados para los nuevos asientos (evita conflicto con unique index)
+        const deleteCancelledSql = `
+          DELETE FROM tickets
+          WHERE schedule_id = ?
+            AND seat_number IN (${placeholders})
+            AND status = 'cancelled'
+        `;
+
+        db.run(deleteCancelledSql, [scheduleId, ...newSeatNumbers], (delErr) => {
+          if (delErr) {
+            return reject(delErr);
+          }
+
+          // Ejecutar updates secuencialmente dentro de una transacción
+          const updateStmt = `
+            UPDATE tickets
+            SET seat_number = ?
+            WHERE schedule_id = ?
+              AND seat_number = ?
+              AND customer_id = ?
+              AND status IN ('reserved', 'occupied')
+          `;
+
+          const runUpdate = (index: number): void => {
+            if (index >= oldSeatNumbers.length) {
+              // Todos los updates completos, hacer commit
+              db.run("COMMIT", (commitErr) => {
+                if (commitErr) {
+                  db.run("ROLLBACK");
+                  return reject(commitErr);
+                }
+                resolve();
+              });
+              return;
+            }
+
+            db.run(updateStmt, [newSeatNumbers[index], scheduleId, oldSeatNumbers[index], customerId], function (updateErr) {
+              if (updateErr) {
+                db.run("ROLLBACK");
+                return reject(updateErr);
+              }
+              if (this.changes === 0) {
+                db.run("ROLLBACK");
+                return reject(new Error(`No se encontró el asiento ${oldSeatNumbers[index]} para reasignar.`));
+              }
+              // Continuar con el siguiente update
+              runUpdate(index + 1);
+            });
+          };
+
+          // Iniciar transacción y comenzar updates
+          db.run("BEGIN TRANSACTION", (txErr) => {
+            if (txErr) {
+              return reject(txErr);
+            }
+            runUpdate(0);
+          });
+        });
+      });
+    });
+  },
+
   getReservationsByDate: async (date: string): Promise<any[]> => {
     return new Promise((resolve, reject) => {
       const sql = `
@@ -191,6 +283,7 @@ export const ticketsRepo = {
           r.origin,
           r.cityName,
           r.terminalName,
+          r.baseFare AS base_fare,
           GROUP_CONCAT(t.seat_number, ', ') AS seats,
           SUM(t.price) AS total_amount,
           t.status AS ticket_status,
@@ -202,7 +295,7 @@ export const ticketsRepo = {
         JOIN routes r ON s.route_id = r.id
         WHERE DATE(s.dateDeparture) = DATE(?)
         AND t.status IN ('reserved', 'cancelled', 'occupied')
-        GROUP BY c.name, c.phone, s.id, s.departure_time, r.origin, r.cityName, r.terminalName, t.status, reservation_date, t.return_date
+        GROUP BY c.name, c.phone, s.id, s.departure_time, r.origin, r.cityName, r.terminalName, r.baseFare, t.status, reservation_date, t.return_date
         ORDER BY s.dateDeparture ASC;
       `;
 
