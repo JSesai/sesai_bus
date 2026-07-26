@@ -328,4 +328,43 @@ export const schedulesRepo = {
       );
     }),
 
+  getTodayDepartures: (): Promise<any[]> =>
+    new Promise((resolve, reject) => {
+      db.all(
+        `
+        SELECT 
+          s.id,
+          s.departure_time,
+          s.arrival AS arrival_time,
+          s.vehicle_number,
+          s.status,
+          s.dateDeparture,
+          r.terminalName AS terminal_destination,
+          r.cityName AS city_destination,
+          r.origin AS city_origin,
+          r.estimatedTravelTime,
+          b.plate AS bus_plate,
+          b.model AS bus_model,
+          b.seatingCapacity,
+          ud.name AS driver_name,
+          a.name AS agency_name,
+          (SELECT COUNT(*) FROM tickets t 
+           WHERE t.schedule_id = s.id 
+             AND t.status IN ('occupied','reserved')) AS occupied_seats
+        FROM schedules s
+        JOIN routes r ON s.route_id = r.id
+        JOIN buses b ON s.bus_id = b.id
+        JOIN users ud ON s.driver_id = ud.id
+        JOIN agencies a ON s.agency_id = a.id
+        WHERE DATE(s.dateDeparture) = DATE('now', 'localtime')
+          AND s.status = 'active'
+        ORDER BY s.departure_time ASC
+        `,
+        (err, rows: any[]) => {
+          if (err) reject(err);
+          else resolve(rows || []);
+        }
+      );
+    }),
+
 };

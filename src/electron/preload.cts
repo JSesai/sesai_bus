@@ -112,6 +112,17 @@ const licenseAPI: LicenseAPI = {
   getLicenseStatus: () => ipcRenderer.invoke("getLicenseStatus"),
 }
 
+const waitingRoomAPI: WaitingRoomAPI = {
+  open: () => ipcRenderer.invoke("openWaitingRoom"),
+  close: () => ipcRenderer.invoke("closeWaitingRoom"),
+  toggle: () => ipcRenderer.invoke("toggleWaitingRoom"),
+  getStatus: () => ipcRenderer.invoke("getWaitingRoomStatus"),
+  getTodayDepartures: () => ipcRenderer.invoke("getTodayDepartures"),
+  getUrl: () => ipcRenderer.invoke("getWaitingRoomUrl"),
+  getConfig: () => ipcRenderer.invoke("getWaitingRoomConfig"),
+  saveConfig: (config) => ipcRenderer.invoke("saveWaitingRoomConfig", config),
+}
+
 contextBridge.exposeInMainWorld("electron", {
   users: usersAPI,
   agency: agencyAPI,
@@ -125,5 +136,6 @@ contextBridge.exposeInMainWorld("electron", {
   biometric: biometricAPI,
   appConfig: appConfiAPI,
   printer: printerAPI,
-  license: licenseAPI
+  license: licenseAPI,
+  waitingRoom: waitingRoomAPI
 });

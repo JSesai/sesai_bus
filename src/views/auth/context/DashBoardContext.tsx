@@ -27,6 +27,7 @@ type DashboardContextType = {
   discounts: Discount[];
   sidebarOpen: boolean;
   serviceFeePercent: number;
+  waitingRoomOpen: boolean;
 
   //methods
   loadSystemInformation: () => Promise<void>;
@@ -43,6 +44,7 @@ type DashboardContextType = {
   showConfetti: () => void;
   handleAddDiscount: (discount: Discount) => Promise<boolean>;
   getDiscountsByDate: (date: string) => Promise<void>;
+  toggleWaitingRoom: () => Promise<void>;
 
 };
 
@@ -62,6 +64,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [discounts, setDiscounts] = useState<Discount[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [serviceFeePercent, setServiceFeePercent] = useState(0);
+  const [waitingRoomOpen, setWaitingRoomOpen] = useState(false);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -627,6 +630,28 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const toggleWaitingRoom = async () => {
+    try {
+      const res = await window.electron.waitingRoom.toggle();
+      if (res.ok && res.data) {
+        setWaitingRoomOpen(res.data.isOpen);
+      }
+    } catch (error) {
+      console.log('error al toggle waiting room', error);
+    }
+  };
+
+  const checkWaitingRoomStatus = async () => {
+    try {
+      const res = await window.electron.waitingRoom.getStatus();
+      if (res.ok && res.data) {
+        setWaitingRoomOpen(res.data.isOpen);
+      }
+    } catch (error) {
+      console.log('error al verificar estado waiting room', error);
+    }
+  };
+
 
   const driverEmployees = useMemo(() => employees.filter(e => e.role === 'driver'), [employees]);
 
@@ -634,6 +659,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   // get agencia
   useEffect(() => {
     loadSystemInformation();
+    checkWaitingRoomStatus();
   }, [userLogged]);
 
   return (
@@ -650,6 +676,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       setTheme,
       handleAddDiscount,
       getDiscountsByDate,
+      toggleWaitingRoom,
       theme,
       backgrounDynamic: 'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#1e293b] dark:to-[#0f172a] p-6 border-b border-border transition-colors',
       destinations,
@@ -662,6 +689,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       discounts,
       sidebarOpen,
       setSidebarOpen,
+      waitingRoomOpen,
       numberRegisteredVehicles: vehicles.length,
       numberRegisteredDestinations: destinations.length,
       numberRegisterSchedule: runningSchedules.length,

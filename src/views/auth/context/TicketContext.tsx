@@ -73,7 +73,7 @@ type TicketContextType = {
     handleSeatSelect: (seatId: number) => void;
     handleRegisterCustomer: (customer: Customer, isSearch: boolean) => Promise<Customer | null>;
     handleRegisterTicket: () => Promise<void>;
-    handleConfirmTicketSale: () => Promise<void>;
+    handleConfirmTicketSale: (paymentMethod: string) => Promise<void>;
     handleTicketSaleCard: () => void;
     handleConfirmReservation: () => Promise<void>;
     handleRegisterTicketAtBack: () => Promise<void>;
@@ -415,18 +415,18 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     }
 
 
-    const handleConfirmTicketSale = async (): Promise<void> => {
+    const handleConfirmTicketSale = async (paymentMethod: string = 'cash'): Promise<void> => {
 
         const updateStatusTicket = await window.electron.processFlow.processConfirmedPurchase({
             customerId: state.customer?.id || 0,
             scheduleId: state.idSchedule,
             totalAmount: discountedPricePerSeat * seatsSelected.length,
-            paymentMethod: 'cash',
+            paymentMethod: paymentMethod as Payment["method"],
             seatNumbers: seatsSelected
         })
 
 
-        if (!updateStatusTicket) return;
+        if (!updateStatusTicket?.ok) return;
 
         const originAgency = agencies?.find((a) => a.id === state.idOrigin);
 

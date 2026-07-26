@@ -57,7 +57,7 @@ type ReservationContextType = {
     // handleSeatSelect: (seatId: number) => void;
     handleRegisterCustomer: (customer: Customer, isSearch: boolean) => Promise<Customer | null>;
     // handleConfirmTicketSale: () => Promise<void>;
-    payReservation: (r: Reservation) => Promise<void>;
+    payReservation: (r: Reservation, paymentMethod?: string) => Promise<void>;
     handleConfirmReservation: () => Promise<void>;
     reassignReservationSeats: (scheduleId: number, customerId: number, oldSeats: number[], newSeats: number[]) => Promise<void>;
     cancelReservation: (reservation: Reservation, reason: string) => Promise<void>;
@@ -234,7 +234,7 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
         }
     }
 
-    const payReservation = async (params: Reservation) => {
+    const payReservation = async (params: Reservation, paymentMethod: string = 'cash') => {
 
 
         console.log('front process pay reservation')
@@ -244,12 +244,15 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
             customerId: params.customer_id,
             scheduleId: params.schedule_id,
             totalAmount: params.total_amount,
-            paymentMethod: 'cash',
+            paymentMethod: paymentMethod as Payment["method"],
             seatNumbers: params.seats.split(',').map((s) => parseInt(s.trim(), 10))
         })
 
 
-        if (!comfirmPay) return;
+        if (!comfirmPay?.ok) return;
+
+        //actualizar la lista de reservaciones antes de mostrar el alert
+        await getReservationsByDate(params.reservation_date);
 
         showAlert({
             typeAlert: 'success',
@@ -262,9 +265,6 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
             }
 
         })
-
-        //actualizar la lista de reservaciones
-        await getReservationsByDate(params.reservation_date);
 
     }
 

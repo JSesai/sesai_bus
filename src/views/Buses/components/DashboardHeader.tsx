@@ -1,4 +1,4 @@
-import { Bell, Moon, Search, Sun, LogOut, User, BusFront, Menu } from "lucide-react";
+import { Bell, Moon, Search, Sun, LogOut, User, BusFront, Menu, Monitor, MonitorOff } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "../../components/ui/dropdown-menu";
@@ -12,7 +12,7 @@ declare const __APP_VERSION__: string
 export default function DashboardHeader() {
   const { userLogged, logout } = useAuth();
 
-  const { theme, setTheme, setSidebarOpen } = useDashboard();
+  const { theme, setTheme, setSidebarOpen, waitingRoomOpen, toggleWaitingRoom } = useDashboard();
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -58,6 +58,28 @@ export default function DashboardHeader() {
         </div>
 
         <div className="flex items-center space-x-1 md:space-x-3">
+          {/* Waiting Room Toggle */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleWaitingRoom}
+                  className={waitingRoomOpen
+                    ? "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
+                    : "text-muted-foreground hover:text-foreground"
+                  }
+                >
+                  {waitingRoomOpen ? <MonitorOff className="h-5 w-5" /> : <Monitor className="h-5 w-5" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{waitingRoomOpen ? "Cerrar pantalla de sala" : "Abrir pantalla de sala de espera"}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
           {/* Notifications */}
           <TooltipProvider>
             <Tooltip>

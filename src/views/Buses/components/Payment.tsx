@@ -74,16 +74,6 @@ export default function Payment() {
 
     }
 
-    if (paymentMethod === "card") {
-        showNofification({
-            typeAlert: 'info',
-            title: 'Función no implementada',
-            message: 'La función de cobro con tarjeta no está implementada en esta versión.'
-
-        })
-
-    }
-
 
     return (
         <div className="min-h-screen bg-background">
@@ -116,8 +106,8 @@ export default function Payment() {
                             selectedSeats={seats.filter((s) => s.status === "selected").map((s) => s.seat_number)}
                             pricePerSeat={discountedPricePerSeat}
                             serviceFeePercent={serviceFeePercent}
-                            onContinue={paymentMethod === 'cash' ? handleConfirmTicketSale : handleTicketSaleCard}
-                            disabledContinue={paymentMethod === "cash" ? !canCompleteCashPayment : false}
+                            onContinue={paymentMethod === 'card' ? handleTicketSaleCard : () => handleConfirmTicketSale(paymentMethod)}
+                            disabledContinue={paymentMethod === 'cash' ? !canCompleteCashPayment : false}
                             tripInfo={{
                                 origin: cityOrigin,
                                 accionBtn: state.bookingType === 'reserve' ? 'Confirmar reservación' : 'Confirmar pago',

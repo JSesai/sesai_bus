@@ -6,7 +6,8 @@ import {
     Mail,
     Phone, CheckCircle2, Banknote,
     Coins,
-    Receipt
+    Receipt,
+    Landmark
 } from "lucide-react"
 import { Label } from "../../components/ui/label"
 import { Input } from "../../components/ui/input"
@@ -80,7 +81,7 @@ export default function PayForm(props: PropsPayForm) {
                         <h2 className="font-semibold">Método de Pago</h2>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-3 gap-4">
                         <button
                             type="button"
                             onClick={() => setPaymentMethod("card")}
@@ -116,6 +117,25 @@ export default function PayForm(props: PropsPayForm) {
                             <span className={`font-medium ${paymentMethod === "cash" ? "text-primary" : "text-foreground"
                                 }`}>
                                 Efectivo
+                            </span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setPaymentMethod("transfer")}
+                            className={`flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all ${paymentMethod === "transfer"
+                                ? "border-primary bg-primary/5"
+                                : "border-border hover:border-muted-foreground/50"
+                                }`}
+                        >
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${paymentMethod === "transfer" ? "bg-primary/10" : "bg-muted"
+                                }`}>
+                                <Landmark className={`w-6 h-6 ${paymentMethod === "transfer" ? "text-primary" : "text-muted-foreground"
+                                    }`} />
+                            </div>
+                            <span className={`font-medium ${paymentMethod === "transfer" ? "text-primary" : "text-foreground"
+                                }`}>
+                                Transferencia
                             </span>
                         </button>
                     </div>
@@ -265,6 +285,28 @@ export default function PayForm(props: PropsPayForm) {
                                     )}
                                 </div>
                             )}
+                        </div>
+                    )}
+
+                    {/* Transfer Payment Form */}
+                    {paymentMethod === "transfer" && (
+                        <div className="space-y-4 pt-4 border-t border-border">
+                            <div className="bg-primary/5 rounded-xl p-4 text-center">
+                                <p className="text-sm text-muted-foreground mb-1">Total a transferir</p>
+                                <p className="text-3xl font-bold text-primary">${finalTotal.toFixed(2)}</p>
+                            </div>
+
+                            <div className="rounded-lg bg-muted/50 p-4 space-y-2">
+                                <p className="text-sm font-medium text-foreground">Datos bancarios</p>
+                                <p className="text-xs text-muted-foreground">Solicita los datos de transferencia al cobrador o taquillero.</p>
+                            </div>
+
+                            <div className="flex items-start gap-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                                <Landmark className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
+                                <p className="text-xs text-blue-700">
+                                    La reservación quedará pendiente de confirmación hasta que se valide la transferencia.
+                                </p>
+                            </div>
                         </div>
                     )}
                 </div>

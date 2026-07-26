@@ -5,7 +5,7 @@ import { ReservationDetail } from './ReservationDetail';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '../../components/ui/select';
-import { TicketCheck, Search, Filter, RefreshCw, CreditCard, HandCoins, Banknote, LucideBanknoteArrowDown } from 'lucide-react'
+import { TicketCheck, Search, Filter, RefreshCw, CreditCard, HandCoins, Banknote, LucideBanknoteArrowDown, Landmark } from 'lucide-react'
 import { useReservation, type Reservation } from '../../auth/context/ReservationContext';
 import { useDashboard } from '../../auth/context/DashBoardContext';
 import { dateInFormatAMD } from '../../../shared/utils/helpers';
@@ -157,10 +157,12 @@ export default function ComfirmationList() {
 
     const handlePayReservation = async () => {
 
+        if (paymentMethod === 'cash' && !canCompleteCashPayment) return;
+
         try {
             //logica de pago
             if (selectedReservation) {
-                await payReservation(selectedReservation);
+                await payReservation(selectedReservation, paymentMethod);
 
                 const ticketPrintData: TicketPrintData = {
                     agencyName: agency?.name || '',
@@ -377,7 +379,7 @@ export default function ComfirmationList() {
 
             {/* Modal del pago de la reservacion */}
             <Dialog open={showPayment} onOpenChange={setShowPayment}>
-                <DialogContent className="sm:max-w-md p-0 gap-0 border-0 bg-transparent shadow-2xl">
+                <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto p-0 gap-0 border-0 bg-transparent shadow-2xl">
                     <DialogTitle className="sr-only">Realizar Pago</DialogTitle>
                     {selectedReservation && (
                         <div>
@@ -396,16 +398,18 @@ export default function ComfirmationList() {
 
                             />
 
-                            <div>
+                            <div className="px-6 pb-6">
                                 <Button
                                     onClick={handlePayReservation}
-                                    className="w-full mt-2"
+                                    className="w-full"
                                     size="lg"
-                                    disabled={!canCompleteCashPayment}
+                                    disabled={paymentMethod === 'cash' ? !canCompleteCashPayment : false}
                                 >
-                                    {paymentMethod === "cash" ? <LucideBanknoteArrowDown className="w-4 h-4 mr-2" /> : <CreditCard className="w-4 h-4 mr-2" />}
+                                    {paymentMethod === "cash" && <LucideBanknoteArrowDown className="w-4 h-4 mr-2" />}
+                                    {paymentMethod === "transfer" && <Landmark className="w-4 h-4 mr-2" />}
+                                    {paymentMethod === "card" && <CreditCard className="w-4 h-4 mr-2" />}
 
-                                    Confimar pago
+                                    Confirmar pago
                                 </Button>
                             </div>
                         </div>

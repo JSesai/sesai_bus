@@ -3,6 +3,11 @@ declare module "node-machine-id" {
   export function machineId(original?: boolean): Promise<string>;
 }
 
+declare module "qrcode" {
+  export function toDataURL(text: string, options?: { width?: number; margin?: number; color?: { dark?: string; light?: string } }): Promise<string>;
+  export function toString(text: string, options?: { type?: string; width?: number; margin?: number }): Promise<string>;
+}
+
 type Theme = 'light' | 'dark' | 'system';
 
 interface User {
@@ -392,6 +397,41 @@ interface ResponseElectronLicenseStatus {
   error: null | ErrorApp;
 }
 
+interface DepartureBoardData {
+  id: number;
+  departure_time: string;
+  arrival_time: string;
+  vehicle_number: number;
+  status: StatusType;
+  dateDeparture: string;
+  terminal_destination: string;
+  city_destination: string;
+  city_origin: string;
+  estimatedTravelTime: number;
+  bus_plate: string;
+  bus_model: string;
+  seatingCapacity: number;
+  driver_name: string;
+  agency_name: string;
+  occupied_seats: number;
+}
+
+interface WaitingRoomConfig {
+  fontScale: number;
+  isOpen: boolean;
+}
+
+interface WaitingRoomAPI {
+  open: () => Promise<ResponseElectronGeneric>;
+  close: () => Promise<ResponseElectronGeneric>;
+  toggle: () => Promise<{ ok: boolean; data: { isOpen: boolean }; error: null | ErrorApp }>;
+  getStatus: () => Promise<{ ok: boolean; data: { isOpen: boolean }; error: null | ErrorApp }>;
+  getTodayDepartures: () => Promise<ResponseElectronGeneric>;
+  getUrl: () => Promise<{ ok: boolean; data: { url: string; port: number }; error: null | ErrorApp }>;
+  getConfig: () => Promise<{ ok: boolean; data: WaitingRoomConfig; error: null | ErrorApp }>;
+  saveConfig: (config: Partial<WaitingRoomConfig>) => Promise<ResponseElectronGeneric>;
+}
+
 interface Window {
   electron: {
     users: UsersAPI;
@@ -407,5 +447,6 @@ interface Window {
     processFlow: ProcessFlowAPI;
     printer: PrinterAPI;
     license: LicenseAPI;
+    waitingRoom: WaitingRoomAPI;
   };
 }

@@ -29,6 +29,7 @@ import SetupLayout from "../shared/layouts/SetupLayout";
 import Agencies from "../Buses/screens/Agencies";
 import { ReservationProvider } from "../auth/context/ReservationContext";
 import ComfirmationList from "../Buses/components/ComfirmationList";
+import WaitingRoomSettings from "../Buses/screens/WaitingRoomSettings";
 
 export const routeDirectory = {
     auth: {
@@ -51,7 +52,8 @@ export const routeDirectory = {
         schedules: "/dashboard/schedules",
         employees: "/dashboard/employees",
         customers: "/dashboard/customers",
-        generalSetting: "/dashboard/general-setting"
+        generalSetting: "/dashboard/general-setting",
+        waitingRoom: "/dashboard/waiting-room",
     },
 
 
@@ -100,6 +102,7 @@ export function AppRouter() {
                                     <Route path="customers" element={<Customers />} />
                                     <Route path="agencies" element={<Agencies />} />
                                     <Route path="general-setting" element={<GeneralSetting />} />
+                                    <Route path="waiting-room" element={<WaitingRoomSettings />} />
                                     <Route path="confirmation-reservation" element={<ComfirmationList />} />
                                 </Route>
 

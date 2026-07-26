@@ -192,8 +192,17 @@ export function registerSchedulesHandlers() {
             const discount = await schedulesRepo.getDiscountBySchedule(scheduleId);
             return { ok: true, error: null, data: discount };
         } catch (error: any) {
-            console.log('error al obtener descuento por schedule ->', error);
-            return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible obtener el descuento" } };
+            return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible obtener el descuento por schedule" } };
+        }
+    });
+
+    ipcMain.handle("getTodayDepartures", async (): Promise<ResponseElectronGeneric> => {
+        try {
+            const departures = await schedulesRepo.getTodayDepartures();
+            return { ok: true, error: null, data: departures };
+        } catch (error: any) {
+            console.log('error en getTodayDepartures', error);
+            return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible obtener las salidas del día" } };
         }
     });
 
