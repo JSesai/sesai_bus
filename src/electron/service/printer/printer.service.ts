@@ -56,7 +56,6 @@ async function printEscPos(ticketData: TicketPrintData): Promise<void> {
       printer
         .text(thinSeparator)
         .text(`PASAJERO:   ${ticketData.passengerName}`)
-        .text(`TELEFONO:   ${ticketData.passengerPhone}`)
         .text(thinSeparator)
         .text(`ASIENTOS:   ${ticketData.seatNumbers.join(", ")}`)
         .text(`CANTIDAD:   ${ticketData.seatNumbers.length}`)

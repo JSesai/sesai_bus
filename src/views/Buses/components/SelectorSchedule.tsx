@@ -5,14 +5,9 @@ import {
     Users,
     ChevronDown,
     ChevronUp,
-    Wifi,
-    Plug,
-    Wind,
-    Tv,
-    Coffee,
     ArrowRight,
     Sparkles,
-    Star,
+    Bus,
 } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Badge } from "../../components/ui/badge"
@@ -36,22 +31,14 @@ const tripTypeConfig = {
     "de paso": { label: "De paso", color: "bg-orange-500/10 text-orange-600" }
 }
 
-const amenityIcons: Record<string, React.ReactNode> = {
-    wifi: <Wifi className="w-4 h-4" />,
-    enchufes: <Plug className="w-4 h-4" />,
-    "aire acondicionado": <Wind className="w-4 h-4" />,
-    entretenimiento: <Tv className="w-4 h-4" />,
-    snacks: <Coffee className="w-4 h-4" />
-}
-
 type SortOption = "departure" | "price" | "duration"
 
 function TripCard({ trip, origin, destination, discount, originalPrice, price,
-    originTerminal, destinationTerminal, estimatedTravelTime, onSelect
+    originTerminal, destinationTerminal, estimatedTravelTime, vehicle, onSelect
 }: {
     trip: Schedule; origin: string; destination: string; discount?: number; originalPrice: number;
     originTerminal: string; destinationTerminal: string; estimatedTravelTime: string;
-    price: number; onSelect: () => void
+    price: number; vehicle?: Bus | null; onSelect: () => void
 }) {
 
     const { stepCompletedSelectedDates } = useTicket();
@@ -137,7 +124,9 @@ function TripCard({ trip, origin, destination, discount, originalPrice, price,
                         {/* Badges */}
                         <div className="flex flex-wrap items-center gap-2 mt-3">
                             <Badge className={cn("text-xs font-medium hidden md:inline-flex", serviceTypeConfig.regular.color)}>
-                                Autobus# {trip.vehicle_number}
+                                <Bus className="w-3 h-3 mr-1" />
+                                #{trip.vehicle_number} — {vehicle?.model || (trip as ScheduleData).bus_model}
+                                {vehicle?.plate && <span className="ml-1 opacity-70">({vehicle.plate})</span>}
                             </Badge>
                             <Badge className={cn("text-xs font-medium", tripTypeConfig.local.color)}>
                                 {tripTypeConfig.local.label}
@@ -233,17 +222,21 @@ function TripCard({ trip, origin, destination, discount, originalPrice, price,
                             </div>
                         </div>
                         <div>
-                            <h4 className="text-sm font-semibold text-foreground mb-2">Amenidades</h4>
-                            <div className="flex flex-wrap gap-2">
-                                {['baños', 'aire acondicionado', 'enchufes'].map((amenity) => (
-                                    <div
-                                        key={amenity}
-                                        className="flex items-center gap-1.5 px-2.5 py-1.5 bg-card rounded-lg border border-border text-xs text-muted-foreground"
-                                    >
-                                        {amenityIcons[amenity] || <Star className="w-4 h-4" />}
-                                        <span className="capitalize">{amenity}</span>
+                            <h4 className="text-sm font-semibold text-foreground mb-2">Vehículo</h4>
+                            <div className="space-y-1.5 text-sm">
+                                {vehicle?.model && <p><span className="text-muted-foreground">Modelo:</span> {vehicle.model}</p>}
+                                {vehicle?.plate && <p><span className="text-muted-foreground">Placa:</span> {vehicle.plate}</p>}
+                                {vehicle?.year && <p><span className="text-muted-foreground">Año:</span> {vehicle.year}</p>}
+                                {vehicle?.seatingCapacity && <p><span className="text-muted-foreground">Capacidad:</span> {vehicle.seatingCapacity} asientos</p>}
+                                {vehicle?.characteristics && (
+                                    <div className="flex flex-wrap gap-1 mt-2">
+                                        {vehicle.characteristics.split(",").map((a) => a.trim()).filter(Boolean).map((amenity) => (
+                                            <Badge key={amenity} variant="secondary" className="text-[10px]">
+                                                {amenity}
+                                            </Badge>
+                                        ))}
                                     </div>
-                                ))}
+                                )}
                             </div>
                         </div>
                     </div>
@@ -255,11 +248,17 @@ function TripCard({ trip, origin, destination, discount, originalPrice, price,
 
 export function SelectorSchedule() {
 
-    const { scheduleToSelection, cityOrigin, cityDestination, destinationSelected, isRoundTrip, dispatch, handleNext } = useTicket();
-    const { destinations } = useDashboard();
+    const { scheduleToSelection, cityOrigin, cityDestination, destinationSelected, isRoundTrip, dispatch, handleNext, state } = useTicket();
+    const { destinations, discounts, getDiscountsByDate, vehicles } = useDashboard();
 
     const [sortBy, setSortBy] = useState<SortOption>("departure")
     const [filterService, setFilterService] = useState<string | null>(null)
+
+    useLayoutEffect(() => {
+        if (state.departureDate) {
+            getDiscountsByDate(state.departureDate);
+        }
+    }, [state.departureDate]);
 
     const sortedTrips = [...scheduleToSelection].sort((a, b) => {
         switch (sortBy) {
@@ -279,29 +278,44 @@ export function SelectorSchedule() {
 
             {/* Trip list */}
             <div className="space-y-4">
-                {sortedTrips.map((trip) => (
-                    <TripCard
-                        key={trip.id}
-                        trip={trip}
-                        onSelect={() => {
-                            dispatch({ type: "SET_FIELD", field: "idSchedule", value: trip.id })
-                            handleNext();
-                        }}
-                        destination={cityDestination}
-                        origin={cityOrigin}
-                        originTerminal={trip.terminal_origin}
-                        destinationTerminal={trip.terminal_destination}
-                        originalPrice={999}
-                        price={isRoundTrip ?
-                            destinations.find((d) => d.id === destinationSelected?.id)?.baseFareRoundTrip || 0
-                            :
-                            destinations.find((d) => d.id === destinationSelected?.id)?.baseFare || 0
+                {sortedTrips.map((trip) => {
+                    const tripDiscount = discounts.find((d) => d.schedule_id === trip.id) || null;
+                    const baseFare = isRoundTrip
+                        ? destinations.find((d) => d.id === destinationSelected?.id)?.baseFareRoundTrip || 0
+                        : destinations.find((d) => d.id === destinationSelected?.id)?.baseFare || 0;
+
+                    let discountedPrice = baseFare;
+                    let discountPercent: number | undefined;
+                    if (tripDiscount) {
+                        if (tripDiscount.discount_type === 'percentage') {
+                            discountedPrice = Math.max(0, baseFare * (1 - tripDiscount.value / 100));
+                            discountPercent = tripDiscount.value;
+                        } else {
+                            discountedPrice = Math.max(0, baseFare - tripDiscount.value);
+                            discountPercent = baseFare > 0 ? Math.round((tripDiscount.value / baseFare) * 100) : undefined;
                         }
-                        estimatedTravelTime={String(destinationSelected?.estimatedTravelTime ?? '')}
+                    }
 
-
-                    />
-                ))}
+                    return (
+                        <TripCard
+                            key={trip.id}
+                            trip={trip}
+                            onSelect={() => {
+                                dispatch({ type: "SET_FIELD", field: "idSchedule", value: trip.id })
+                                handleNext();
+                            }}
+                            destination={cityDestination}
+                            origin={cityOrigin}
+                            originTerminal={trip.terminal_origin}
+                            destinationTerminal={trip.terminal_destination}
+                            originalPrice={tripDiscount ? baseFare : 0}
+                            discount={discountPercent}
+                            price={discountedPrice}
+                            estimatedTravelTime={String(destinationSelected?.estimatedTravelTime ?? '')}
+                            vehicle={vehicles.find((v) => v.id === trip.bus_id)}
+                        />
+                    );
+                })}
             </div>
 
             {sortedTrips.length === 0 && (

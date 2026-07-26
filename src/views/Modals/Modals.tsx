@@ -160,7 +160,7 @@ export default function showAlert({
             /* inputOptions can be an object or Promise */
             const inputOptions = {
                 "percentage": "Porcentaje",
-                "mount": "Monto fijo",
+                "fixed": "Monto fijo",
 
             }
 
@@ -190,7 +190,7 @@ export default function showAlert({
                             if (!value) return "Es necesario ingresar un valor!";
                             if (isNaN(Number(value))) return "El valor debe ser numérico!";
                             if (discount.value === 'percentage' && (Number(value) <= 0 || Number(value) > 100)) return "El porcentaje debe ser entre 1 y 100!";
-                            if (discount.value === 'mount' && Number(value) <= 0) return "El monto debe ser mayor a 0!";
+                            if (discount.value === 'fixed' && Number(value) <= 0) return "El monto debe ser mayor a 0!";
                         }
 
                     }).then((result: any) => {

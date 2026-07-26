@@ -52,7 +52,7 @@ console.log('agencieForm',formData);
 
 
     return (
-        <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden">
+        <Card className="bg-card text-card-foreground border border-border transition-colors overflow-hidden">
             <CardHeader className="space-y-2">
                 <CardTitle className="text-2xl font-semibold text-balance">Configuración de agencia</CardTitle>
                 <CardDescription className="text-base text-balance">

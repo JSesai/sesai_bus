@@ -67,6 +67,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     validaSesionActiva();
   }, []);
 
+  const checkLicenseStatus = async (): Promise<"valid" | "no_license" | "expired" | "invalid"> => {
+    try {
+      const response = await window.electron.license.checkLicense();
+      if (!response.ok) return "invalid";
+      if (!response.data) return "no_license";
+      if (!response.data.valid && response.data.expired) return "expired";
+      if (!response.data.valid) return "no_license";
+      return "valid";
+    } catch (error) {
+      console.log("error al verificar licencia", error);
+      return "invalid";
+    }
+  };
+
   const systemConfigurationStatus = async (): Promise<AppConfigStatus> => {
     try {
       const validateAppConfig = await window.electron.appConfig.getAppConfig();
@@ -83,14 +97,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 
   const validateSystemConfiguration = async () => {
-    console.log('ejecutando validacion de configuracion del sistema');
+    console.log('ejecutando validacion de licencia y configuracion del sistema');
+
+    const licenseStatus = await checkLicenseStatus();
+
+    if (licenseStatus === "expired") {
+      navigate('/auth/license-expired');
+      return;
+    }
+
+    if (licenseStatus === "no_license" || licenseStatus === "invalid") {
+      navigate('/auth/license');
+      return;
+    }
 
     const currentConfiguration = await systemConfigurationStatus();
     console.log({ systemConfigurationStatus });
 
     currentConfiguration === "complete" ? navigate('/dashboard/ticket-sale') : navigate('/setup');;
-
-
   }
   // Login
   const login = async (userData: UserCredentials) => {

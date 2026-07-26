@@ -60,29 +60,30 @@ interface NavItemProps {
     label: string;
     path: string;
     end?: boolean;
+    onNavigate?: () => void;
 }
 
 
 // Component for nav items
-export function NavItem({ icon: Icon, label, path, end }: NavItemProps) {
+export function NavItem({ icon: Icon, label, path, end, onNavigate }: NavItemProps) {
     const { agency } = useDashboard();
 
     if (!agency) {
         return (
-            <Button disabled variant="ghost" className="w-full justify-start text-slate-700 dark:text-slate-400" >
+            <Button disabled variant="ghost" className="w-full justify-start text-muted-foreground" >
                 <Icon className="mr-2 h-4 w-4" /> {label}
             </Button>
         );
     }
 
     return (
-        <NavLink to={path} end={end} className="w-full">
+        <NavLink to={path} end={end} className="w-full" onClick={onNavigate}>
             {({ isActive }) => (
                 <Button
                     variant="ghost"
                     className={`w-full justify-start ${isActive
-                        ? "bg-slate-800/70 text-cyan-400"
-                        : "text-slate-700 dark:text-slate-400 hover:text-slate-300"
+                        ? "bg-accent text-accent-brand"
+                        : "text-muted-foreground hover:text-foreground"
                         }`}
                 >
                     <Icon className="mr-2 h-4 w-4" />
@@ -113,10 +114,10 @@ function StatusItem({ label, value, color }: { label: string; value: number; col
     return (
         <div>
             <div className="flex items-center justify-between mb-1">
-                <div className="text-xs text-slate-700 dark:text-slate-400">{label}</div>
-                <div className="text-xs text-slate-700 dark:text-slate-400">{value}%</div>
+                <div className="text-xs text-muted-foreground">{label}</div>
+                <div className="text-xs text-muted-foreground">{value}%</div>
             </div>
-            <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                 <div className={`h-full bg-gradient-to-r ${getColor()} rounded-full`} style={{ width: `${value}%` }}></div>
             </div>
         </div>
@@ -124,7 +125,7 @@ function StatusItem({ label, value, color }: { label: string; value: number; col
 }
 
 
-function DashboardSidebar() {
+function DashboardSidebar({ onNavigate }: { onNavigate?: () => void }) {
 
     const { userLogged } = useAuth();
     const userRole = userLogged?.role || null;
@@ -138,23 +139,21 @@ function DashboardSidebar() {
 
 
     return (
-        <div className="col-span-12 md:col-span-3 lg:col-span-2">
-            {/* <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm h-full"> */}
-            <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors h-screen">
-
+        <div>
+            <Card className="bg-card text-card-foreground border border-border transition-colors h-full md:h-screen overflow-y-auto">
                 <CardContent className="p-4">
                     <nav className="space-y-2">
                         {
                             menuItems.map(item => (
-                                <NavItem key={item.label} icon={item.icon} label={item.label} path={item.path} end={Boolean(item.end)} />
+                                <NavItem key={item.label} icon={item.icon} label={item.label} path={item.path} end={Boolean(item.end)} onNavigate={onNavigate} />
 
                             ))
                         }
 
                     </nav>
 
-                    <div className="mt-8 pt-6 border-t border-slate-700/50">
-                        <div className="text-xs text-slate-500 mb-2 font-mono">SYSTEM STATUS</div>
+                    <div className="mt-8 pt-6 border-t border-border">
+                        <div className="text-xs text-muted-foreground mb-2 font-mono">SYSTEM STATUS</div>
                         <div className="space-y-3">
                             <StatusItem label="Core Systems" value={systemStatus} color="cyan" />
                             <StatusItem label="Security" value={securityLevel} color="green" />
@@ -168,4 +167,3 @@ function DashboardSidebar() {
 }
 
 export default React.memo(DashboardSidebar);
-

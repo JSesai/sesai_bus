@@ -1,3 +1,8 @@
+declare module "node-machine-id" {
+  export function machineIdSync(original?: boolean): string;
+  export function machineId(original?: boolean): Promise<string>;
+}
+
 type Theme = 'light' | 'dark' | 'system';
 
 interface User {
@@ -86,6 +91,7 @@ interface Bus {
   id?: number;
   // number: string;
   seatingCapacity: number;
+  inapamSeats: number;
   plate: string;
   serialNumber: string;
   year: string;
@@ -164,6 +170,7 @@ interface Schedule {
 interface ScheduleData extends Schedule {
   agency_name: string;
   bus_model: string;
+  bus_plate: string;
   route_name: string;
   driver_name: string;
   city_origin: string;
@@ -228,7 +235,7 @@ interface TicketAPI {
   getReservationsByDate: (dateReservation: string) => Promise<ResponseElectronGeneric>;
   deletedTicketNotcomfirmed: (id: User['id']) => Promise<ResponseElectronGeneric>;
   reassignSeats: (scheduleId: number, customerId: number, oldSeatNumbers: number[], newSeatNumbers: number[]) => Promise<ResponseElectronGeneric>;
-
+  cancelReservation: (scheduleId: number, seatNumbers: number[], purchaseId: number | null, reason: string) => Promise<ResponseElectronGeneric>;
 }
 
 interface Payment {
@@ -345,6 +352,46 @@ interface PrinterAPI {
   checkStatus: () => Promise<{ connected: boolean }>;
 }
 
+interface License {
+  machineId: string;
+  licenseKey: string;
+  licenseType: 'standard' | 'trial' | 'enterprise';
+  maxUsers: number;
+  expiresAt: string;
+  signature: string;
+  activatedAt: string;
+}
+
+interface LicenseActivation {
+  licenseKey: string;
+}
+
+interface LicenseStatus {
+  valid: boolean;
+  license: License | null;
+  daysRemaining: number | null;
+  expired: boolean;
+  message: string;
+}
+
+interface LicenseAPI {
+  activateLicense: (data: LicenseActivation) => Promise<ResponseElectronLicense>;
+  checkLicense: () => Promise<ResponseElectronLicense>;
+  getLicenseStatus: () => Promise<ResponseElectronLicenseStatus>;
+}
+
+interface ResponseElectronLicense {
+  ok: boolean;
+  data: LicenseStatus | null;
+  error: null | ErrorApp;
+}
+
+interface ResponseElectronLicenseStatus {
+  ok: boolean;
+  data: LicenseStatus | null;
+  error: null | ErrorApp;
+}
+
 interface Window {
   electron: {
     users: UsersAPI;
@@ -352,12 +399,13 @@ interface Window {
     buses: BusesAPI;
     routesTravel: RouteTravelAPI;
     schedules: ScheduleAPI;
-    customers: CustomersAPI
+    customers: CustomersAPI;
     tickets: TicketAPI;
     payments: PaymentsAPI;
     biometric: BiometricService;
     appConfig: appConfigAPI;
     processFlow: ProcessFlowAPI;
     printer: PrinterAPI;
+    license: LicenseAPI;
   };
 }

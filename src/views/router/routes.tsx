@@ -7,6 +7,8 @@ import RegisterUser from "../auth/screens/RegisterUser";
 import { AuthProvider } from "../auth/context/AuthContext";
 import ForgotPassword from "../auth/screens/ForgotPassword";
 import NewPassword from "../auth/screens/NewPassword";
+import LicenseActivation from "../auth/screens/LicenseActivation";
+import LicenseExpired from "../auth/screens/LicenseExpired";
 import Summary from "../Buses/screens/Summary";
 import MainDashboard from "../Buses/components/MainDashboard";
 import { TicketSale } from "../Buses/screens/TicketSale";
@@ -67,6 +69,8 @@ export function AppRouter() {
                         <Route path="register" element={<RegisterUser />} />
                         <Route path="forgot-password" element={<ForgotPassword />} />
                         <Route path="new-password" element={<NewPassword />} />
+                        <Route path="license" element={<LicenseActivation />} />
+                        <Route path="license-expired" element={<LicenseExpired />} />
                     </Route>
 
                 </Routes>

@@ -28,7 +28,7 @@ export default function SetupWizard() {
     const back = () => setStep((s) => Math.max(s - 1, 0))
 
     return (
-        <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden p-4">
+        <div className="bg-card text-card-foreground border border-border transition-colors overflow-hidden p-4">
             {/* Header */}
             <div className="mb-6 ">
                 <div>
@@ -38,7 +38,7 @@ export default function SetupWizard() {
                     </h1>
 
                 </div>
-                <p className="text-slate-700 dark:text-slate-400 text-sm">
+                <p className="text-muted-foreground text-sm">
                     Paso {step + 1} de {steps.length} — {steps[step]}
                 </p>
             </div>
@@ -48,7 +48,7 @@ export default function SetupWizard() {
                 {steps.map((_, i) => (
                     <div
                         key={i}
-                        className={`h-2 flex-1 rounded-full ${i <= step ? "bg-cyan-500" : "bg-slate-700"
+                        className={`h-2 flex-1 rounded-full ${i <= step ? "bg-accent-brand" : "bg-muted"
                             }`}
                     />
                 ))}

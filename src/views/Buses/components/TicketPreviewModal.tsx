@@ -147,7 +147,7 @@ export function TicketPreviewModal({ open, onClose, ticketData }: TicketPreviewM
             <div className="px-5 py-3 flex items-center justify-between border-b border-dashed border-gray-300">
               <span className="text-xs text-gray-500 uppercase tracking-wider">Total</span>
               <span className="text-lg font-bold">
-                ${ticketData.totalAmount.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+                ${(Number(ticketData.totalAmount) || 0).toLocaleString("es-MX", { minimumFractionDigits: 2 })}
               </span>
             </div>
 

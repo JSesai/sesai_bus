@@ -3,11 +3,11 @@ import { useState } from "react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
-import { Textarea } from "../../components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
-import { CreditCard, Hash, Users, Calendar } from "lucide-react"
+import { CreditCard, Hash, Users, Calendar, Accessibility } from "lucide-react"
 import { useDashboard } from "../../auth/context/DashBoardContext"
 import { useSearchParams } from "react-router-dom";
+import { AmenitySelector } from "../components/AmenitySelector"
 
 
 const initialStateBus: Bus = {
@@ -15,6 +15,7 @@ const initialStateBus: Bus = {
     // number: "",
     plate: "",
     seatingCapacity: 0,
+    inapamSeats: 0,
     serialNumber: "",
     year: "",
     characteristics: "",
@@ -46,7 +47,7 @@ export default function RegisterBus({ editingBus }: { editingBus?: Bus | null })
 
 
     return (
-        <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden">
+        <Card className="bg-card text-card-foreground border border-border transition-colors overflow-hidden">
             <CardHeader className="space-y-3 text-center pb-6">
 
                 <div className="space-y-1">
@@ -100,7 +101,7 @@ export default function RegisterBus({ editingBus }: { editingBus?: Bus | null })
 
 
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="seatingCapacity" className="text-sm font-medium">
                                 Capacidad de asientos <span className="text-destructive">*</span>
@@ -119,6 +120,29 @@ export default function RegisterBus({ editingBus }: { editingBus?: Bus | null })
                                     min="1"
                                 />
                             </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="inapamSeats" className="text-sm font-medium">
+                                Asientos INAPAM
+                            </Label>
+                            <div className="relative">
+                                <Accessibility className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    id="inapamSeats"
+                                    type="number"
+                                    placeholder="0"
+                                    value={formData.inapamSeats}
+                                    onChange={(e) => handleChange("inapamSeats", e.target.value)}
+                                    className="pl-10"
+                                    disabled={isLoading}
+                                    min="0"
+                                    max={formData.seatingCapacity}
+                                />
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                Asientos reservados para tercera edad
+                            </p>
                         </div>
 
                         <div className="space-y-2">
@@ -159,21 +183,14 @@ export default function RegisterBus({ editingBus }: { editingBus?: Bus | null })
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="characteristics" className="text-sm font-medium">
-                            Características
+                        <Label className="text-sm font-medium">
+                            Amenidades del vehículo
                         </Label>
-                        <Textarea
-                            id="characteristics"
-                            placeholder="Ej: WiFi, Aire acondicionado, Pantallas individuales, Asientos reclinables, Baño, Tomas de corriente USB..."
-                            value={formData.characteristics}
-                            onChange={(e) => handleChange("characteristics", e.target.value)}
+                        <AmenitySelector
+                            value={formData.characteristics ?? ""}
+                            onChange={(val) => setFormData((prev) => ({ ...prev, characteristics: val }))}
                             disabled={isLoading}
-                            rows={4}
-                            className="resize-none"
                         />
-                        <p className="text-xs text-muted-foreground">
-                            Describe las comodidades y características especiales del autobús
-                        </p>
                     </div>
 
                     <Button type="submit" className="w-full h-11 text-base font-medium" disabled={isLoading}>

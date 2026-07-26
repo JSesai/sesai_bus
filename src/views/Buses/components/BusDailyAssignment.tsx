@@ -237,16 +237,16 @@ export function BusDailyAssignment() {
     
 
     return (
-        <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden">
-            <CardHeader className="border-b border-slate-700/50 pb-3">
+        <Card className="bg-card text-card-foreground border border-border transition-colors overflow-hidden">
+            <CardHeader className="border-b border-border pb-3">
                 <div className="flex items-center justify-between">
-                    <CardTitle className="text-slate-100 flex items-center text-2xl">
+                    <CardTitle className="text-card-foreground flex items-center text-2xl">
                         <ArrowUp01 className="mr-2 h-5 w-5 text-cyan-500" />
                         Asignación de número de vehículo
                     </CardTitle>
                     <div className="flex items-center space-x-2">
 
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
                             <RefreshCw className="h-4 w-4" />
                         </Button>
                     </div>

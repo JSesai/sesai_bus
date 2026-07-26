@@ -21,6 +21,22 @@ function runMigrations(database: sqlite3.Database) {
             }
         }
     );
+    database.run(
+        "ALTER TABLE tickets ADD COLUMN cancel_reason TEXT",
+        (err) => {
+            if (err && !err.message.includes("duplicate column")) {
+                console.error("Error en migración cancel_reason:", err);
+            }
+        }
+    );
+    database.run(
+        "ALTER TABLE buses ADD COLUMN inapam_seats INTEGER NOT NULL DEFAULT 0",
+        (err) => {
+            if (err && !err.message.includes("duplicate column")) {
+                console.error("Error en migración inapam_seats:", err);
+            }
+        }
+    );
 }
 
 export function getDB(): sqlite3.Database {
@@ -35,7 +51,7 @@ export function getDB(): sqlite3.Database {
             console.error("NO SE PUDO CONECTAR CON LA BD:", err);
         } else {
             console.log("BD conectada en:", dbPath);
-            runMigrations(db);
+            if (db) runMigrations(db);
         }
     });
 

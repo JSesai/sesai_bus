@@ -132,6 +132,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
                 type="time"
                 value={formData.departure_time}
                 onChange={handleDepartureTime}
+                onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                 className="h-11"
                 required
                 disabled={formData.route_id === 0}
@@ -152,6 +153,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
 
                   setFormData({ ...formData, arrival_time: e.target.value })
                 }}
+                onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                 className="h-11"
                 required
                 disabled={formData.arrival_time === ""}
@@ -231,6 +233,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
                 type="date"
                 value={formData.dateDeparture}
                 onChange={(e) => setFormData({ ...formData, dateDeparture: e.target.value })}
+                onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                 className="h-11"
                 required
                 min={minDateToday()}

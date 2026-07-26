@@ -8,23 +8,48 @@ import { useState } from 'react';
 import { useDashboard } from '../../auth/context/DashBoardContext';
 import { cn } from '../../lib/utils';
 import type { Reservation } from '../../auth/context/ReservationContext';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../components/ui/dialog';
+import { Textarea } from '../../components/ui/textarea';
 
 interface ReservationDetailProps {
     reservation: Reservation
     onPayment: () => void
     onClose: () => void
     onReassign: () => void
+    onCancel: (reservation: Reservation, reason: string) => Promise<void>
 }
 
-export function ReservationDetail({ reservation, onPayment, onClose, onReassign, }: ReservationDetailProps) {
+export function ReservationDetail({ reservation, onPayment, onClose, onReassign, onCancel }: ReservationDetailProps) {
     console.log('reservation detail ->', reservation);
 
     const { customer_name, customer_phone, reservation_date, departure_time, cityName: cityNameDestination, seats, total_amount, ticket_status, origin, return_date, base_fare } = reservation;
     const { agency } = useDashboard();
     const [showTicketModal, setShowTicketModal] = useState(false);
+    const [showCancelDialog, setShowCancelDialog] = useState(false);
+    const [cancelReason, setCancelReason] = useState('');
+    const [isCancelling, setIsCancelling] = useState(false);
+
+    const safeTotal = Number(total_amount) || 0;
+    const safeBaseFare = Number(base_fare) || 0;
 
     const handleReprint = () => {
         setShowTicketModal(true);
+    };
+
+    const handleCancelConfirm = async () => {
+        if (!cancelReason.trim()) return;
+        setIsCancelling(true);
+        try {
+            await onCancel(reservation, cancelReason);
+            setShowCancelDialog(false);
+            setCancelReason('');
+        } finally {
+            setIsCancelling(false);
+        }
+    };
+
+    const handleOpenCancelDialog = () => {
+        setShowCancelDialog(true);
     };
 
     return (
@@ -139,8 +164,8 @@ export function ReservationDetail({ reservation, onPayment, onClose, onReassign,
                         <div className="text-right">
                             {(() => {
                                 const numSeats = seats.split(',').length;
-                                const originalTotal = base_fare * numSeats;
-                                const hasDiscount = originalTotal > total_amount;
+                                const originalTotal = safeBaseFare * numSeats;
+                                const hasDiscount = originalTotal > safeTotal;
                                 return (
                                     <>
                                         {hasDiscount && (
@@ -150,7 +175,7 @@ export function ReservationDetail({ reservation, onPayment, onClose, onReassign,
                                             </div>
                                         )}
                                         <span className={cn("text-2xl font-bold", hasDiscount ? "text-destructive" : "text-primary")}>
-                                            ${total_amount.toLocaleString('es-MX')}
+                                            ${safeTotal.toLocaleString('es-MX')}
                                         </span>
                                     </>
                                 );
@@ -195,8 +220,7 @@ export function ReservationDetail({ reservation, onPayment, onClose, onReassign,
                         </p>
                     </div>
                 ) :
-                    //cambiar color a rojo
-                    <Button variant={'destructive'} onClick={() => console.log('mete la cancelacion')} className="w-full" size="lg" >
+                    <Button variant={'destructive'} onClick={handleOpenCancelDialog} className="w-full" size="lg" >
                         <TicketX className="mr-2 h-4 w-4" />
                         Cancelar reservación
                     </Button>
@@ -216,13 +240,41 @@ export function ReservationDetail({ reservation, onPayment, onClose, onReassign,
                     date: reservation_date,
                     time: departure_time,
                     passengerName: customer_name,
-                    passengerPhone: customer_phone,
                     seatNumbers: seats.split(',').map(s => parseInt(s.trim(), 10)),
-                    totalAmount: total_amount,
+                    totalAmount: safeTotal,
                     isRoundTrip: !!return_date,
                     returnDate: return_date || undefined,
                 }}
             />
+
+            {/* Dialog de confirmación de cancelación */}
+            <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Cancelar Reservación</DialogTitle>
+                        <DialogDescription>
+                            Se cancelarán {seats.split(',').length} asiento(s) reservados para <strong>{customer_name}</strong>. Esta acción no se puede deshacer.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground">Motivo de cancelación *</label>
+                        <Textarea
+                            placeholder="Escribe el motivo de la cancelación..."
+                            value={cancelReason}
+                            onChange={(e) => setCancelReason(e.target.value)}
+                            rows={3}
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => { setShowCancelDialog(false); setCancelReason(''); }} disabled={isCancelling}>
+                            Volver
+                        </Button>
+                        <Button variant="destructive" onClick={handleCancelConfirm} disabled={!cancelReason.trim() || isCancelling}>
+                            {isCancelling ? 'Cancelando...' : 'Confirmar Cancelación'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </Card>
     )
 }

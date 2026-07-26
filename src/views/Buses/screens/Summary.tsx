@@ -9,10 +9,10 @@ import { MetricCard, ProcessRow } from "../components/SystemOverview";
 function Summary() {
 
     return (
-        <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden">
-            <CardHeader className="border-b border-slate-700/50 pb-3">
+        <Card className="bg-card text-card-foreground border border-border transition-colors overflow-hidden">
+            <CardHeader className="border-b border-border pb-3">
                 <div className="flex items-center justify-between">
-                    <CardTitle className="text-slate-900 dark:text-slate-100 flex items-center text-2xl">
+                    <CardTitle className="text-card-foreground flex items-center text-2xl">
                         <ChartLine className="mr-2 h-5 w-5 text-cyan-500" />
                         Resumen de Taquilla
                     </CardTitle>
@@ -21,7 +21,7 @@ function Summary() {
                             <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 mr-1 animate-pulse"></div>
                             LIVE
                         </Badge>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-700 dark:text-slate-400">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
                             <RefreshCw className="h-4 w-4" />
                         </Button>
                     </div>
@@ -58,38 +58,38 @@ function Summary() {
                 <div className="mt-8">
                     <Tabs defaultValue="Todos" className="w-full">
                         <div className="flex items-center justify-between mb-4">
-                            <TabsList className="bg-slate-800/50 p-1">
+                            <TabsList className="bg-muted p-1">
                                 <TabsTrigger
                                     value="Todos"
-                                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                                    className="data-[state=active]:bg-background data-[state=active]:text-accent-brand"
                                 >
                                     Todos
                                 </TabsTrigger>
 
                                 <TabsTrigger
                                     value="Vendidos"
-                                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                                    className="data-[state=active]:bg-background data-[state=active]:text-accent-brand"
                                 >
                                     Vendidos
                                 </TabsTrigger>
 
                                 <TabsTrigger
                                     value="Apartados"
-                                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                                    className="data-[state=active]:bg-background data-[state=active]:text-accent-brand"
                                 >
                                     Apartados
                                 </TabsTrigger>
 
                                 <TabsTrigger
                                     value="Disponibles"
-                                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                                    className="data-[state=active]:bg-background data-[state=active]:text-accent-brand"
                                 >
                                     Disponibles
                                 </TabsTrigger>
                                
                             </TabsList>
 
-                            <div className="flex items-center space-x-2 text-xs text-slate-700 dark:text-slate-400">
+                            <div className="flex items-center space-x-2 text-xs text-muted-foreground">
                                 <div className="flex items-center">
                                     <div className="h-2 w-2 rounded-full bg-cyan-500 mr-1"></div>
                                     Vendidos
@@ -108,8 +108,8 @@ function Summary() {
                      
 
                         <TabsContent value="Todos" className="mt-0">
-                            <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 overflow-hidden">
-                                <div className="grid grid-cols-12 text-xs text-slate-700 dark:text-slate-400 p-3 border-b border-slate-700/50 bg-slate-800/50">
+                            <div className="bg-muted/30 rounded-lg border border-border overflow-hidden">
+                                <div className="grid grid-cols-12 text-xs text-muted-foreground p-3 border-b border-border bg-muted/50">
                                     <div className="col-span-1">PID</div>
                                     <div className="col-span-4">Process</div>
                                     <div className="col-span-2">User</div>
@@ -118,7 +118,7 @@ function Summary() {
                                     <div className="col-span-1">Status</div>
                                 </div>
 
-                                <div className="divide-y divide-slate-700/30">
+                                <div className="divide-y divide-border">
                                     <ProcessRow
                                         pid="1024"
                                         name="system_core.exe"
@@ -171,8 +171,8 @@ function Summary() {
                             </div>
                         </TabsContent>
                         <TabsContent value="Vendidos" className="mt-0">
-                            <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 overflow-hidden">
-                                <div className="grid grid-cols-12 text-xs text-slate-700 dark:text-slate-400 p-3 border-b border-slate-700/50 bg-slate-800/50">
+                            <div className="bg-muted/30 rounded-lg border border-border overflow-hidden">
+                                <div className="grid grid-cols-12 text-xs text-muted-foreground p-3 border-b border-border bg-muted/50">
                                     <div className="col-span-1">PID</div>
                                     <div className="col-span-4">Process</div>
                                     <div className="col-span-2">User</div>
@@ -181,7 +181,7 @@ function Summary() {
                                     <div className="col-span-1">Status</div>
                                 </div>
 
-                                <div className="divide-y divide-slate-700/30">
+                                <div className="divide-y divide-border">
                                     <ProcessRow
                                         pid="1024"
                                         name="system_core.exe"
@@ -234,8 +234,8 @@ function Summary() {
                             </div>
                         </TabsContent>
                         <TabsContent value="Apartados" className="mt-0">
-                            <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 overflow-hidden">
-                                <div className="grid grid-cols-12 text-xs text-slate-700 dark:text-slate-400 p-3 border-b border-slate-700/50 bg-slate-800/50">
+                            <div className="bg-muted/30 rounded-lg border border-border overflow-hidden">
+                                <div className="grid grid-cols-12 text-xs text-muted-foreground p-3 border-b border-border bg-muted/50">
                                     <div className="col-span-1">PID</div>
                                     <div className="col-span-4">Process</div>
                                     <div className="col-span-2">User</div>
@@ -244,7 +244,7 @@ function Summary() {
                                     <div className="col-span-1">Status</div>
                                 </div>
 
-                                <div className="divide-y divide-slate-700/30">
+                                <div className="divide-y divide-border">
                                     <ProcessRow
                                         pid="1024"
                                         name="system_core.exe"
@@ -297,8 +297,8 @@ function Summary() {
                             </div>
                         </TabsContent>
                         <TabsContent value="Disponibles" className="mt-0">
-                            <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 overflow-hidden">
-                                <div className="grid grid-cols-12 text-xs text-slate-700 dark:text-slate-400 p-3 border-b border-slate-700/50 bg-slate-800/50">
+                            <div className="bg-muted/30 rounded-lg border border-border overflow-hidden">
+                                <div className="grid grid-cols-12 text-xs text-muted-foreground p-3 border-b border-border bg-muted/50">
                                     <div className="col-span-1">PID</div>
                                     <div className="col-span-4">Process</div>
                                     <div className="col-span-2">User</div>
@@ -307,7 +307,7 @@ function Summary() {
                                     <div className="col-span-1">Status</div>
                                 </div>
 
-                                <div className="divide-y divide-slate-700/30">
+                                <div className="divide-y divide-border">
                                     <ProcessRow
                                         pid="1024"
                                         name="system_core.exe"

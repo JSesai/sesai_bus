@@ -306,10 +306,75 @@ export const ticketsRepo = {
         resolve(rows);
       });
     });
-  }
+  },
 
+  cancelReservation: (
+    scheduleId: number,
+    seatNumbers: number[],
+    purchaseId: number | null,
+    reason: string
+  ): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (seatNumbers.length === 0) {
+        return reject(new Error("Se requieren asientos para cancelar."));
+      }
 
+      const placeholders = seatNumbers.map(() => "?").join(", ");
 
+      db.serialize(() => {
+        db.run("BEGIN TRANSACTION");
 
+        // 1. Actualizar tickets a cancelled con motivo
+        const updateTicketsSql = `
+          UPDATE tickets
+          SET status = 'cancelled', cancel_reason = ?
+          WHERE schedule_id = ?
+            AND seat_number IN (${placeholders})
+            AND status IN ('reserved', 'occupied')
+        `;
+        db.run(updateTicketsSql, [reason, scheduleId, ...seatNumbers], (err) => {
+          if (err) {
+            db.run("ROLLBACK");
+            return reject(err);
+          }
 
+          // 2. Si tiene purchase, cancelar purchase y reembolsar pago
+          if (purchaseId) {
+            const updatePurchaseSql = `UPDATE purchases SET status = 'cancelled' WHERE id = ?`;
+            db.run(updatePurchaseSql, [purchaseId], (errPurchase) => {
+              if (errPurchase) {
+                db.run("ROLLBACK");
+                return reject(errPurchase);
+              }
+
+              const updatePaymentSql = `UPDATE payments SET status = 'refunded' WHERE purchase_id = ?`;
+              db.run(updatePaymentSql, [purchaseId], (errPayment) => {
+                if (errPayment) {
+                  db.run("ROLLBACK");
+                  return reject(errPayment);
+                }
+
+                db.run("COMMIT", (commitErr) => {
+                  if (commitErr) {
+                    db.run("ROLLBACK");
+                    return reject(commitErr);
+                  }
+                  resolve();
+                });
+              });
+            });
+          } else {
+            // Sin purchase, solo commit
+            db.run("COMMIT", (commitErr) => {
+              if (commitErr) {
+                db.run("ROLLBACK");
+                return reject(commitErr);
+              }
+              resolve();
+            });
+          }
+        });
+      });
+    });
+  },
 };

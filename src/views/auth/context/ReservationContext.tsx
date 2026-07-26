@@ -44,6 +44,7 @@ type ReservationContextType = {
         available: string;
         selected: string;
         occupied: string;
+        reserved: string;
         selectedTemporal: string;
     };
 
@@ -59,6 +60,7 @@ type ReservationContextType = {
     payReservation: (r: Reservation) => Promise<void>;
     handleConfirmReservation: () => Promise<void>;
     reassignReservationSeats: (scheduleId: number, customerId: number, oldSeats: number[], newSeats: number[]) => Promise<void>;
+    cancelReservation: (reservation: Reservation, reason: string) => Promise<void>;
 
 };
 
@@ -93,10 +95,11 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
 
 
     const seatColors = {
-        available: "bg-green-200",
-        selected: "bg-sky-600",
-        occupied: "bg-gray-200",
-        selectedTemporal: "bg-yellow-400",
+        available: "bg-seat-available",
+        selected: "bg-seat-selected",
+        occupied: "bg-seat-occupied",
+        reserved: "bg-seat-reserved",
+        selectedTemporal: "bg-seat-temporal",
     }
 
 
@@ -265,6 +268,40 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
 
     }
 
+    const cancelReservation = async (reservation: Reservation, reason: string): Promise<void> => {
+        const seatNumbers = reservation.seats.split(',').map(s => parseInt(s.trim(), 10));
+
+        // Determinar si tiene purchase (reservación pagada)
+        // Para reservaciones sin pagar, purchaseId es null
+        // El backend determina el purchaseId consultando los tickets
+        const purchaseId = reservation.ticket_status === 'occupied' ? null : null;
+
+        const result = await window.electron.tickets.cancelReservation(
+            reservation.schedule_id,
+            seatNumbers,
+            purchaseId,
+            reason
+        );
+
+        if (!result.ok) {
+            showNofification({
+                typeAlert: 'error',
+                title: 'Error al cancelar reservación',
+                message: result.error?.detail || 'No fue posible cancelar la reservación, intenta nuevamente'
+            });
+            return;
+        }
+
+        showNofification({
+            typeAlert: 'success',
+            title: 'Reservación cancelada',
+            message: `Se cancelaron ${seatNumbers.length} asiento(s) exitosamente.`
+        });
+
+        // Refrescar la lista de reservaciones
+        await getReservationsByDate(reservation.reservation_date);
+    }
+
 
 
     const backgrounTiketSale = 'bg-card text-card-foreground border border-border transition-colors';
@@ -309,7 +346,8 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
             handleConfirmReservation,
             payReservation,
             getReservationsByDate,
-            reassignReservationSeats
+            reassignReservationSeats,
+            cancelReservation
 
         }}>
             {children}

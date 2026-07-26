@@ -11,13 +11,17 @@ export function SeatSelection() {
 
     const { handleSeatSelect, backgrounTiketSale, seats, state, cityOrigin, cityDestination,
         destinationSelected, totalPassengers, selectedSchedule, getSeatStatus, handleRegisterTicket,
-        discountedPricePerSeat
+        discountedPricePerSeat, vehicleForTripe, hasInapamPassengers
     } = useTicket();
     const { serviceFeePercent } = useDashboard();
     const [totalSeats] = useState(seats.length || 0);
     const [seatsPerRow] = useState(4)
 
     console.log({ totalSeats, seats });
+
+    const inapamSeatsConfig = vehicleForTripe?.inapamSeats ?? 0;
+    const inapamSeatsOccupied = seats.filter((s) => s.status === "occupied").length;
+    const inapamLimitReached = inapamSeatsConfig > 0 && state.passengers.inapam >= inapamSeatsConfig;
 
     //obtener los asientos disponibles con el query de la base de datos
     useLayoutEffect(() => {
@@ -67,6 +71,24 @@ export function SeatSelection() {
                             <div className="text-xs text-muted-foreground">Ocupados</div>
                         </div>
                     </div>
+
+                    {/* INAPAM info */}
+                    {hasInapamPassengers && inapamSeatsConfig > 0 && (
+                        <div className={`rounded-lg border p-3 text-sm ${inapamLimitReached
+                            ? 'bg-status-cancelled/20 border-status-cancelled text-status-cancelled-foreground'
+                            : 'bg-status-reserved/20 border-status-reserved text-status-reserved-foreground'
+                            }`}>
+                            {inapamLimitReached
+                                ? `Límite INAPAM alcanzado (${state.passengers.inapam}/${inapamSeatsConfig}).`
+                                : `Asientos INAPAM: ${state.passengers.inapam} de ${inapamSeatsConfig} seleccionados.`}
+                        </div>
+                    )}
+
+                    {hasInapamPassengers && inapamSeatsConfig === 0 && (
+                        <div className="rounded-lg bg-status-cancelled/20 border border-status-cancelled p-3 text-sm text-status-cancelled-foreground">
+                            Este vehículo no tiene asientos INAPAM configurados.
+                        </div>
+                    )}
 
 
                     <OrderSummary

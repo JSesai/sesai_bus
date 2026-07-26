@@ -34,7 +34,7 @@ export default function TravelDates({ resetSteps }: { resetSteps: () => void }) 
     }, [isDateReturnValid])
 
     return (
-        <Card className={`${backgrounTiketSale} mt-12 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden`}>
+        <Card className={`${backgrounTiketSale} mt-12 overflow-hidden`}>
             <CardHeader className="space-y-2">
                 <CardTitle className="text-2xl font-semibold text-balance">{isRoundTrip ? "Fechas / Horarios" : "Fecha /horario"} </CardTitle>
                 <CardDescription className="text-base text-balance">
@@ -57,6 +57,7 @@ export default function TravelDates({ resetSteps }: { resetSteps: () => void }) 
                                     type="date"
                                     value={departureDate}
                                     onChange={(e) => dispatch({ type: "SET_FIELD", field: "departureDate", value: e.target.value })}
+                                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                                     className="h-11"
                                     required
                                     min={minDateToday()}
@@ -101,6 +102,7 @@ export default function TravelDates({ resetSteps }: { resetSteps: () => void }) 
                                         type="date"
                                         value={state.returnDate}
                                         onChange={(e) => dispatch({ type: "SET_FIELD", field: "returnDate", value: e.target.value })}
+                                        onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                                         className="h-11"
                                         required
                                         min={minDateToday()}

@@ -147,11 +147,11 @@ export function registerSchedulesHandlers() {
         }
 
     });
-    ipcMain.handle("addDiscount", async (_e, bus): Promise<ResponseElectronGeneric> => {
+    ipcMain.handle("addDiscount", async (_e, discount: Discount): Promise<ResponseElectronGeneric> => {
         try {
-            console.log("init process addDiscount 💸");
+            console.log("init process addDiscount");
 
-            const response = await schedulesRepo.addDiscount(bus);
+            const response = await schedulesRepo.addDiscount(discount);
 
             return { ok: true, error: null, data: response }
 
@@ -167,6 +167,34 @@ export function registerSchedulesHandlers() {
 
     });
 
+    ipcMain.handle("getDiscountsByDate", async (_e, date: string): Promise<ResponseElectronGeneric> => {
+        try {
+            const discounts = await schedulesRepo.getDiscountsByDate(date);
+            return { ok: true, error: null, data: discounts };
+        } catch (error: any) {
+            console.log('error al obtener descuentos ->', error);
+            return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible obtener los descuentos" } };
+        }
+    });
 
+    ipcMain.handle("updateDiscountStatus", async (_e, discountId: number, status: 'active' | 'inactive'): Promise<ResponseElectronGeneric> => {
+        try {
+            await schedulesRepo.updateDiscountStatus(discountId, status);
+            return { ok: true, error: null, data: null };
+        } catch (error: any) {
+            console.log('error al actualizar descuento ->', error);
+            return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible actualizar el descuento" } };
+        }
+    });
+
+    ipcMain.handle("getDiscountBySchedule", async (_e, scheduleId: number): Promise<ResponseElectronGeneric> => {
+        try {
+            const discount = await schedulesRepo.getDiscountBySchedule(scheduleId);
+            return { ok: true, error: null, data: discount };
+        } catch (error: any) {
+            console.log('error al obtener descuento por schedule ->', error);
+            return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible obtener el descuento" } };
+        }
+    });
 
 }

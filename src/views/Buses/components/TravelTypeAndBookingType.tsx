@@ -9,7 +9,7 @@ export default function TravelTypeAndBookingType() {
     const { state, dispatch, backgrounTiketSale } = useTicket();
 
     return (
-        <Card className={`${backgrounTiketSale} mt-12 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden`}>
+        <Card className={`${backgrounTiketSale} mt-12 overflow-hidden`}>
             <CardHeader className="space-y-2">
                 <CardTitle className="text-2xl font-semibold text-balance">Tipo de operación y viaje</CardTitle>
                 <CardDescription className="text-base text-balance">

@@ -230,8 +230,8 @@ export const schedulesRepo = {
     new Promise((resolve, reject) => {
       db.run(
         `INSERT INTO discounts (
-        schedule_id, description, discount_type, value, start_date, end_date, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        schedule_id, description, discount_type, value, status
+      ) VALUES (?, ?, ?, ?, ?)`,
         [
           discount.schedule_id,
           discount.description,
@@ -243,7 +243,6 @@ export const schedulesRepo = {
           if (err) {
             reject(err);
           } else {
-            // Recuperar el registro recién insertado
             db.get(
               `SELECT 
               d.id,
@@ -251,8 +250,6 @@ export const schedulesRepo = {
               d.description,
               d.discount_type,
               d.value,
-              d.start_date,
-              d.end_date,
               d.status,
               d.created_at,
               s.departure_time,
@@ -270,6 +267,63 @@ export const schedulesRepo = {
               }
             );
           }
+        }
+      );
+    }),
+
+  getDiscountsByDate: (date: string): Promise<any[]> =>
+    new Promise((resolve, reject) => {
+      db.all(
+        `SELECT 
+          d.id,
+          d.schedule_id,
+          d.description,
+          d.discount_type,
+          d.value,
+          d.status,
+          d.created_at
+        FROM discounts d
+        JOIN schedules s ON d.schedule_id = s.id
+        WHERE DATE(s.dateDeparture) = DATE(?)
+          AND d.status = 'active'`,
+        [date],
+        (err, rows) => {
+          if (err) reject(err);
+          else resolve(rows || []);
+        }
+      );
+    }),
+
+  updateDiscountStatus: (discountId: number, status: 'active' | 'inactive'): Promise<void> =>
+    new Promise((resolve, reject) => {
+      db.run(
+        `UPDATE discounts SET status = ? WHERE id = ?`,
+        [status, discountId],
+        function (err) {
+          if (err) reject(err);
+          else resolve();
+        }
+      );
+    }),
+
+  getDiscountBySchedule: (scheduleId: number): Promise<any> =>
+    new Promise((resolve, reject) => {
+      db.get(
+        `SELECT 
+          d.id,
+          d.schedule_id,
+          d.description,
+          d.discount_type,
+          d.value,
+          d.status,
+          d.created_at
+        FROM discounts d
+        WHERE d.schedule_id = ?
+          AND d.status = 'active'`,
+        [scheduleId],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(row || null);
         }
       );
     }),

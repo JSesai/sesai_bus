@@ -50,10 +50,10 @@ function AlertItem({
             </div>
             <div>
                 <div className="flex items-center">
-                    <div className="text-sm font-medium text-slate-200">{title}</div>
-                    <div className="ml-2 text-xs text-slate-500">{time}</div>
+                    <div className="text-sm font-medium text-foreground">{title}</div>
+                    <div className="ml-2 text-xs text-muted-foreground">{time}</div>
                 </div>
-                <div className="text-xs text-slate-700 dark:text-slate-400">{description}</div>
+                <div className="text-xs text-muted-foreground">{description}</div>
             </div>
         </div>
     )
@@ -74,17 +74,17 @@ function CommunicationItem({
     unread?: boolean
 }) {
     return (
-        <div className={`flex space-x-3 p-2 rounded-md ${unread ? "bg-slate-800/50 border border-slate-700/50" : ""}`}>
+        <div className={`flex space-x-3 p-2 rounded-md ${unread ? "bg-muted/50 border border-border" : ""}`}>
             <Avatar className="h-8 w-8">
                 <AvatarImage src={avatar} alt={sender} />
-                <AvatarFallback className="bg-slate-700 text-cyan-500">{sender.charAt(0)}</AvatarFallback>
+                <AvatarFallback className="bg-muted text-accent-brand">{sender.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
                 <div className="flex items-center justify-between">
-                    <div className="text-sm font-medium text-slate-200">{sender}</div>
-                    <div className="text-xs text-slate-500">{time}</div>
+                    <div className="text-sm font-medium text-foreground">{sender}</div>
+                    <div className="text-xs text-muted-foreground">{time}</div>
                 </div>
-                <div className="text-xs text-slate-700 dark:text-slate-400 mt-1">{message}</div>
+                <div className="text-xs text-muted-foreground mt-1">{message}</div>
             </div>
             {unread && (
                 <div className="flex-shrink-0 self-center">
@@ -117,9 +117,9 @@ export default function MainDashboard() {
 
             {/* Security & Alerts */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors">
+                <Card className="bg-card text-card-foreground border border-border transition-colors">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-slate-100 flex items-center text-base">
+                        <CardTitle className="text-card-foreground flex items-center text-base">
                             <Shield className="mr-2 h-5 w-5 text-green-500" />
                             Security Status
                         </CardTitle>
@@ -127,30 +127,30 @@ export default function MainDashboard() {
                     <CardContent>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <div className="text-sm text-slate-700 dark:text-slate-400">Firewall</div>
+                                <div className="text-sm text-muted-foreground">Firewall</div>
                                 <Badge className="bg-green-500/20 text-green-400 border-green-500/50">Active</Badge>
                             </div>
                             <div className="flex items-center justify-between">
-                                <div className="text-sm text-slate-700 dark:text-slate-400">Intrusion Detection</div>
+                                <div className="text-sm text-muted-foreground">Intrusion Detection</div>
                                 <Badge className="bg-green-500/20 text-green-400 border-green-500/50">Active</Badge>
                             </div>
                             <div className="flex items-center justify-between">
-                                <div className="text-sm text-slate-700 dark:text-slate-400">Encryption</div>
+                                <div className="text-sm text-muted-foreground">Encryption</div>
                                 <Badge className="bg-green-500/20 text-green-400 border-green-500/50">Active</Badge>
                             </div>
                             <div className="flex items-center justify-between">
-                                <div className="text-sm text-slate-700 dark:text-slate-400">Threat Database</div>
+                                <div className="text-sm text-muted-foreground">Threat Database</div>
                                 <div className="text-sm text-cyan-400">
-                                    Updated <span className="text-slate-500">12 min ago</span>
+                                    Updated <span className="text-muted-foreground">12 min ago</span>
                                 </div>
                             </div>
 
-                            <div className="pt-2 mt-2 border-t border-slate-700/50">
+                            <div className="pt-2 mt-2 border-t border-border">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="text-sm font-medium">Security Level</div>
                                     <div className="text-sm text-cyan-400">{securityLevel}%</div>
                                 </div>
-                                <Progress value={securityLevel} className="h-2 bg-slate-700">
+                                <Progress value={securityLevel} className="h-2 bg-muted">
                                     <div
                                         className="h-full bg-gradient-to-r from-green-500 to-cyan-500 rounded-full"
                                         style={{ width: `${securityLevel}%` }}
@@ -161,9 +161,9 @@ export default function MainDashboard() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors">
+                <Card className="bg-card text-card-foreground border border-border transition-colors">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-slate-100 flex items-center text-base">
+                        <CardTitle className="text-card-foreground flex items-center text-base">
                             <AlertCircle className="mr-2 h-5 w-5 text-amber-500" />
                             System Alerts
                         </CardTitle>
@@ -200,7 +200,7 @@ export default function MainDashboard() {
             </div>
 
             {/* Communications */}
-            <Card className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors">
+            <Card className="bg-card text-card-foreground border border-border transition-colors">
                 <CardHeader className="pb-2 flex flex-row items-center justify-between">
                     <CardTitle className="text-slate-100 flex items-center text-base">
                         <MessageSquare className="mr-2 h-5 w-5 text-blue-500" />
@@ -242,12 +242,12 @@ export default function MainDashboard() {
                         />
                     </div>
                 </CardContent>
-                <CardFooter className="border-t border-slate-700/50 pt-4">
+                <CardFooter className="border-t border-border pt-4">
                     <div className="flex items-center w-full space-x-2">
                         <input
                             type="text"
                             placeholder="Type a message..."
-                            className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                            className="flex-1 bg-muted border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-accent-brand"
                         />
                         <Button size="icon" className="bg-blue-600 hover:bg-blue-700">
                             <Mic className="h-4 w-4" />

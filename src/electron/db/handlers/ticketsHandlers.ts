@@ -82,6 +82,17 @@ export function registerTicketsHandlers() {
   });
 
 
+  ipcMain.handle("reassignSeats", async (_, scheduleId: number, customerId: number, oldSeatNumbers: number[], newSeatNumbers: number[]): Promise<ResponseElectronGeneric> => {
+    console.log("init process reassignSeats", { scheduleId, customerId, oldSeatNumbers, newSeatNumbers });
+    try {
+      await ticketsRepo.reassignSeats(scheduleId, customerId, oldSeatNumbers, newSeatNumbers);
+      return { ok: true, error: null, data: null };
+    } catch (error: any) {
+      console.log('error al reasignar asientos ->', error);
+      return { ok: false, data: null, error: { message: error.message || "Error interno", detail: "No fue posible reasignar los asientos" } };
+    }
+  });
+
   ipcMain.handle("getReservationsByDate", async (_, dateReservation: string) => {
     console.log("init process getReservationsByDate", dateReservation);
     try {
@@ -95,6 +106,19 @@ export function registerTicketsHandlers() {
     }
 
 
+  });
+
+  ipcMain.handle("cancelReservation", async (_, scheduleId: number, seatNumbers: number[], purchaseId: number | null, reason: string): Promise<ResponseElectronGeneric> => {
+    try {
+      if (!reason || reason.trim().length === 0) {
+        return { ok: false, data: null, error: { message: "Motivo requerido", detail: "Debe especificar el motivo de la cancelación" } };
+      }
+      await ticketsRepo.cancelReservation(scheduleId, seatNumbers, purchaseId, reason.trim());
+      return { ok: true, error: null, data: null };
+    } catch (error: any) {
+      console.log('error al cancelar reservación ->', error);
+      return { ok: false, data: null, error: { message: error.message || "Error interno", detail: "No fue posible cancelar la reservación" } };
+    }
   });
 
 

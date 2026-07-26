@@ -22,15 +22,17 @@ export const busesRepo = {
         `
           INSERT INTO buses (
             seatingCapacity,
+            inapam_seats,
             plate,
             serialNumber,
             year,
             model,
             characteristics
-          ) VALUES (?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?)
           `,
         [
           bus.seatingCapacity,
+          bus.inapamSeats ?? 0,
           bus.plate,
           bus.serialNumber,
           bus.year,
@@ -49,6 +51,7 @@ export const busesRepo = {
         `
           UPDATE buses SET
             seatingCapacity  = COALESCE(?, seatingCapacity),
+            inapam_seats     = COALESCE(?, inapam_seats),
             plate            = COALESCE(?, plate),
             serialNumber     = COALESCE(?, serialNumber),
             year             = COALESCE(?, year),
@@ -59,6 +62,7 @@ export const busesRepo = {
           `,
         [
           bus.seatingCapacity,
+          bus.inapamSeats ?? 0,
           bus.plate,
           bus.serialNumber,
           bus.year,

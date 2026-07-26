@@ -194,9 +194,13 @@ export default function Buses({ configInitial = false }: { configInitial?: boole
                             </div>
 
                             {buses.characteristics && (
-                                <p className="text-xs text-muted-foreground italic text-pretty border-t border-border pt-2">
-                                    {buses.characteristics}
-                                </p>
+                                <div className="flex flex-wrap gap-1 pt-2 border-t border-border">
+                                    {buses.characteristics.split(",").map((a) => a.trim()).filter(Boolean).map((amenity) => (
+                                        <Badge key={amenity} variant="secondary" className="text-[10px]">
+                                            {amenity}
+                                        </Badge>
+                                    ))}
+                                </div>
                             )}
 
                             <div className="flex gap-2 pt-2">

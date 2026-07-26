@@ -35,9 +35,9 @@ export default function ActionButton({ icon: Icon, label, size, onClick }: Props
         <Button
             onClick={onClick}
             variant="outline"
-            className="h-auto py-3 px-3 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors cursor-pointer hover:bg-slate-700/50 flex flex-col items-center justify-center space-y-1 w-full"
+            className="h-auto py-3 px-3 bg-card border border-border transition-colors cursor-pointer hover:bg-accent flex flex-col items-center justify-center space-y-1 w-full"
         >
-            <Icon className={`h-10 w-10 text-cyan-500`} />
+            <Icon className={`${sizer(size ?? 's').size} text-cyan-500`} />
             <span className={sizer(size ?? 's').text}>{label}</span>
         </Button>
     )

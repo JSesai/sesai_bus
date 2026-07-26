@@ -16,9 +16,9 @@ interface arrayMenu {
 export function MenuCard({ menu, titleMenu, description }: arrayMenu) {
 
     return (
-        <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm transition-colors overflow-hidden p-4">
+        <div className="bg-card text-card-foreground border border-border transition-colors overflow-hidden p-4">
             <div className="mb-8">
-                <h1 className="text-slate-700 dark:text-slate-400 text-3xl font-bold text-balance mb-2">{titleMenu}</h1>
+                <h1 className="text-card-foreground text-3xl font-bold text-balance mb-2">{titleMenu}</h1>
                 <p className="text-muted-foreground text-pretty">{description}</p>
             </div>
 
@@ -28,7 +28,7 @@ export function MenuCard({ menu, titleMenu, description }: arrayMenu) {
                     return (
                         <Link key={item.title} to={item.path} className="group">
                             <Card
-                                className={`backdrop-blur-sm transition-colors h-full transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer border-2 ${item.hoverColor}`}
+                                className={`transition-colors h-full transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer border-2 ${item.hoverColor}`}
                             >
                                 <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
                                     <div

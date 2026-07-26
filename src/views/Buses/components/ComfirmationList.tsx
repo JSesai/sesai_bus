@@ -24,7 +24,7 @@ type StatusFilter = 'all' | 'roundTrip' | 'sencillo' | ReservationStatus
 export default function ComfirmationList() {
 
 
-    const { getReservationsByDate, reservations, showNofification, payReservation } = useReservation();
+    const { getReservationsByDate, reservations, showNofification, payReservation, cancelReservation } = useReservation();
     const { agency, serviceFeePercent } = useDashboard();
 
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
@@ -106,6 +106,11 @@ export default function ComfirmationList() {
         setShowReassignDialog(false)
     }
 
+    const handleCancelReservation = async (reservation: Reservation, reason: string) => {
+        await cancelReservation(reservation, reason)
+        setSelectedReservation(null)
+    }
+
     const handlePaymentComplete = () => {
 
     }
@@ -167,7 +172,7 @@ export default function ComfirmationList() {
                     time: selectedReservation.departure_time,
                     passengerName: selectedReservation.customer_name,
                     seatNumbers: selectedReservation.seats.split(',').map(s => parseInt(s.trim(), 10)),
-                    totalAmount: selectedReservation.total_amount,
+                    totalAmount: Number(selectedReservation.total_amount) || 0,
                     isRoundTrip: !!selectedReservation.return_date,
                     returnDate: selectedReservation.return_date || undefined,
                     purchaseDate: new Date().toISOString(),
@@ -363,6 +368,7 @@ export default function ComfirmationList() {
                                 onPayment={handleOpenPayment}
                                 onClose={handleCloseDetail}
                                 onReassign={handleOpenReassign}
+                                onCancel={handleCancelReservation}
                             />
                         </div>
                     )}

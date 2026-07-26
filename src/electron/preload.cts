@@ -48,7 +48,9 @@ const schedulesAPI: ScheduleAPI = {
   deleteSchedule: (id: Schedule['id']) => ipcRenderer.invoke("deleteSchedule", id),
   getVehicleSeatStatus: (scheduleId: Schedule['id']) => ipcRenderer.invoke("getVehicleSeatStatus", scheduleId),
   addDiscount: (discount: Discount) => ipcRenderer.invoke("addDiscount", discount),
-
+  getDiscountsByDate: (date: string) => ipcRenderer.invoke("getDiscountsByDate", date),
+  updateDiscountStatus: (discountId: number, status: 'active' | 'inactive') => ipcRenderer.invoke("updateDiscountStatus", discountId, status),
+  getDiscountBySchedule: (scheduleId: number) => ipcRenderer.invoke("getDiscountBySchedule", scheduleId),
 }
 
 const customerAPI: CustomersAPI = {
@@ -71,6 +73,8 @@ const ticketAPI: TicketAPI = {
   updateTicketStatus: (scheduleId: number, seatNumbers: SeatData['seat_number'][], newStatus: SeatData['status']) => ipcRenderer.invoke("updateTicketStatus", scheduleId, seatNumbers, newStatus),
   getReservationsByDate: (dateReservation: string) => ipcRenderer.invoke("getReservationsByDate", dateReservation),
   deletedTicketNotcomfirmed: (id: User['id']) => ipcRenderer.invoke("deletedTicketNotcomfirmed", id),
+  reassignSeats: (scheduleId: number, customerId: number, oldSeatNumbers: number[], newSeatNumbers: number[]) => ipcRenderer.invoke("reassignSeats", scheduleId, customerId, oldSeatNumbers, newSeatNumbers),
+  cancelReservation: (scheduleId: number, seatNumbers: number[], purchaseId: number | null, reason: string) => ipcRenderer.invoke("cancelReservation", scheduleId, seatNumbers, purchaseId, reason),
 
 }
 
@@ -102,6 +106,12 @@ const printerAPI: PrinterAPI = {
   checkStatus: () => ipcRenderer.invoke("printer:checkStatus"),
 }
 
+const licenseAPI: LicenseAPI = {
+  activateLicense: (data: LicenseActivation) => ipcRenderer.invoke("activateLicense", data),
+  checkLicense: () => ipcRenderer.invoke("checkLicense"),
+  getLicenseStatus: () => ipcRenderer.invoke("getLicenseStatus"),
+}
+
 contextBridge.exposeInMainWorld("electron", {
   users: usersAPI,
   agency: agencyAPI,
@@ -114,5 +124,6 @@ contextBridge.exposeInMainWorld("electron", {
   processFlow: processFlowAPI,
   biometric: biometricAPI,
   appConfig: appConfiAPI,
-  printer: printerAPI
+  printer: printerAPI,
+  license: licenseAPI
 });
