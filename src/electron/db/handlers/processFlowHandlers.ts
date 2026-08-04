@@ -1,6 +1,7 @@
 import { ipcMain } from "electron";
 import { processFlowRepo } from "../repositories/processFlowRepo.js";
 import { ticketsRepo } from "../repositories/ticketsRepo.js";
+import { logger } from "../../service/logger.js";
 
 export function registerProcessFlowHandlers() {
 
@@ -13,7 +14,7 @@ export function registerProcessFlowHandlers() {
             return { ok: true, data: response, error: null };
 
         } catch (error) {
-            console.log(error);
+            logger.error('processFlowHandlers', 'Error', error);
             //   if (error instanceof DestinationRouteError) {
             //     return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
             //   }

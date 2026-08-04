@@ -123,6 +123,33 @@ const waitingRoomAPI: WaitingRoomAPI = {
   saveConfig: (config) => ipcRenderer.invoke("saveWaitingRoomConfig", config),
 }
 
+const cashClosingAPI: CashClosingAPI = {
+  openCashClosing: (userId, agencyId) => ipcRenderer.invoke("openCashClosing", userId, agencyId),
+  getActiveCashClosing: (agencyId) => ipcRenderer.invoke("getActiveCashClosing", agencyId),
+  getCashClosingSummary: (agencyId, date) => ipcRenderer.invoke("getCashClosingSummary", agencyId, date),
+  getCashClosingPeriodSummary: (agencyId, fromDate, toDate) => ipcRenderer.invoke("getCashClosingPeriodSummary", agencyId, fromDate, toDate),
+  getCashClosingTransactions: (agencyId, date) => ipcRenderer.invoke("getCashClosingTransactions", agencyId, date),
+  closeCashClosing: (closingId, notes) => ipcRenderer.invoke("closeCashClosing", closingId, notes),
+  getCashClosingHistory: (agencyId) => ipcRenderer.invoke("getCashClosingHistory", agencyId),
+}
+
+const boardingAPI: BoardingAPI = {
+  getDeparturesByDate: (date) => ipcRenderer.invoke("boarding:getDeparturesByDate", date),
+  getBoardingManifest: (scheduleId) => ipcRenderer.invoke("boarding:getBoardingManifest", scheduleId),
+  getTicketsByIds: (ticketIds) => ipcRenderer.invoke("boarding:getTicketsByIds", ticketIds),
+  markBoarded: (ticketIds, userId) => ipcRenderer.invoke("boarding:markBoarded", ticketIds, userId),
+  unmarkBoarded: (ticketIds) => ipcRenderer.invoke("boarding:unmarkBoarded", ticketIds),
+  getPin: () => ipcRenderer.invoke("boarding:getPin"),
+  regeneratePin: () => ipcRenderer.invoke("boarding:regeneratePin"),
+  getServerUrl: () => ipcRenderer.invoke("boarding:getServerUrl"),
+}
+
+const logsAPI: LogsAPI = {
+  get: (opts) => ipcRenderer.invoke("logs:get", opts),
+  clear: () => ipcRenderer.invoke("logs:clear"),
+  write: (level, scope, message, meta) => ipcRenderer.invoke("logs:write", { level, scope, message, meta }),
+}
+
 contextBridge.exposeInMainWorld("electron", {
   users: usersAPI,
   agency: agencyAPI,
@@ -137,5 +164,8 @@ contextBridge.exposeInMainWorld("electron", {
   appConfig: appConfiAPI,
   printer: printerAPI,
   license: licenseAPI,
-  waitingRoom: waitingRoomAPI
+  waitingRoom: waitingRoomAPI,
+  cashClosing: cashClosingAPI,
+  boarding: boardingAPI,
+  logs: logsAPI
 });

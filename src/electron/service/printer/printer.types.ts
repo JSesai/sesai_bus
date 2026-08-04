@@ -13,4 +13,5 @@ export interface TicketPrintData {
   returnDate?: string;
   purchaseDate?: string;
   ticketId?: string;
+  ticketIds?: number[];
 }

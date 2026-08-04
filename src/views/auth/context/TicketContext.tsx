@@ -85,7 +85,7 @@ export const TicketContext = createContext<TicketContextType | undefined>(undefi
 
 export function TicketProvider({ children }: { children: React.ReactNode }) {
     const [state, dispatch] = useReducer(tripReducer, initialStateTrip);
-    const { vehicles, agencies, runningSchedules, destinations } = useDashboard();
+    const { vehicles, agencies, runningSchedules, destinations, activeCashClosing } = useDashboard();
     const { userLogged } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [currentStep, setCurrentStep] = useState<stepsTicketOffice>(stepsTicketOffice.originAndDestinationSelection);
@@ -417,6 +417,16 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
     const handleConfirmTicketSale = async (paymentMethod: string = 'cash'): Promise<void> => {
 
+        if (!activeCashClosing) {
+            showAlert({
+                typeAlert: 'error',
+                title: 'Corte de caja requerido',
+                message: 'No hay un corte de caja abierto. Abre un corte antes de realizar ventas.',
+                btnAccept: 'Aceptar',
+            });
+            return;
+        }
+
         const updateStatusTicket = await window.electron.processFlow.processConfirmedPurchase({
             customerId: state.customer?.id || 0,
             scheduleId: state.idSchedule,
@@ -430,6 +440,10 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
         const originAgency = agencies?.find((a) => a.id === state.idOrigin);
 
+        const ticketIds: number[] = Array.isArray(updateStatusTicket.data?.ticketIds)
+            ? updateStatusTicket.data.ticketIds
+            : [];
+
         const ticketPrintData: TicketPrintData = {
             agencyName: originAgency?.name || '',
             agencyCity: originAgency?.city || '',
@@ -440,6 +454,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             time: selectedSchedule?.departure_time || '',
             passengerName: state.customer?.name || '',
             seatNumbers: seatsSelected,
+            ticketIds,
             totalAmount: discountedPricePerSeat * seatsSelected.length,
             isRoundTrip,
             returnDate: state.returnDate,

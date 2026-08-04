@@ -301,13 +301,14 @@ export default function SchedulesManager({ configInitial = false }: { configInit
           </Button>
         </div>
       )}
-      {/* {filteredSchedules.length === 0 && (
+
+      {numberRegisterSchedule > 0 && filteredSchedules.length === 0 && (
         <div className="text-center py-12">
           <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-          <h3 className="text-lg font-semibold mb-2">No se encontraron horarios</h3>
-          <p className="text-muted-foreground mb-4">Intenta con otra búsqueda o agrega un nuevo horario</p>
+          <h3 className="text-lg font-semibold mb-2">No se encontraron salidas en la fecha seleccionada</h3>
+          <p className="text-muted-foreground mb-4">Selecciona otra fecha o intenta con una búsqueda diferente</p>
         </div>
-      )} */}
+      )}
     </div>
   )
 }

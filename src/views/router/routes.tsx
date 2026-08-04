@@ -30,6 +30,9 @@ import Agencies from "../Buses/screens/Agencies";
 import { ReservationProvider } from "../auth/context/ReservationContext";
 import ComfirmationList from "../Buses/components/ComfirmationList";
 import WaitingRoomSettings from "../Buses/screens/WaitingRoomSettings";
+import CashClosing from "../Buses/screens/CashClosing";
+import Boarding from "../Buses/screens/Boarding";
+import Logs from "../Buses/screens/Logs";
 
 export const routeDirectory = {
     auth: {
@@ -54,6 +57,9 @@ export const routeDirectory = {
         customers: "/dashboard/customers",
         generalSetting: "/dashboard/general-setting",
         waitingRoom: "/dashboard/waiting-room",
+        cashClosing: "/dashboard/cash-closing",
+        boarding: "/dashboard/boarding",
+        logs: "/dashboard/logs",
     },
 
 
@@ -103,6 +109,9 @@ export function AppRouter() {
                                     <Route path="agencies" element={<Agencies />} />
                                     <Route path="general-setting" element={<GeneralSetting />} />
                                     <Route path="waiting-room" element={<WaitingRoomSettings />} />
+                                    <Route path="cash-closing" element={<CashClosing />} />
+                                    <Route path="boarding" element={<Boarding />} />
+                                    <Route path="logs" element={<Logs />} />
                                     <Route path="confirmation-reservation" element={<ComfirmationList />} />
                                 </Route>
 

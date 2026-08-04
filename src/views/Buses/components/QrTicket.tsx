@@ -11,6 +11,10 @@ export function QrTicket({ data, size = 120, className }: QrTicketProps) {
   const [src, setSrc] = useState("");
 
   useEffect(() => {
+    if (!data) {
+      setSrc("");
+      return;
+    }
     let cancelled = false;
     generateQrDataUri(data, size).then((uri) => {
       if (!cancelled) setSrc(uri);

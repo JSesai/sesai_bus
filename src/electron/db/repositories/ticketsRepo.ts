@@ -327,7 +327,7 @@ export const ticketsRepo = {
         // 1. Actualizar tickets a cancelled con motivo
         const updateTicketsSql = `
           UPDATE tickets
-          SET status = 'cancelled', cancel_reason = ?
+          SET status = 'cancelled', cancel_reason = ?, cancelled_at = datetime('now', 'localtime')
           WHERE schedule_id = ?
             AND seat_number IN (${placeholders})
             AND status IN ('reserved', 'occupied')

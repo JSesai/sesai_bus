@@ -173,6 +173,7 @@ export async function generateTicketPdf(ticketData: TicketPrintData): Promise<st
     time: ticketData.time,
     passengerName: ticketData.passengerName,
     seatNumbers: ticketData.seatNumbers,
+    ticketIds: ticketData.ticketIds || [],
   });
 
   const qrBuffer: Buffer = qrImage.imageSync(ticketCode, { type: "png", size: 4, margin: 1 });

@@ -25,7 +25,7 @@ export default function ComfirmationList() {
 
 
     const { getReservationsByDate, reservations, showNofification, payReservation, cancelReservation } = useReservation();
-    const { agency, serviceFeePercent } = useDashboard();
+    const { agency, serviceFeePercent, activeCashClosing } = useDashboard();
 
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
     const [showPayment, setShowPayment] = useState(false)
@@ -159,10 +159,19 @@ export default function ComfirmationList() {
 
         if (paymentMethod === 'cash' && !canCompleteCashPayment) return;
 
+        if (!activeCashClosing) {
+            showNofification({
+                typeAlert: 'error',
+                title: 'Corte de caja requerido',
+                message: 'No hay un corte de caja abierto. Abre un corte antes de realizar pagos.',
+            });
+            return;
+        }
+
         try {
             //logica de pago
             if (selectedReservation) {
-                await payReservation(selectedReservation, paymentMethod);
+                const purchaseResult = await payReservation(selectedReservation, paymentMethod);
 
                 const ticketPrintData: TicketPrintData = {
                     agencyName: agency?.name || '',
@@ -174,6 +183,7 @@ export default function ComfirmationList() {
                     time: selectedReservation.departure_time,
                     passengerName: selectedReservation.customer_name,
                     seatNumbers: selectedReservation.seats.split(',').map(s => parseInt(s.trim(), 10)),
+                    ticketIds: purchaseResult?.ticketIds || [],
                     totalAmount: Number(selectedReservation.total_amount) || 0,
                     isRoundTrip: !!selectedReservation.return_date,
                     returnDate: selectedReservation.return_date || undefined,

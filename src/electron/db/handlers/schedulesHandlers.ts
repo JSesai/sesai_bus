@@ -3,6 +3,7 @@ import { schedulesRepo } from "../repositories/schedulesRepo.js";
 import { appConfigRepo } from "../repositories/appConfigRepo.js";
 import { ScheduleError } from "../../../shared/errors/customError.js";
 import { isCurrentAgency, isSuperUser } from "../../utils/helpers.js";
+import { logger } from "../../service/logger.js";
 
 export function registerSchedulesHandlers() {
     ipcMain.handle("getSchedules", async (): Promise<ResponseElectronGeneric> => {
@@ -23,7 +24,7 @@ export function registerSchedulesHandlers() {
             // if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('routes.terminalName')) {
             //     return { ok: false, data: null, error: { message: 'La terminal destino ya se encuentra registrada', detail: 'Cambia el nombre de la terminal destino' } };
             // }
-            console.log('error en getSchedules', error);
+            logger.error('schedulesHandlers', 'error en getSchedules', error);
             return { ok: false, data: null, error: { message: "Error interno no esperado", detail: "No fue posible obtener schedule - horario" } };
         }
 
@@ -79,7 +80,7 @@ export function registerSchedulesHandlers() {
             if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('schedules.bus_id')) {
                 return { ok: false, data: null, error: { message: 'Seleccione otro vehículo', detail: 'El vehículo elegido ya se encuentra asignado a otra salida' } };
             }
-            console.log('error en addSchedule', error);
+            logger.error('schedulesHandlers', 'error en addSchedule', error);
             return { ok: false, data: null, error: { message: "Error interno no esperado", detail: "No fue posible agregar horario" } };
         }
 
@@ -122,7 +123,7 @@ export function registerSchedulesHandlers() {
             // if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('routes.terminalName')) {
             //     return { ok: false, data: null, error: { message: 'La terminal destino ya se encuentra registrada', detail: 'Cambia el nombre de la terminal destino' } };
             // }
-            console.log('error en addSchedule', error);
+            logger.error('schedulesHandlers', 'error en addSchedule', error);
             return { ok: false, data: null, error: { message: "Error interno no esperado", detail: "No fue posible agregar schedule - horario" } };
         }
 
@@ -141,7 +142,7 @@ export function registerSchedulesHandlers() {
             return { ok: true, error: null, data: response }
 
         } catch (error: any) {
-            console.log('error al obtner status de asientos ->', error);
+            logger.error('schedulesHandlers', 'error al obtner status de asientos ->', error);
             return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible consultar el status de los asientos del vehículo" } };
 
         }
@@ -156,7 +157,7 @@ export function registerSchedulesHandlers() {
             return { ok: true, error: null, data: response }
 
         } catch (error: any) {
-            console.log('error al agregar descuento ->', error);
+            logger.error('schedulesHandlers', 'error al agregar descuento ->', error);
             if (error?.code === 'SQLITE_ERROR' && error.message.includes('no such table: discounts')) {
                 return { ok: false, data: null, error: { message: 'Informa a soporte', detail: 'La tabla de descuentos no existe' } };
             }
@@ -172,7 +173,7 @@ export function registerSchedulesHandlers() {
             const discounts = await schedulesRepo.getDiscountsByDate(date);
             return { ok: true, error: null, data: discounts };
         } catch (error: any) {
-            console.log('error al obtener descuentos ->', error);
+            logger.error('schedulesHandlers', 'error al obtener descuentos ->', error);
             return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible obtener los descuentos" } };
         }
     });
@@ -182,7 +183,7 @@ export function registerSchedulesHandlers() {
             await schedulesRepo.updateDiscountStatus(discountId, status);
             return { ok: true, error: null, data: null };
         } catch (error: any) {
-            console.log('error al actualizar descuento ->', error);
+            logger.error('schedulesHandlers', 'error al actualizar descuento ->', error);
             return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible actualizar el descuento" } };
         }
     });
@@ -201,7 +202,7 @@ export function registerSchedulesHandlers() {
             const departures = await schedulesRepo.getTodayDepartures();
             return { ok: true, error: null, data: departures };
         } catch (error: any) {
-            console.log('error en getTodayDepartures', error);
+            logger.error('schedulesHandlers', 'error en getTodayDepartures', error);
             return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible obtener las salidas del día" } };
         }
     });

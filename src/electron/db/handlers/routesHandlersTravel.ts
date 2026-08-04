@@ -2,6 +2,7 @@ import { ipcMain } from "electron";
 import { routesTravelRepo } from "../repositories/routesTravelRepo.js";
 import { AppError, DestinationRouteError } from "../../../shared/errors/customError.js";
 import { HHMMToTimestamp, timestamToHHMM } from "../../../shared/utils/helpers.js";
+import { logger } from "../../service/logger.js";
 
 export function registerRoutesHandlersTravel() {
   ipcMain.handle("getRoutes", async (): Promise<ResponseElectronGeneric> => {
@@ -13,7 +14,7 @@ export function registerRoutesHandlersTravel() {
       const routesMaped = routes.map(route => ({ ...route, estimatedTravelTime: timestamToHHMM(Number(route.estimatedTravelTime)) || route.estimatedTravelTime }))
       return { ok: true, error: null, data: routesMaped }
     } catch (error) {
-      console.log(error);
+      logger.error('routesHandlersTravel', 'Error', error);
       if (error instanceof DestinationRouteError) {
         return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
       }
@@ -32,7 +33,7 @@ export function registerRoutesHandlersTravel() {
       if (!routeAdd) return { ok: false, data: null, error: { message: "No se obtuvo información", detail: "No hay routes debes agregar" } }
       return { ok: true, error: null, data: { ...routeAdd, estimatedTravelTime: route.estimatedTravelTime } }
     } catch (error: any) {
-      console.log(error);
+      logger.error('routesHandlersTravel', 'Error', error);
       if (error instanceof DestinationRouteError) {
         return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
       }
@@ -63,7 +64,7 @@ export function registerRoutesHandlersTravel() {
       if (!routeUpdate) return { ok: false, data: null, error: { message: "No se obtuvo información", detail: "No actualizó route - destino" } }
       return { ok: true, error: null, data: { ...routeUpdate, estimatedTravelTime: route.estimatedTravelTime } }
     } catch (error: any) {
-      console.log(error);
+      logger.error('routesHandlersTravel', 'Error', error);
       if (error instanceof DestinationRouteError) {
         return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
       }

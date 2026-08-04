@@ -4,6 +4,7 @@ import { BusError, TicketError } from "../../../shared/errors/customError.js";
 import { se } from "date-fns/locale";
 import { userRepo } from "../repositories/userRepo.js";
 import { handleCheckSession } from "./userHandlers.js";
+import { logger } from "../../service/logger.js";
 
 export function registerTicketsHandlers() {
 
@@ -13,7 +14,7 @@ export function registerTicketsHandlers() {
       userLoged = data;
     }
   }).catch(error => {
-    console.log('error al verificar sesión en tickets handlers', error);
+    logger.error('ticketsHandlers', 'error al verificar sesión en tickets handlers', error);
   });
 
 
@@ -31,7 +32,7 @@ export function registerTicketsHandlers() {
       const insertedTickets = await ticketsRepo.insertSelectedSeats(ticketInsert, userLoged?.id || 0);
       return { ok: true, error: null, data: insertedTickets }
     } catch (error: any) {
-      console.log('error al insertar asientos seleccionados ->', error);
+      logger.error('ticketsHandlers', 'error al insertar asientos seleccionados ->', error);
       return { ok: false, data: null, error: { message: error.message || "Error interno", detail: "No fue posible procesar la compra de los asientos seleccionados" } };
     }
 
@@ -45,7 +46,7 @@ export function registerTicketsHandlers() {
       return { ok: true, error: null, data: updated }
 
     } catch (error: any) {
-      console.log('error al actualizar el estado de los tickets ->', error);
+      logger.error('ticketsHandlers', 'error al actualizar el estado de los tickets ->', error);
       return { ok: false, data: null, error: { message: error.message || "Error interno", detail: "No fue posible actualizar el estado de los tickets" } };
 
     }
@@ -74,7 +75,7 @@ export function registerTicketsHandlers() {
       return { ok: true, error: null, data: deleted }
 
     } catch (error: any) {
-      console.log('error al eliminar tickets no confirmados ->', error);
+      logger.error('ticketsHandlers', 'error al eliminar tickets no confirmados ->', error);
       return { ok: false, data: null, error: { message: error.message || "Error interno", detail: "No fue posible eliminar los tickets no confirmados" } };
 
     }
@@ -88,7 +89,7 @@ export function registerTicketsHandlers() {
       await ticketsRepo.reassignSeats(scheduleId, customerId, oldSeatNumbers, newSeatNumbers);
       return { ok: true, error: null, data: null };
     } catch (error: any) {
-      console.log('error al reasignar asientos ->', error);
+      logger.error('ticketsHandlers', 'error al reasignar asientos ->', error);
       return { ok: false, data: null, error: { message: error.message || "Error interno", detail: "No fue posible reasignar los asientos" } };
     }
   });
@@ -100,7 +101,7 @@ export function registerTicketsHandlers() {
       return { ok: true, error: null, data: reservations }
 
     } catch (error: any) {
-      console.log('error al optener el estado de los tickets por fecha ->', error);
+      logger.error('ticketsHandlers', 'error al optener el estado de los tickets por fecha ->', error);
       return { ok: false, data: null, error: { message: error.message || "Error interno", detail: "No fue posible obtener reservaciones por fecha" } };
 
     }
@@ -116,7 +117,7 @@ export function registerTicketsHandlers() {
       await ticketsRepo.cancelReservation(scheduleId, seatNumbers, purchaseId, reason.trim());
       return { ok: true, error: null, data: null };
     } catch (error: any) {
-      console.log('error al cancelar reservación ->', error);
+      logger.error('ticketsHandlers', 'error al cancelar reservación ->', error);
       return { ok: false, data: null, error: { message: error.message || "Error interno", detail: "No fue posible cancelar la reservación" } };
     }
   });

@@ -6,6 +6,7 @@ import { generateUniqueUserName, getAppMetadata } from "../../utils/helpers.js";
 import { sessionStore } from "../../security/store-sesion.js";
 import { signToken, verifyToken } from "../../security/jwt.js";
 import jwt from "jsonwebtoken";
+import { logger } from "../../service/logger.js";
 
 
 const { JsonWebTokenError, TokenExpiredError } = jwt;
@@ -25,7 +26,7 @@ export const handleCheckSession = async (): Promise<ResponseElectronUser> => {
         if (error instanceof TokenExpiredError) return { ok: false, data: null, error: { message: "Sesión expirada", detail: "Tu sesión ha expirado. Inicia sesión nuevamente." } };
         if (error instanceof JsonWebTokenError) return { ok: false, data: null, error: { message: "Sesión inválida", detail: "Token inválido. Inicia sesión nuevamente." } };
 
-        console.log('error in check sesion', error);
+        logger.error('userHandlers', 'error in check sesion', error);
         return { ok: false, data: null, error: { message: "Error interno", detail: "error no esperado" } };
     }
 }
@@ -50,7 +51,7 @@ export function registerUserHandlers() {
 
         } catch (error) {
             //logger
-            console.log(error);
+            logger.error('userHandlers', 'Error', error);
             if (error instanceof AppError) {
                 return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
             }
@@ -69,7 +70,7 @@ export function registerUserHandlers() {
             if (!users) return { ok: false, data: [], error: { message: "No se obtuvieron usuarios", detail: "No data" } }
             return { ok: true, error: null, data: users }
         } catch (error) {
-            console.log(error);
+            logger.error('userHandlers', 'Error', error);
             if (error instanceof AppError) {
                 return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
             }
@@ -95,7 +96,7 @@ export function registerUserHandlers() {
 
         } catch (error: any) {
             //logger
-            console.log(error);
+            logger.error('userHandlers', 'Error', error);
             if (error instanceof AppError) {
                 return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
             }
@@ -129,7 +130,7 @@ export function registerUserHandlers() {
             return { ok: true, error: null, data: userUpdate }
 
         } catch (error) {
-            console.log('error update user', error);
+            logger.error('userHandlers', 'error update user', error);
 
             if (error instanceof AppError) {
                 return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
@@ -164,7 +165,7 @@ export function registerUserHandlers() {
 
         } catch (error) {
             //logger
-            console.log(error);
+            logger.error('userHandlers', 'Error', error);
             if (error instanceof AppError) {
                 return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
             }
@@ -183,7 +184,7 @@ export function registerUserHandlers() {
 
         } catch (error) {
             //logger
-            console.log(error);
+            logger.error('userHandlers', 'Error', error);
             if (error instanceof AppError) {
                 return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
             }
@@ -207,7 +208,7 @@ export function registerUserHandlers() {
             if (error instanceof TokenExpiredError) return { ok: false, data: null, error: { message: "Sesión expirada", detail: "Tu sesión ha expirado. Inicia sesión nuevamente." } };
             if (error instanceof JsonWebTokenError) return { ok: false, data: null, error: { message: "Sesión inválida", detail: "Token inválido. Inicia sesión nuevamente." } };
 
-            console.log('error in check sesion', error);
+            logger.error('userHandlers', 'error in check sesion', error);
             return { ok: false, data: null, error: { message: "Error interno", detail: "error no esperado" } };
         }
     });
@@ -223,7 +224,7 @@ export function registerUserHandlers() {
 
         } catch (error) {
             //logger
-            console.log(error);
+            logger.error('userHandlers', 'Error', error);
             if (error instanceof AppError) {
                 return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
             }

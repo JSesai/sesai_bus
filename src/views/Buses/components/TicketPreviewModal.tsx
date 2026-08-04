@@ -37,6 +37,7 @@ export function TicketPreviewModal({ open, onClose, ticketData }: TicketPreviewM
         time: ticketData.time,
         passengerName: ticketData.passengerName,
         seatNumbers: ticketData.seatNumbers,
+        ticketIds: ticketData.ticketIds || [],
       }),
     [ticketData]
   );

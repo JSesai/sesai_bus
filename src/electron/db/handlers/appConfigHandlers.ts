@@ -1,6 +1,7 @@
 import { ipcMain } from "electron";
 import { AppError } from '../../../shared/errors/customError.js';
 import { appConfigRepo } from "../repositories/appConfigRepo.js";
+import { logger } from "../../service/logger.js";
 
 
 
@@ -14,7 +15,7 @@ export function registerAppConfigHandlers() {
             if (!configApp) return { ok: false, data: null, error: { message: "No se obtuvo información", detail: "No hay app config" } }
             return { ok: true, error: null, data: configApp }
         } catch (error) {
-            console.log(error);
+            logger.error('appConfigHandlers', 'Error', error);
             if (error instanceof AppError) {
                 return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
             }

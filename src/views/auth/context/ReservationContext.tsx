@@ -57,7 +57,7 @@ type ReservationContextType = {
     // handleSeatSelect: (seatId: number) => void;
     handleRegisterCustomer: (customer: Customer, isSearch: boolean) => Promise<Customer | null>;
     // handleConfirmTicketSale: () => Promise<void>;
-    payReservation: (r: Reservation, paymentMethod?: string) => Promise<void>;
+    payReservation: (r: Reservation, paymentMethod?: string) => Promise<{ purchaseId: number; ticketIds: number[] } | undefined>;
     handleConfirmReservation: () => Promise<void>;
     reassignReservationSeats: (scheduleId: number, customerId: number, oldSeats: number[], newSeats: number[]) => Promise<void>;
     cancelReservation: (reservation: Reservation, reason: string) => Promise<void>;
@@ -265,6 +265,11 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
             }
 
         })
+
+        return {
+            purchaseId: comfirmPay.data?.purchaseId ?? 0,
+            ticketIds: Array.isArray(comfirmPay.data?.ticketIds) ? comfirmPay.data.ticketIds : [],
+        };
 
     }
 

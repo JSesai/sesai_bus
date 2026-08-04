@@ -350,6 +350,7 @@ interface TicketPrintData {
   returnDate?: string;
   purchaseDate?: string;
   ticketId?: string;
+  ticketIds?: number[];
 }
 
 interface PrinterAPI {
@@ -421,6 +422,115 @@ interface WaitingRoomConfig {
   isOpen: boolean;
 }
 
+interface BoardingDeparture extends DepartureBoardData {
+  boarded_seats: number;
+}
+
+interface BoardingManifestRow {
+  ticket_id: number;
+  seat_number: number;
+  price: number;
+  status: string;
+  boarded_at: string | null;
+  boarded_by: number | null;
+  return_date: string | null;
+  customer_id: number;
+  customer_name: string;
+  customer_phone: string;
+}
+
+interface BoardingTicketInfo {
+  ticket_id: number;
+  seat_number: number;
+  price: number;
+  status: string;
+  boarded_at: string | null;
+  customer_id: number;
+  customer_name: string;
+  customer_phone: string;
+  schedule_id: number;
+  departure_time: string;
+  dateDeparture: string;
+  vehicle_number: number;
+  city_origin: string;
+  city_destination: string;
+}
+
+interface BoardingAPI {
+  getDeparturesByDate: (date: string) => Promise<ResponseElectronGeneric>;
+  getBoardingManifest: (scheduleId: number) => Promise<ResponseElectronGeneric>;
+  getTicketsByIds: (ticketIds: number[]) => Promise<ResponseElectronGeneric>;
+  markBoarded: (ticketIds: number[], userId: number) => Promise<ResponseElectronGeneric>;
+  unmarkBoarded: (ticketIds: number[]) => Promise<ResponseElectronGeneric>;
+  getPin: () => Promise<ResponseElectronGeneric>;
+  regeneratePin: () => Promise<ResponseElectronGeneric>;
+  getServerUrl: () => Promise<ResponseElectronGeneric>;
+}
+
+interface ICashClosing {
+  id?: number;
+  agency_id: number;
+  user_id: number;
+  closing_date: string;
+  opening_time: string;
+  closing_time?: string;
+  total_cash: number;
+  total_card: number;
+  total_transfer: number;
+  total_sales: number;
+  total_reservations: number;
+  total_cancellations: number;
+  total_service_fees: number;
+  transaction_count: number;
+  status: 'open' | 'closed';
+  notes?: string;
+  created_at?: string;
+}
+
+interface ICashSummaryByMethod {
+  method: 'cash' | 'card' | 'transfer';
+  purchase_count: number;
+  total_amount: number;
+  ticket_count: number;
+}
+
+interface ICashClosingSummary {
+  byMethod: ICashSummaryByMethod[];
+  totalSales: number;
+  totalReservations: number;
+  totalCancellations: number;
+  totalServiceFees: number;
+  transactionCount: number;
+  cancelledAmount: number;
+}
+
+interface ICashTransaction {
+  id: number;
+  customer_name: string;
+  customer_phone: string;
+  origin: string;
+  destination: string;
+  departure_time: string;
+  date_departure: string;
+  seat_numbers: string;
+  ticket_count: number;
+  amount: number;
+  method: string;
+  payment_status: string;
+  purchase_status: string;
+  created_at: string;
+}
+
+interface CashClosingAPI {
+  openCashClosing: (userId: number, agencyId: number) => Promise<ResponseElectronGeneric>;
+  getActiveCashClosing: (agencyId: number) => Promise<ResponseElectronGeneric>;
+  getCashClosingSummary: (agencyId: number, date: string) => Promise<ResponseElectronGeneric>;
+  getCashClosingPeriodSummary: (agencyId: number, fromDate: string, toDate: string) => Promise<ResponseElectronGeneric>;
+  getCashClosingTransactions: (agencyId: number, date: string) => Promise<ResponseElectronGeneric>;
+  closeCashClosing: (closingId: number, notes?: string) => Promise<ResponseElectronGeneric>;
+  getCashClosingHistory: (agencyId: number) => Promise<ResponseElectronGeneric>;
+}
+
 interface WaitingRoomAPI {
   open: () => Promise<ResponseElectronGeneric>;
   close: () => Promise<ResponseElectronGeneric>;
@@ -430,6 +540,22 @@ interface WaitingRoomAPI {
   getUrl: () => Promise<{ ok: boolean; data: { url: string; port: number }; error: null | ErrorApp }>;
   getConfig: () => Promise<{ ok: boolean; data: WaitingRoomConfig; error: null | ErrorApp }>;
   saveConfig: (config: Partial<WaitingRoomConfig>) => Promise<ResponseElectronGeneric>;
+}
+
+type LogLevel = "debug" | "info" | "warn" | "error";
+
+interface LogEntry {
+  id: number;
+  ts: string;
+  level: LogLevel;
+  scope: string;
+  message: string;
+}
+
+interface LogsAPI {
+  get: (opts?: { limit?: number; level?: LogLevel }) => Promise<{ ok: boolean; data: { entries: LogEntry[] }; error: null | ErrorApp }>;
+  clear: () => Promise<ResponseElectronGeneric>;
+  write: (level: LogLevel, scope: string, message: string, meta?: any) => Promise<ResponseElectronGeneric>;
 }
 
 interface Window {
@@ -448,5 +574,8 @@ interface Window {
     printer: PrinterAPI;
     license: LicenseAPI;
     waitingRoom: WaitingRoomAPI;
+    cashClosing: CashClosingAPI;
+    boarding: BoardingAPI;
+    logs: LogsAPI;
   };
 }

@@ -3,6 +3,7 @@ import { licenseStore } from "../../security/license-store.js";
 import { verifyLicense, isLicenseExpired, getDaysRemaining } from "../../security/license.js";
 import { activateLicenseAPI } from "../../security/license-api.js";
 import { AppError, ValidationError } from "../../../shared/errors/customError.js";
+import { logger } from "../../service/logger.js";
 
 export function registerLicenseHandlers() {
   ipcMain.handle("checkLicense", async (): Promise<ResponseElectronLicense> => {
@@ -43,7 +44,7 @@ export function registerLicenseHandlers() {
         error: null,
       };
     } catch (error) {
-      console.log("error checking license", error);
+      logger.error('licenseHandlers', "error checking license", error);
       if (error instanceof AppError) {
         return { ok: false, data: null, error: { message: error.message, detail: error.details || "" } };
       }
@@ -98,7 +99,7 @@ export function registerLicenseHandlers() {
         error: null,
       };
     } catch (error) {
-      console.log("error activating license", error);
+      logger.error('licenseHandlers', "error activating license", error);
       if (error instanceof AppError) {
         return { ok: false, data: null, error: { message: error.message, detail: error.details || "" } };
       }
@@ -129,7 +130,7 @@ export function registerLicenseHandlers() {
         error: null,
       };
     } catch (error) {
-      console.log("error getting license status", error);
+      logger.error('licenseHandlers', "error getting license status", error);
       return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible obtener el estado de la licencia" } };
     }
   });

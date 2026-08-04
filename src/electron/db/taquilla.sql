@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS app_config (
     initial_setup_completed INTEGER DEFAULT 0,
     min_advance_minutes INTEGER DEFAULT 30,
     service_fee_percent INTEGER DEFAULT 0,
+    boarding_pin TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP, 
     status TEXT NOT NULL DEFAULT 'active'
 
@@ -198,5 +199,28 @@ CREATE TABLE IF NOT EXISTS discounts (
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (schedule_id) REFERENCES schedules(id) ON DELETE CASCADE
+);
+
+-- 11. CASH CLOSINGS (Cortes de caja)
+CREATE TABLE IF NOT EXISTS cash_closings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    agency_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    closing_date TEXT NOT NULL,
+    opening_time TEXT NOT NULL,
+    closing_time TEXT,
+    total_cash REAL DEFAULT 0,
+    total_card REAL DEFAULT 0,
+    total_transfer REAL DEFAULT 0,
+    total_sales REAL DEFAULT 0,
+    total_reservations REAL DEFAULT 0,
+    total_cancellations REAL DEFAULT 0,
+    total_service_fees REAL DEFAULT 0,
+    transaction_count INTEGER DEFAULT 0,
+    status TEXT CHECK(status IN ('open','closed')) DEFAULT 'open',
+    notes TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (agency_id) REFERENCES agencies(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 

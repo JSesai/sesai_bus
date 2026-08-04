@@ -2,6 +2,7 @@ import { ipcMain } from "electron";
 import { agenciesRepo } from "../repositories/agenciesRepo.js";
 import { isCurrentAgency, isSuperUser } from "../../utils/helpers.js";
 import { AgencyError } from "../../../shared/errors/customError.js";
+import { logger } from "../../service/logger.js";
 
 export function registerAgenciesHandlers() {
   ipcMain.handle("getAgencies", async (_e): Promise<ResponseElectronGeneric> => {
@@ -14,7 +15,7 @@ export function registerAgenciesHandlers() {
       return { ok: true, data: agency, error: null }
 
     } catch (error) {
-      console.log('error al obtener agencie ->', error);
+      logger.error('agenciesHandlers', 'error al obtener agencie ->', error);
 
       return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible actualizar el bus" } };
 
@@ -32,7 +33,7 @@ export function registerAgenciesHandlers() {
       return { ok: true, data: agencyLocal, error: null }
 
     } catch (error) {
-      console.log('error al obtener agencie ->', error);
+      logger.error('agenciesHandlers', 'error al obtener agencie ->', error);
 
       return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible actualizar el bus" } };
 
@@ -51,7 +52,7 @@ export function registerAgenciesHandlers() {
       return { ok: true, data, error: null }
     
     } catch (error) {
-      console.log('error al agregar agency ->', error);
+      logger.error('agenciesHandlers', 'error al agregar agency ->', error);
 
       return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible guardar información de la agencia" } };
 
@@ -67,7 +68,7 @@ export function registerAgenciesHandlers() {
       return { ok: true, data: agency, error: null }
 
     } catch (error) {
-      console.log('error al actualizar agencie ->', error);
+      logger.error('agenciesHandlers', 'error al actualizar agencie ->', error);
 
       return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible actualizar información agency" } };
 

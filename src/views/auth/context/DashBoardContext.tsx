@@ -28,6 +28,7 @@ type DashboardContextType = {
   sidebarOpen: boolean;
   serviceFeePercent: number;
   waitingRoomOpen: boolean;
+  activeCashClosing: any | null;
 
   //methods
   loadSystemInformation: () => Promise<void>;
@@ -45,6 +46,7 @@ type DashboardContextType = {
   handleAddDiscount: (discount: Discount) => Promise<boolean>;
   getDiscountsByDate: (date: string) => Promise<void>;
   toggleWaitingRoom: () => Promise<void>;
+  refreshActiveCashClosing: () => Promise<void>;
 
 };
 
@@ -65,6 +67,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [serviceFeePercent, setServiceFeePercent] = useState(0);
   const [waitingRoomOpen, setWaitingRoomOpen] = useState(false);
+  const [activeCashClosing, setActiveCashClosing] = useState<any | null>(null);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -597,6 +600,18 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
 
   //manejador de carga de informacion del sistema
+  const refreshActiveCashClosing = async () => {
+    if (!agency?.id) return;
+    try {
+      const resp = await window.electron.cashClosing.getActiveCashClosing(agency.id);
+      if (resp.ok) {
+        setActiveCashClosing(resp.data);
+      }
+    } catch (error) {
+      console.log('error al verificar corte activo', error);
+    }
+  };
+
   const loadSystemInformation = async () => {
     try {
       setIsLoading(true);
@@ -662,6 +677,12 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     checkWaitingRoomStatus();
   }, [userLogged]);
 
+  useEffect(() => {
+    if (agency?.id) {
+      refreshActiveCashClosing();
+    }
+  }, [agency]);
+
   return (
     <DashboardContext.Provider value={{
       loadSystemInformation,
@@ -696,7 +717,9 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       driverEmployees,
       numberRegisteredDriver: driverEmployees.length,
       serviceFeePercent,
-      loadAppConfig
+      loadAppConfig,
+      activeCashClosing,
+      refreshActiveCashClosing
 
 
     }}>

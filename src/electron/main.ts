@@ -22,8 +22,42 @@ import { registerAppConfigHandlers } from "./db/handlers/appConfigHandlers.js";
 import { registerProcessFlowHandlers } from "./db/handlers/processFlowHandlers.js";
 import { registerPrinterHandlers } from "./service/printer/printer.service.js";
 import { registerLicenseHandlers } from "./db/handlers/licenseHandlers.js";
+import { registerCashClosingHandlers } from "./db/handlers/cashClosingHandlers.js";
+import { registerBoardingHandlers } from "./db/handlers/boardingHandlers.js";
+import { startBoardingServer, stopBoardingServer } from "./service/boarding/boardingServer.js";
+import { logger, initLogger, getRecentLogs, clearLogFile, sanitize, type LogLevel } from "./service/logger.js";
 
+process.on("uncaughtException", (err) => {
+    logger.error("main", "uncaughtException", err);
+});
+process.on("unhandledRejection", (reason) => {
+    logger.error("main", "unhandledRejection", reason);
+});
 
+function summarizeArgs(args: any[]): string {
+    try {
+        const json = JSON.stringify(sanitize(args));
+        return json.length > 160 ? json.slice(0, 160) + "…" : json;
+    } catch {
+        return "[no serializable]";
+    }
+}
+
+const originalIpcHandle = ipcMain.handle.bind(ipcMain);
+ipcMain.handle = ((channel: string, listener: (...args: any[]) => any) => {
+    originalIpcHandle(channel, async (event: any, ...args: any[]) => {
+        const start = Date.now();
+        logger.debug("ipc", `→ ${channel}`, { args: summarizeArgs(args) });
+        try {
+            const result = await listener(event, ...args);
+            logger.debug("ipc", `← ${channel} ok (${Date.now() - start}ms)`);
+            return result;
+        } catch (err) {
+            logger.error("ipc", `← ${channel} error (${Date.now() - start}ms)`, err);
+            throw err;
+        }
+    });
+}) as typeof ipcMain.handle;
 
 let waitingRoomWindow: BrowserWindow | null = null;
 let waitingRoomVisible = false;
@@ -134,6 +168,7 @@ function startWaitingRoomServer() {
     const db = getDB();
 
     waitingRoomServer = http.createServer((req, res) => {
+        logger.debug("waiting-room", `→ ${req.method || 'GET'} ${req.url}`);
         // CORS headers
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -332,6 +367,7 @@ function startWaitingRoomServer() {
 
     waitingRoomServer.listen(WAITING_ROOM_PORT, '0.0.0.0', () => {
         const ip = getLocalIP();
+        logger.info("waiting-room", `Servidor disponible en http://${ip}:${WAITING_ROOM_PORT}`);
         console.log(`\n  🖥️  Sala de Espera disponible en:`);
         console.log(`     http://${ip}:${WAITING_ROOM_PORT}`);
         console.log(`     (abre esta URL en cualquier navegador de la red local)\n`);
@@ -339,8 +375,10 @@ function startWaitingRoomServer() {
 
     waitingRoomServer.on('error', (err: any) => {
         if (err.code === 'EADDRINUSE') {
+            logger.warn("waiting-room", `Puerto ${WAITING_ROOM_PORT} en uso, servidor de sala de espera no iniciado`);
             console.log(`Puerto ${WAITING_ROOM_PORT} en uso, servidor de sala de espera no iniciado`);
         } else {
+            logger.error("waiting-room", "Error en servidor de sala de espera", err);
             console.error('Error en servidor de sala de espera:', err);
         }
     });
@@ -375,6 +413,22 @@ async function createWindow() {
 let db = getDB()
 
 app.whenReady().then(async () => {
+    initLogger();
+    logger.info("main", "Aplicación iniciada", { version: process.env.npm_package_version || '' });
+
+    ipcMain.handle("logs:get", (_e, opts: { limit?: number; level?: LogLevel } = {}) => {
+        const entries = getRecentLogs(opts?.limit ?? 200, opts?.level);
+        return { ok: true, data: { entries }, error: null };
+    });
+    ipcMain.handle("logs:clear", () => {
+        clearLogFile();
+        return { ok: true, data: null, error: null };
+    });
+    ipcMain.handle("logs:write", (_e, payload: { level?: LogLevel; scope?: string; message?: string; meta?: any }) => {
+        logger[payload?.level || "info"](payload?.scope || "renderer", payload?.message || "", payload?.meta);
+        return { ok: true, data: null, error: null };
+    });
+
     await initDatabase(db);
     createWindow();
     registerAppConfigHandlers();
@@ -391,6 +445,11 @@ app.whenReady().then(async () => {
     registerProcessFlowHandlers();
     registerPrinterHandlers();
     registerLicenseHandlers();
+    registerCashClosingHandlers();
+    registerBoardingHandlers();
+
+    // Servidor HTTPS para abordaje desde el teléfono
+    startBoardingServer();
 
     // Start HTTP server for waiting room display
     startWaitingRoomServer();
@@ -463,11 +522,13 @@ app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 app.on("before-quit", () => {
+    logger.info("main", "Cerrando aplicación");
     stopWaitingRoomServer();
+    stopBoardingServer();
     if (!db) return;
     db.close((err) => {
-        if (err) console.error("Error cerrando la BD:", err);
-        else console.log("BD cerrada correctamente");
+        if (err) logger.error("main", "Error cerrando la BD", err);
+        else logger.info("main", "BD cerrada correctamente");
     });
 
 });

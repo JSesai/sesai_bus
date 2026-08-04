@@ -1,5 +1,6 @@
 import { ipcMain } from "electron";
 import { customersRepo } from "../repositories/customersRepo.js";
+import { logger } from "../../service/logger.js";
 
 export function registerCustomersHandlers() {
   ipcMain.handle("getCustomers", () => customersRepo.getAll());
@@ -19,7 +20,7 @@ export function registerCustomersHandlers() {
         return { ok: false, data: null, error: { message: "Número de teléfono ya registrado", detail: "El número de teléfono proporcionado ya está asociado a otro cliente" } };
       }
 
-      console.log('error al agregar cliente ->', error);
+      logger.error('customersHandlers', 'error al agregar cliente ->', error);
       return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible agregar el cliente con la información proporcionada" } };
 
     }
@@ -38,7 +39,7 @@ export function registerCustomersHandlers() {
         return { ok: false, data: null, error: { message: "Número de teléfono ya registrado", detail: "El número de teléfono proporcionado ya está asociado a otro cliente" } };
       }
 
-      console.log('error al actualizar cliente ->', error);
+      logger.error('customersHandlers', 'error al actualizar cliente ->', error);
       return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible actualizar el cliente con la información proporcionada" } };
 
     }
@@ -55,7 +56,7 @@ export function registerCustomersHandlers() {
       return { ok: true, error: null, data: response }
 
     } catch (error: any) {
-      console.log('error al obtener phone ->', error);
+      logger.error('customersHandlers', 'error al obtener phone ->', error);
       return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible obtener información del cliente" } };
 
     }
@@ -77,7 +78,7 @@ export function registerCustomersHandlers() {
       if (!updatedCustomer) return { ok: false, data: null, error: { message: "Error al actualizar cliente", detail: "No fue posible actualizar el cliente con la información proporcionada" } };
       return { ok: true, error: null, data: updatedCustomer }
     } catch (error: any) {
-      console.log('error al obtener phone ->', error);
+      logger.error('customersHandlers', 'error al obtener phone ->', error);
 
       return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible obtener información del cliente" } };
 

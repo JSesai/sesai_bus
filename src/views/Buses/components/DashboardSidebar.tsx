@@ -3,7 +3,7 @@ import {
     Activity, Command, Globe, type LucideIcon,
     MessageSquare, Settings,
     Shield, Terminal, TicketPlus, LayoutDashboard, Bus,
-    NotebookText, Monitor
+    NotebookText, Monitor, Calculator, ScanLine, ScrollText
 } from "lucide-react"
 
 import { Button } from "../../components/ui/button"
@@ -56,6 +56,24 @@ export const menuDashboard: MeuDash[] = [
         label: "Sala de Espera",
         path: "/dashboard/waiting-room",
         icon: Monitor,
+        roles: ["manager", "developer"],
+    },
+    {
+        label: "Corte de Caja",
+        path: "/dashboard/cash-closing",
+        icon: Calculator,
+        roles: ["manager", "developer", "ticketSeller"],
+    },
+    {
+        label: "Abordaje",
+        path: "/dashboard/boarding",
+        icon: ScanLine,
+        roles: ["checkIn", "manager", "developer"],
+    },
+    {
+        label: "Logs",
+        path: "/dashboard/logs",
+        icon: ScrollText,
         roles: ["manager", "developer"],
     },
 ];

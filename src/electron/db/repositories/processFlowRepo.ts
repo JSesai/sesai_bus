@@ -6,7 +6,7 @@ export const processFlowRepo = {
 
     processConfirmedPurchase: async (
         props: IProcessConfirmedPurchase
-    ): Promise<void> => {
+    ): Promise<{ purchaseId: number; ticketIds: number[] }> => {
         const { customerId, scheduleId, seatNumbers, paymentMethod, totalAmount } = props;
         return new Promise((resolve, reject) => {
             db.serialize(() => {
@@ -57,7 +57,20 @@ export const processFlowRepo = {
                                             db.run("ROLLBACK");
                                             return reject(commitErr);
                                         }
-                                        resolve();
+
+                                        // 5. Recuperar ids de los tickets vendidos (para el QR del boleto)
+                                        const idsSql = `
+                          SELECT id FROM tickets
+                          WHERE schedule_id = ? AND purchase_id = ?
+                            AND seat_number IN (${placeholders})
+                        `;
+                                        db.all(idsSql, [scheduleId, purchaseId, ...seatNumbers], (errIds, rows: any[]) => {
+                                            if (errIds) return reject(errIds);
+                                            resolve({
+                                                purchaseId,
+                                                ticketIds: (rows || []).map((r) => r.id),
+                                            });
+                                        });
                                     });
                                 }
                             );

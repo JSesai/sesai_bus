@@ -1,6 +1,7 @@
 import { ipcMain } from "electron";
 import { busesRepo } from "../repositories/busesRepo.js";
 import { AppError, BusError } from "../../../shared/errors/customError.js";
+import { logger } from "../../service/logger.js";
 
 export function busesHandlers() {
   ipcMain.handle("getBuses", async (): Promise<ResponseElectronGeneric> => {
@@ -12,7 +13,7 @@ export function busesHandlers() {
       return { ok: true, data: busesFilters, error: null }
 
     } catch (error) {
-      console.log('error al obtener autobus ->', error);
+      logger.error('busesHandlers', 'error al obtener autobus ->', error);
 
       if (error instanceof AppError) {
         return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
@@ -35,7 +36,7 @@ export function busesHandlers() {
       if (!registerBus) throw new BusError("Error al crear registro", "No se ha registrado autobus");
       return { ok: true, error: null, data: registerBus }
     } catch (error: any) {
-      console.log('error al registrar autobus ->', error);
+      logger.error('busesHandlers', 'error al registrar autobus ->', error);
 
       if (error instanceof AppError) {
         return { ok: false, data: null, error: { message: error.message, detail: error.details || '' } };
@@ -63,7 +64,7 @@ export function busesHandlers() {
       return { ok: true, error: null, data: response }
 
     } catch (error: any) {
-      console.log('error al actualizar bus ->', error);
+      logger.error('busesHandlers', 'error al actualizar bus ->', error);
 
       if (error?.code === 'SQLITE_CONSTRAINT' && error.message.includes('buses.plate')) {
         return { ok: false, data: null, error: { message: 'Placas ya registradas', detail: 'El número de placas ya está asociada a otro autobus' } };
