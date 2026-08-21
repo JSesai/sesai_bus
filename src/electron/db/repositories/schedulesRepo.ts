@@ -212,9 +212,10 @@ export const schedulesRepo = {
                      ELSE 'available'
                    END AS status
             FROM seat_numbers sn
-            LEFT JOIN tickets t 
-              ON t.schedule_id = ? 
+            LEFT JOIN tickets t
+              ON t.schedule_id = ?
              AND t.seat_number = sn.seat_number
+             AND t.status != 'cancelled'
             ORDER BY sn.seat_number;
             `,
         [scheduleId, scheduleId], // parámetros para los dos "?"

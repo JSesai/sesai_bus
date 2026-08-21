@@ -153,6 +153,7 @@ export const ticketsRepo = {
       SET status = ?
       WHERE schedule_id = ?
         AND seat_number IN (${placeholders})
+        AND status != 'cancelled'
     `;
 
       const params = [newStatus, scheduleId, ...seatNumbers];
@@ -208,63 +209,50 @@ export const ticketsRepo = {
           return reject(new Error(`El asiento ${row.seat_number} no está disponible.`));
         }
 
-        // Eliminar tickets cancelados para los nuevos asientos (evita conflicto con unique index)
-        const deleteCancelledSql = `
-          DELETE FROM tickets
+        // Ejecutar updates secuencialmente dentro de una transacción
+        // (el índice único parcial permite mover el ticket sin borrar los históricos cancelados)
+        const updateStmt = `
+          UPDATE tickets
+          SET seat_number = ?
           WHERE schedule_id = ?
-            AND seat_number IN (${placeholders})
-            AND status = 'cancelled'
+            AND seat_number = ?
+            AND customer_id = ?
+            AND status IN ('reserved', 'occupied')
         `;
 
-        db.run(deleteCancelledSql, [scheduleId, ...newSeatNumbers], (delErr) => {
-          if (delErr) {
-            return reject(delErr);
+        const runUpdate = (index: number): void => {
+          if (index >= oldSeatNumbers.length) {
+            // Todos los updates completos, hacer commit
+            db.run("COMMIT", (commitErr) => {
+              if (commitErr) {
+                db.run("ROLLBACK");
+                return reject(commitErr);
+              }
+              resolve();
+            });
+            return;
           }
 
-          // Ejecutar updates secuencialmente dentro de una transacción
-          const updateStmt = `
-            UPDATE tickets
-            SET seat_number = ?
-            WHERE schedule_id = ?
-              AND seat_number = ?
-              AND customer_id = ?
-              AND status IN ('reserved', 'occupied')
-          `;
-
-          const runUpdate = (index: number): void => {
-            if (index >= oldSeatNumbers.length) {
-              // Todos los updates completos, hacer commit
-              db.run("COMMIT", (commitErr) => {
-                if (commitErr) {
-                  db.run("ROLLBACK");
-                  return reject(commitErr);
-                }
-                resolve();
-              });
-              return;
+          db.run(updateStmt, [newSeatNumbers[index], scheduleId, oldSeatNumbers[index], customerId], function (updateErr) {
+            if (updateErr) {
+              db.run("ROLLBACK");
+              return reject(updateErr);
             }
-
-            db.run(updateStmt, [newSeatNumbers[index], scheduleId, oldSeatNumbers[index], customerId], function (updateErr) {
-              if (updateErr) {
-                db.run("ROLLBACK");
-                return reject(updateErr);
-              }
-              if (this.changes === 0) {
-                db.run("ROLLBACK");
-                return reject(new Error(`No se encontró el asiento ${oldSeatNumbers[index]} para reasignar.`));
-              }
-              // Continuar con el siguiente update
-              runUpdate(index + 1);
-            });
-          };
-
-          // Iniciar transacción y comenzar updates
-          db.run("BEGIN TRANSACTION", (txErr) => {
-            if (txErr) {
-              return reject(txErr);
+            if (this.changes === 0) {
+              db.run("ROLLBACK");
+              return reject(new Error(`No se encontró el asiento ${oldSeatNumbers[index]} para reasignar.`));
             }
-            runUpdate(0);
+            // Continuar con el siguiente update
+            runUpdate(index + 1);
           });
+        };
+
+        // Iniciar transacción y comenzar updates
+        db.run("BEGIN TRANSACTION", (txErr) => {
+          if (txErr) {
+            return reject(txErr);
+          }
+          runUpdate(0);
         });
       });
     });

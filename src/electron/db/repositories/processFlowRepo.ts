@@ -26,11 +26,13 @@ export const processFlowRepo = {
                         const purchaseId = this.lastID;
 
                         // 2. Actualizar tickets seleccionados a 'occupied' y asociarlos a la compra
+                        // (se excluyen filas canceladas para preservar el histórico)
                         const placeholders = seatNumbers.map(() => "?").join(", ");
                         const sqlUpdate = `
                   UPDATE tickets
                   SET status = 'occupied', purchase_id = ?
                   WHERE schedule_id = ? AND seat_number IN (${placeholders})
+                    AND status != 'cancelled'
                 `;
                         const params = [purchaseId, scheduleId, ...seatNumbers];
 

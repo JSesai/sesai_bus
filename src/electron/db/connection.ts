@@ -69,6 +69,23 @@ function runMigrations(database: sqlite3.Database) {
             }
         }
     );
+    // Reemplaza el índice único absoluto por uno parcial: permite re-vender un asiento
+    // cancelado (quedando disponible para compra) conservando el histórico de cancelaciones.
+    database.run("DROP INDEX IF EXISTS idx_unique_seat_per_schedule", (err) => {
+        if (err) {
+            console.error("Error en migración drop idx_unique_seat_per_schedule:", err);
+        }
+    });
+    database.run(
+        `CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_active_seat_per_schedule
+         ON tickets(schedule_id, seat_number)
+         WHERE status != 'cancelled'`,
+        (err) => {
+            if (err) {
+                console.error("Error en migración idx_unique_active_seat_per_schedule:", err);
+            }
+        }
+    );
     database.run(
         `CREATE TABLE IF NOT EXISTS cash_closings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
