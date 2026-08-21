@@ -4,6 +4,7 @@ import { appConfigRepo } from "../repositories/appConfigRepo.js";
 import { ScheduleError } from "../../../shared/errors/customError.js";
 import { isCurrentAgency, isSuperUser } from "../../utils/helpers.js";
 import { logger } from "../../service/logger.js";
+import { getTodayDate } from "../../../shared/utils/helpers.js";
 
 export function registerSchedulesHandlers() {
     ipcMain.handle("getSchedules", async (): Promise<ResponseElectronGeneric> => {
@@ -47,9 +48,11 @@ export function registerSchedulesHandlers() {
 
             const config = await appConfigRepo.getConfig() as any;
             const minAdvance = config?.min_advance_minutes ?? 30;
-            const today = new Date().toISOString().split("T")[0];
+            const today = getTodayDate();
+
             if (schedule.dateDeparture === today) {
                 const now = new Date();
+                console.log('now ->', now);
                 const [h, m] = [now.getHours(), now.getMinutes() + minAdvance];
                 const minDeparture = `${String(Math.floor(h + m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
                 if (schedule.departure_time < minDeparture) {

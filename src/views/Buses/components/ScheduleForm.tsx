@@ -65,6 +65,7 @@ export default function HorarioForm({ initialData, onCancel, isEditing = false }
     const today = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
     if (formData.dateDeparture === today) {
       const now = new Date();
+      console.log('now', now);
       const [h, m] = [now.getHours(), now.getMinutes() + minAdvanceMinutes];
       const minDeparture = `${String(Math.floor(h + m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
       if (formData.departure_time < minDeparture) {

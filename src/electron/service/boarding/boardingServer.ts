@@ -1,7 +1,6 @@
 import { app } from "electron";
 import https from "https";
 import type { IncomingMessage, ServerResponse } from "http";
-import os from "os";
 import path from "path";
 import fs from "fs";
 import { createRequire } from "module";
@@ -11,24 +10,13 @@ import { decodeTicketCode } from "../../../shared/utils/ticketCode.js";
 import { getBoardingPin } from "./boardingConfig.js";
 import { boardingPageHtml } from "./boarding-page.js";
 import { logger } from "../logger.js";
+import { getLocalIP } from "../../utils/network.js";
 
 const require = createRequire(import.meta.url);
 
 const BOARDING_PORT = 8098;
 
 let server: https.Server | null = null;
-
-function getLocalIP(): string {
-    const interfaces = os.networkInterfaces();
-    for (const name of Object.keys(interfaces)) {
-        for (const iface of interfaces[name] || []) {
-            if (iface.family === 'IPv4' && !iface.internal) {
-                return iface.address;
-            }
-        }
-    }
-    return 'localhost';
-}
 
 function getCertPath(): string {
     return path.join(app.getPath('userData'), 'boarding-cert.json');
