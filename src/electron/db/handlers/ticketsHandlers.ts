@@ -1,8 +1,6 @@
 import { ipcMain } from "electron";
 import { ticketsRepo } from "../repositories/ticketsRepo.js";
-import { BusError, TicketError } from "../../../shared/errors/customError.js";
-import { se } from "date-fns/locale";
-import { userRepo } from "../repositories/userRepo.js";
+import { TicketError } from "../../../shared/errors/customError.js";
 import { handleCheckSession } from "./userHandlers.js";
 import { logger } from "../../service/logger.js";
 

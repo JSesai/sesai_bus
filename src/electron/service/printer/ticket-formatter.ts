@@ -176,18 +176,24 @@ export async function generateTicketPdf(ticketData: TicketPrintData): Promise<st
     ticketIds: ticketData.ticketIds || [],
   });
 
-  const qrBuffer: Buffer = qrImage.imageSync(ticketCode, { type: "png", size: 4, margin: 1 });
-  const qrBase64 = qrBuffer.toString("base64");
-  const qrDataUri = `data:image/png;base64,${qrBase64}`;
+  if (ticketCode) {
+    const qrBuffer: Buffer = qrImage.imageSync(ticketCode, { type: "png", size: 4, margin: 1 });
+    const qrBase64 = qrBuffer.toString("base64");
+    const qrDataUri = `data:image/png;base64,${qrBase64}`;
 
-  const qrSize = 28;
-  const qrX = (80 - qrSize) / 2;
-  doc.addImage(qrDataUri, "PNG", qrX, y, qrSize, qrSize);
-  y += qrSize + 3;
+    const qrSize = 28;
+    const qrX = (80 - qrSize) / 2;
+    doc.addImage(qrDataUri, "PNG", qrX, y, qrSize, qrSize);
+    y += qrSize + 3;
 
-  doc.setFontSize(8);
-  doc.text("Presentar este codigo al abordar", centerX, y, { align: "center" });
-  y += 6;
+    doc.setFontSize(8);
+    doc.text("Presentar este codigo al abordar", centerX, y, { align: "center" });
+    y += 6;
+  } else {
+    doc.setFontSize(8);
+    doc.text("QR no disponible: boleto sin identificador", centerX, y, { align: "center" });
+    y += 6;
+  }
 
   doc.line(5, y, 75, y);
   y += 5;

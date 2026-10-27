@@ -173,6 +173,28 @@ export default function ComfirmationList() {
             if (selectedReservation) {
                 const purchaseResult = await payReservation(selectedReservation, paymentMethod);
 
+                if (!purchaseResult) {
+                    showNofification({
+                        typeAlert: 'error',
+                        title: 'No se pudo confirmar el pago',
+                        message: 'No se obtuvo respuesta del proceso de pago. Intenta nuevamente.'
+                    });
+                    return;
+                }
+
+                const ticketIds = purchaseResult.ticketIds.length > 0
+                    ? purchaseResult.ticketIds
+                    : selectedReservation.ticketIds;
+
+                if (ticketIds.length === 0) {
+                    showNofification({
+                        typeAlert: 'error',
+                        title: 'No se pudo generar el QR',
+                        message: 'El pago se registró, pero no se obtuvieron los identificadores de los boletos. Reimprime el boleto desde reservaciones.'
+                    });
+                    return;
+                }
+
                 const ticketPrintData: TicketPrintData = {
                     agencyName: agency?.name || '',
                     agencyCity: agency?.city || '',
@@ -183,7 +205,7 @@ export default function ComfirmationList() {
                     time: selectedReservation.departure_time,
                     passengerName: selectedReservation.customer_name,
                     seatNumbers: selectedReservation.seats.split(',').map(s => parseInt(s.trim(), 10)),
-                    ticketIds: purchaseResult?.ticketIds || [],
+                    ticketIds,
                     totalAmount: Number(selectedReservation.total_amount) || 0,
                     isRoundTrip: !!selectedReservation.return_date,
                     returnDate: selectedReservation.return_date || undefined,

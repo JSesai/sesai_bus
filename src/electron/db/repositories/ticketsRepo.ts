@@ -1,8 +1,6 @@
 import { getDB } from "../connection.js";
-import { handleCheckSession } from "../handlers/userHandlers.js";
 
 const db = getDB();
-let userLoged: UserResponseAuth | null = null;
 
 
 
@@ -273,6 +271,7 @@ export const ticketsRepo = {
           r.terminalName,
           r.baseFare AS base_fare,
           GROUP_CONCAT(t.seat_number, ', ') AS seats,
+          GROUP_CONCAT(t.id) AS ticket_ids,
           SUM(t.price) AS total_amount,
           t.status AS ticket_status,
           t.return_date,

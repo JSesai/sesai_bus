@@ -8,6 +8,9 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "overrides": {
+    "usb": "^2.18.0"
+  },
   "main": "dist-electron/electron/main.js",
   "build": {
     "extraResources": [

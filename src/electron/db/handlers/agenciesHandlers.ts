@@ -10,7 +10,7 @@ export function registerAgenciesHandlers() {
       console.log("init process getAgencie");
 
       const agency = await agenciesRepo.getAgencies();
-      if(!agency) return { ok: false, data: null, error: {message: "No existe agencia registrada", detail: "Registra una agencia"} }
+      if (!agency) return { ok: false, data: null, error: { message: "No existe agencia registrada", detail: "Registra una agencia" } }
 
       return { ok: true, data: agency, error: null }
 
@@ -28,7 +28,7 @@ export function registerAgenciesHandlers() {
 
       const agencyLocal = await agenciesRepo.getCurrent();
 
-      if(!agencyLocal) return { ok: false, data: null, error: {message: "No existe agencia registrada", detail: "Registra una agencia"} }
+      if (!agencyLocal) return { ok: false, data: null, error: { message: "No existe agencia registrada", detail: "Registra una agencia" } }
 
       return { ok: true, data: agencyLocal, error: null }
 
@@ -40,17 +40,17 @@ export function registerAgenciesHandlers() {
     }
 
   });
-  ipcMain.handle("addAgency", async(_, agency: Agency): Promise<ResponseElectronAgencie> => {
+  ipcMain.handle("addAgency", async (_, agency: Agency): Promise<ResponseElectronAgencie> => {
     try {
       const isAgencyLocal = await isCurrentAgency(agency.id ?? 0);
-      console.log({"init process add agency": agency});
+      console.log({ "init process add agency": agency });
       if (!isAgencyLocal && !isSuperUser()) throw new AgencyError("No pudes agregar agencias.", "No tienes permisos para agregar mas agencias.");
-      
+
       const data = await agenciesRepo.add(agency) as Agency;
-      
+
 
       return { ok: true, data, error: null }
-    
+
     } catch (error) {
       logger.error('agenciesHandlers', 'error al agregar agency ->', error);
 
@@ -59,12 +59,12 @@ export function registerAgenciesHandlers() {
     }
   });
 
-  ipcMain.handle("updateAgency", async(_, agency):  Promise<ResponseElectronGeneric> => {
+  ipcMain.handle("updateAgency", async (_, agency): Promise<ResponseElectronGeneric> => {
 
-      try {
+    try {
       console.log("init process update agency");
-      
-      const data = await  agenciesRepo.update(agency)
+
+      // const data = await  agenciesRepo.update(agency)
       return { ok: true, data: agency, error: null }
 
     } catch (error) {
@@ -73,8 +73,8 @@ export function registerAgenciesHandlers() {
       return { ok: false, data: null, error: { message: "Error interno", detail: "No fue posible actualizar información agency" } };
 
     }
-   
-  
+
+
   });
   ipcMain.handle("deleteAgency", (_, id: number) => agenciesRepo.delete(id));
 }

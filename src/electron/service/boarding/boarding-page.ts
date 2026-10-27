@@ -133,7 +133,9 @@ body { font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-s
 <script>
 "use strict";
 var state = { pin:null, date:today(), departures:[], scheduleId:null, manifest:[] };
-var scanActive = false, scanRaf = 0, scanStream = null, scanDetector = null;
+var scanActive = false, scanRaf = 0, scanStream = null, scanDetector = null, scanTick = 0;
+var scanCanvas = document.createElement('canvas');
+var scanCanvasFull = document.createElement('canvas');
 var pendingTickets = [];
 
 function today(){
@@ -306,9 +308,36 @@ async function toggleGroup(g){
 /* ---------- Escáner ---------- */
 function hasBarcodeDetector(){ return typeof window.BarcodeDetector === 'function'; }
 
+async function applyCameraFocus(stream){
+  try {
+    var track = stream.getVideoTracks && stream.getVideoTracks()[0];
+    if (!track || !track.getCapabilities) return;
+    var caps = track.getCapabilities() || {};
+    var modes = caps.focusMode || [];
+    if (modes.indexOf('continuous') !== -1){
+      try { await track.applyConstraints({ focusMode:'continuous' }); }
+      catch(e){ await track.applyConstraints({ advanced:[{ focusMode:'continuous' }] }); }
+    }
+  } catch(e){}
+}
+
 async function startScan(){
   try {
-    scanStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' } });
+    scanStream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        facingMode: { ideal: 'environment' },
+        width: { ideal: 1920 },
+        height: { ideal: 1080 },
+        frameRate: { ideal: 30 }
+      }
+    });
+    const track = scanStream.getVideoTracks()[0];
+
+    console.log('Cámara seleccionada:', track.label);
+    console.log('Configuración real:', track.getSettings());
+    console.log('Capacidades:', track.getCapabilities?.());
+
   } catch(e){
     toast('No se pudo acceder a la cámara. Usa el código manual.');
     return;
@@ -316,6 +345,7 @@ async function startScan(){
   var video = el('scanVideo');
   video.srcObject = scanStream;
   await video.play();
+  await applyCameraFocus(scanStream);
   show('scanModal');
   scanActive = true;
   requestAnimationFrame(scanLoop);
@@ -331,14 +361,47 @@ function stopScan(){
   hide('scanModal');
 }
 
-function scanWithJsqr(video){
-  var canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
+function grabFrame(video){
+  var vw = video.videoWidth, vh = video.videoHeight;
+  if (!vw || !vh) return null;
+  var f = 0.6;
+  var cw = Math.round(vw * f), ch = Math.round(vh * f);
+  var sx = Math.round((vw - cw) / 2), sy = Math.round((vh - ch) / 2);
+  scanCanvas.width = cw;
+  scanCanvas.height = ch;
+  var ctx = scanCanvas.getContext('2d');
+  ctx.drawImage(video, sx, sy, cw, ch, 0, 0, cw, ch);
+  return scanCanvas;
+}
+
+async function decodeFromVideo(video){
+  scanTick++;
+  var canvas = grabFrame(video);
+  if (!canvas) return null;
+  if (hasBarcodeDetector()){
+    if (!scanDetector) scanDetector = new BarcodeDetector({ formats:['qr_code'] });
+    var codes = await scanDetector.detect(canvas);
+    if (codes && codes.length && codes[0].rawValue) return codes[0].rawValue;
+    codes = await scanDetector.detect(video);
+    if (codes && codes.length && codes[0].rawValue) return codes[0].rawValue;
+    return null;
+  }
+  var raw = jsqrDecode(canvas);
+  if (raw) return raw;
+  if (scanTick % 3 === 0){
+    var vw = video.videoWidth, vh = video.videoHeight;
+    scanCanvasFull.width = vw;
+    scanCanvasFull.height = vh;
+    scanCanvasFull.getContext('2d').drawImage(video, 0, 0, vw, vh);
+    return jsqrDecode(scanCanvasFull);
+  }
+  return null;
+}
+
+function jsqrDecode(canvas){
   var ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0);
   var img = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  var r = window.jsQR(img.data, img.width, img.height, { inversionAttempts:'dontInvert' });
+  var r = window.jsQR(img.data, img.width, img.height, { inversionAttempts:'attemptBoth' });
   return r ? r.data : null;
 }
 
@@ -348,14 +411,10 @@ async function scanLoop(){
   if (video.readyState >= 2){
     var raw = null;
     try {
-      if (hasBarcodeDetector()){
-        if (!scanDetector) scanDetector = new BarcodeDetector({ formats:['qr_code'] });
-        var codes = await scanDetector.detect(video);
-        if (codes && codes.length && codes[0].rawValue) raw = codes[0].rawValue;
-      } else {
-        raw = scanWithJsqr(video);
-      }
-    } catch(e){}
+      raw = await decodeFromVideo(video);
+    } catch(e){
+      console.log('error al leer el qr', e);
+    }
     if (raw){
       stopScan();
       await identify(raw);

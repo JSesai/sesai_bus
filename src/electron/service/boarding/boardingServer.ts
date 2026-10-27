@@ -11,6 +11,7 @@ import { getBoardingPin } from "./boardingConfig.js";
 import { boardingPageHtml } from "./boarding-page.js";
 import { logger } from "../logger.js";
 import { getLocalIP } from "../../utils/network.js";
+import { BoardingError } from "../../../shared/errors/customError.js";
 
 const require = createRequire(import.meta.url);
 
@@ -179,6 +180,8 @@ export async function startBoardingServer(): Promise<void> {
             if (req.method === 'POST') {
                 if (pathname === '/api/boarding/identify') {
                     const decoded = decodeTicketCode(String(body.code || ''));
+                    console.log('decoded', decoded);
+
                     if (!decoded || decoded.ticketIds.length === 0) {
                         logger.warn("boarding", "Código no reconocido en identify");
                         sendJson(res, 400, { ok: false, data: null, error: { message: 'Código no reconocido', detail: 'El QR no es un boleto válido' } });
@@ -210,6 +213,15 @@ export async function startBoardingServer(): Promise<void> {
             res.writeHead(404);
             res.end('Not found');
         } catch (error) {
+            if (error instanceof BoardingError) {
+                logger.warn("boarding", "Abordaje rechazado", error.details);
+                sendJson(res, 400, {
+                    ok: false,
+                    data: null,
+                    error: { message: error.message, detail: error.details || error.message },
+                });
+                return;
+            }
             logger.error("boarding", `${req.method || 'GET'} ${pathname} → error`, error);
             console.error('Error en servidor de abordaje:', error);
             sendJson(res, 500, { ok: false, data: null, error: { message: 'Error interno', detail: String(error) } });

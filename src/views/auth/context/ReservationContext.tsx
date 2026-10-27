@@ -1,5 +1,4 @@
 import { createContext, useContext, useState } from "react";
-import { useDashboard } from "./DashBoardContext";
 import showAlert, { type PropsModal } from "../../Modals/Modals";
 import { toast } from "sonner";
 
@@ -81,7 +80,10 @@ export interface Reservation {
     ticket_status: SeatData['status'];
     total_amount: number;
     base_fare: number;
+    ticketIds: number[];
 }
+
+type ReservationRow = Omit<Reservation, 'ticketIds'> & { ticket_ids?: string | null };
 
 export const ReservationContext = createContext<ReservationContextType | undefined>(undefined);
 
@@ -169,7 +171,20 @@ export function ReservationProvider({ children }: { children: React.ReactNode })
         }
 
 
-        setReservations(reservationsDate.data);
+        const normalizedReservations: Reservation[] = (reservationsDate.data || []).map((row: ReservationRow) => {
+            const { ticket_ids, ...rest } = row;
+            return {
+                ...rest,
+                ticketIds: typeof ticket_ids === 'string'
+                    ? ticket_ids
+                        .split(',')
+                        .map((id: string) => parseInt(id.trim(), 10))
+                        .filter((id: number) => !isNaN(id))
+                    : [],
+            };
+        });
+
+        setReservations(normalizedReservations);
 
 
 

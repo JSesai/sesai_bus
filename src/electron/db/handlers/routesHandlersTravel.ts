@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
 import { routesTravelRepo } from "../repositories/routesTravelRepo.js";
-import { AppError, DestinationRouteError } from "../../../shared/errors/customError.js";
+import { DestinationRouteError } from "../../../shared/errors/customError.js";
 import { HHMMToTimestamp, timestamToHHMM } from "../../../shared/utils/helpers.js";
 import { logger } from "../../service/logger.js";
 

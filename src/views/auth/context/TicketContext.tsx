@@ -461,16 +461,24 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             purchaseDate: new Date().toISOString(),
         };
 
-        window.electron.printer.print(ticketPrintData).then((result) => {
-            if (result.method === "pdf" && result.pdfData) {
-                const link = document.createElement("a");
-                link.href = result.pdfData;
-                link.download = `ticket_${ticketPrintData.passengerName.replace(/\s+/g, "_")}_${Date.now()}.pdf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }).catch(() => {});
+        if (ticketIds.length === 0) {
+            showNofification({
+                typeAlert: 'error',
+                title: 'No se pudo generar el QR',
+                message: 'La venta se registró, pero no se obtuvieron los identificadores de los boletos. Reimprime el boleto desde reservaciones.'
+            });
+        } else {
+            window.electron.printer.print(ticketPrintData).then((result) => {
+                if (result.method === "pdf" && result.pdfData) {
+                    const link = document.createElement("a");
+                    link.href = result.pdfData;
+                    link.download = `ticket_${ticketPrintData.passengerName.replace(/\s+/g, "_")}_${Date.now()}.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            }).catch(() => {});
+        }
 
         showAlert({
             typeAlert: 'success',

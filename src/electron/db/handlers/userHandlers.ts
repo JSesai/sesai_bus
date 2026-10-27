@@ -175,7 +175,7 @@ export function registerUserHandlers() {
 
 
     });
-    ipcMain.handle("logout", async (_event, credentials: UserCredentials): Promise<ResponseElectronGeneric> => {
+    ipcMain.handle("logout", async (_event): Promise<ResponseElectronGeneric> => {
 
         try {
             console.log('inicia process logout');

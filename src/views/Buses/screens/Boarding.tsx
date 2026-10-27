@@ -110,6 +110,21 @@ export default function Boarding() {
         setShowScanner(false);
     };
 
+    const applyCameraFocus = async (stream: MediaStream) => {
+        try {
+            const track = stream.getVideoTracks()[0];
+            if (!track || typeof track.getCapabilities !== "function") return;
+            const caps = track.getCapabilities() as MediaTrackCapabilities & { focusMode?: string[] };
+            if (caps.focusMode?.includes("continuous")) {
+                await track.applyConstraints({
+                    advanced: [{ focusMode: "continuous" } as unknown as MediaTrackConstraintSet],
+                } as MediaTrackConstraints);
+            }
+        } catch {
+            // algunos equipos no permiten forzar el enfoque continuo
+        }
+    };
+
     const startScanner = async () => {
         setScanningError(null);
         try {
@@ -130,6 +145,7 @@ export default function Boarding() {
 
             video.srcObject = stream;
             await video.play();
+            await applyCameraFocus(stream);
             scanningRef.current = true;
             setShowScanner(true);
 

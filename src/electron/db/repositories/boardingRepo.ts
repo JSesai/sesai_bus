@@ -1,4 +1,5 @@
 import { getDB } from "../connection.js";
+import { BoardingError } from "../../../shared/errors/customError.js";
 
 const db = getDB();
 
@@ -118,14 +119,47 @@ export const boardingRepo = {
       if (ticketIds.length === 0) return resolve(0);
 
       const placeholders = ticketIds.map(() => "?").join(", ");
-      db.run(
-        `UPDATE tickets
-         SET boarded_at = datetime('now', 'localtime'), boarded_by = ?
-         WHERE id IN (${placeholders})`,
-        [userId, ...ticketIds],
-        function (err) {
-          if (err) reject(err);
-          else resolve(this.changes || 0);
+      db.all(
+        `SELECT
+           t.id AS ticket_id,
+           c.name AS customer_name,
+           s.dateDeparture,
+           s.departure_time
+         FROM tickets t
+         JOIN schedules s ON t.schedule_id = s.id
+         JOIN customers c ON t.customer_id = c.id
+         WHERE t.id IN (${placeholders})
+           AND datetime(date(s.dateDeparture) || ' ' || s.departure_time) > datetime('now', 'localtime')`,
+        ticketIds,
+        (lookupErr, rows: any[]) => {
+          if (lookupErr) return reject(lookupErr);
+
+          if (rows && rows.length > 0) {
+            const summary = rows
+              .map((r) => `${r.customer_name} (${r.dateDeparture} ${r.departure_time})`)
+              .join(", ");
+            return reject(
+              new BoardingError(
+                "El abordaje aún no está disponible",
+                `Solo se puede registrar el abordaje a partir de la fecha y hora del viaje. Salida programada: ${summary}`
+              )
+            );
+          }
+
+          db.run(
+            `UPDATE tickets
+             SET boarded_at = datetime('now', 'localtime'), boarded_by = ?
+             WHERE id IN (${placeholders})
+               AND schedule_id IN (
+                 SELECT id FROM schedules
+                 WHERE datetime(date(dateDeparture) || ' ' || departure_time) <= datetime('now', 'localtime')
+               )`,
+            [userId, ...ticketIds],
+            function (err) {
+              if (err) reject(err);
+              else resolve(this.changes || 0);
+            }
+          );
         }
       );
     }),

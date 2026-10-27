@@ -320,7 +320,19 @@ interface AppConfig {
   initial_setup_completed: number;
   min_advance_minutes: number;
   service_fee_percent: number;
+  boarding_pin?: string;
+  printer_text_size?: number;
+  printer_qr_size?: number;
+  printer_cut_enabled?: number;
+  printer_cut_mode?: number;
   created_at: string;
+}
+
+interface PrinterSettings {
+  textSize: number;
+  qrSize: number;
+  cutEnabled: boolean;
+  cutMode: number;
 }
 
 interface SeatData {

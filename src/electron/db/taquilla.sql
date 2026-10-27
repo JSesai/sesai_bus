@@ -9,6 +9,10 @@ CREATE TABLE IF NOT EXISTS app_config (
     min_advance_minutes INTEGER DEFAULT 30,
     service_fee_percent INTEGER DEFAULT 0,
     boarding_pin TEXT,
+    printer_text_size INTEGER DEFAULT 1,
+    printer_qr_size INTEGER DEFAULT 4,
+    printer_cut_enabled INTEGER DEFAULT 1,
+    printer_cut_mode INTEGER DEFAULT 1,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP, 
     status TEXT NOT NULL DEFAULT 'active'
 

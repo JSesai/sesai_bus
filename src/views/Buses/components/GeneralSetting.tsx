@@ -6,6 +6,7 @@ import { Label } from "../../components/ui/label";
 import { Settings, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useDashboard } from "../../auth/context/DashBoardContext";
+import { PrinterSettingsCard } from "./PrinterSettingsCard";
 
 export default function GeneralSetting() {
   const { loadAppConfig } = useDashboard();
@@ -66,60 +67,64 @@ export default function GeneralSetting() {
   }
 
   return (
-    <Card className="max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl flex items-center gap-2">
-          <Settings size={28} className="text-slate-600" />
-          Configuración General
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="minAdvance" className="text-base font-medium">
-            Minutos de anticipación para salidas del día actual
-          </Label>
-          <p className="text-sm text-muted-foreground">
-            Al crear o editar un horario de salida para el día de hoy, la hora de salida debe ser al menos esta cantidad de minutos posterior a la hora actual.
-          </p>
-          <div className="flex items-center gap-3 mt-3">
-            <Input
-              id="minAdvance"
-              type="number"
-              min="0"
-              value={minAdvanceMinutes}
-              onChange={(e) => setMinAdvanceMinutes(Number(e.target.value))}
-              className="h-11 w-32"
-            />
-            <span className="text-sm text-muted-foreground">minutos</span>
+    <div className="space-y-6">
+      <Card className="max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl flex items-center gap-2">
+            <Settings size={28} className="text-slate-600" />
+            Configuración General
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="minAdvance" className="text-base font-medium">
+              Minutos de anticipación para salidas del día actual
+            </Label>
+            <p className="text-sm text-muted-foreground">
+              Al crear o editar un horario de salida para el día de hoy, la hora de salida debe ser al menos esta cantidad de minutos posterior a la hora actual.
+            </p>
+            <div className="flex items-center gap-3 mt-3">
+              <Input
+                id="minAdvance"
+                type="number"
+                min="0"
+                value={minAdvanceMinutes}
+                onChange={(e) => setMinAdvanceMinutes(Number(e.target.value))}
+                className="h-11 w-32"
+              />
+              <span className="text-sm text-muted-foreground">minutos</span>
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="serviceFee" className="text-base font-medium">
-            Cargo por servicio
-          </Label>
-          <p className="text-sm text-muted-foreground">
-            Porcentaje adicional que se cobra sobre el subtotal del boleto. Se muestra desglosado en el resumen de compra. Configurar en 0 para no cobrar.
-          </p>
-          <div className="flex items-center gap-3 mt-3">
-            <Input
-              id="serviceFee"
-              type="number"
-              min="0"
-              max="100"
-              value={serviceFeePercent}
-              onChange={(e) => setServiceFeePercent(Number(e.target.value))}
-              className="h-11 w-32"
-            />
-            <span className="text-sm text-muted-foreground">%</span>
+          <div className="space-y-2">
+            <Label htmlFor="serviceFee" className="text-base font-medium">
+              Cargo por servicio
+            </Label>
+            <p className="text-sm text-muted-foreground">
+              Porcentaje adicional que se cobra sobre el subtotal del boleto. Se muestra desglosado en el resumen de compra. Configurar en 0 para no cobrar.
+            </p>
+            <div className="flex items-center gap-3 mt-3">
+              <Input
+                id="serviceFee"
+                type="number"
+                min="0"
+                max="100"
+                value={serviceFeePercent}
+                onChange={(e) => setServiceFeePercent(Number(e.target.value))}
+                className="h-11 w-32"
+              />
+              <span className="text-sm text-muted-foreground">%</span>
+            </div>
           </div>
-        </div>
 
-        <Button onClick={handleSave} disabled={isSaving} className="h-11">
-          <Save size={16} className="mr-2" />
-          {isSaving ? "Guardando..." : "Guardar"}
-        </Button>
-      </CardContent>
-    </Card>
+          <Button onClick={handleSave} disabled={isSaving} className="h-11">
+            <Save size={16} className="mr-2" />
+            {isSaving ? "Guardando..." : "Guardar"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      <PrinterSettingsCard />
+    </div>
   );
 }

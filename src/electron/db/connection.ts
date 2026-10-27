@@ -62,6 +62,38 @@ function runMigrations(database: sqlite3.Database) {
         }
     );
     database.run(
+        "ALTER TABLE app_config ADD COLUMN printer_text_size INTEGER DEFAULT 1",
+        (err) => {
+            if (err && !err.message.includes("duplicate column")) {
+                console.error("Error en migración printer_text_size:", err);
+            }
+        }
+    );
+    database.run(
+        "ALTER TABLE app_config ADD COLUMN printer_qr_size INTEGER DEFAULT 4",
+        (err) => {
+            if (err && !err.message.includes("duplicate column")) {
+                console.error("Error en migración printer_qr_size:", err);
+            }
+        }
+    );
+    database.run(
+        "ALTER TABLE app_config ADD COLUMN printer_cut_enabled INTEGER DEFAULT 1",
+        (err) => {
+            if (err && !err.message.includes("duplicate column")) {
+                console.error("Error en migración printer_cut_enabled:", err);
+            }
+        }
+    );
+    database.run(
+        "ALTER TABLE app_config ADD COLUMN printer_cut_mode INTEGER DEFAULT 1",
+        (err) => {
+            if (err && !err.message.includes("duplicate column")) {
+                console.error("Error en migración printer_cut_mode:", err);
+            }
+        }
+    );
+    database.run(
         "ALTER TABLE buses ADD COLUMN inapam_seats INTEGER NOT NULL DEFAULT 0",
         (err) => {
             if (err && !err.message.includes("duplicate column")) {

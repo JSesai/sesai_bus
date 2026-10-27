@@ -3,6 +3,7 @@ import { boardingRepo } from "../repositories/boardingRepo.js";
 import { getBoardingPin, regenerateBoardingPin } from "../../service/boarding/boardingConfig.js";
 import { getBoardingServerInfo } from "../../service/boarding/boardingServer.js";
 import { logger } from "../../service/logger.js";
+import { BoardingError } from "../../../shared/errors/customError.js";
 
 export function registerBoardingHandlers() {
   ipcMain.handle("boarding:getPin", async (): Promise<ResponseElectronGeneric> => {
@@ -70,6 +71,10 @@ export function registerBoardingHandlers() {
       const changes = await boardingRepo.markBoarded(ticketIds, userId);
       return { ok: true, data: { changes }, error: null };
     } catch (error) {
+      if (error instanceof BoardingError) {
+        logger.warn('boardingHandlers', "Abordaje rechazado", error.details);
+        return { ok: false, data: null, error: { message: error.message, detail: error.details || error.message } };
+      }
       logger.error('boardingHandlers', "Error en boarding:markBoarded", error);
       return { ok: false, data: null, error: { message: "No fue posible registrar el abordaje", detail: String(error) } };
     }

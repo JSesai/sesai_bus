@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../
 import { useAuth } from "../../auth/context/AuthContext"
 import { getInitials, translateRole } from "../../../shared/utils/helpers"
 import { useDashboard } from "../../auth/context/DashBoardContext";
+import { PrinterStatusIndicator } from "./PrinterStatusIndicator";
 
 declare const __APP_VERSION__: string
 
@@ -58,6 +59,9 @@ export default function DashboardHeader() {
         </div>
 
         <div className="flex items-center space-x-1 md:space-x-3">
+          {/* Printer Status */}
+          <PrinterStatusIndicator />
+
           {/* Waiting Room Toggle */}
           <TooltipProvider>
             <Tooltip>

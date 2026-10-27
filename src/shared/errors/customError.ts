@@ -73,3 +73,8 @@ export class TicketError extends AppError {
         super(message, 401, details);
     }
 }
+export class BoardingError extends AppError {
+    constructor(message: string, details?: string) {
+        super(message, 400, details);
+    }
+}

@@ -1,6 +1,5 @@
 import { ipcMain } from "electron";
 import { processFlowRepo } from "../repositories/processFlowRepo.js";
-import { ticketsRepo } from "../repositories/ticketsRepo.js";
 import { logger } from "../../service/logger.js";
 
 export function registerProcessFlowHandlers() {

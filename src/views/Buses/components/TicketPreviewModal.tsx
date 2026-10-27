@@ -28,21 +28,30 @@ export function TicketPreviewModal({ open, onClose, ticketData }: TicketPreviewM
   const [isPrinting, setIsPrinting] = useState(false);
   const [printResult, setPrintResult] = useState<"success" | "pdf" | null>(null);
 
+  const hasTicketIds = (ticketData.ticketIds?.length ?? 0) > 0;
+
   const ticketCode = useMemo(
     () =>
-      generateTicketCode({
-        origin: ticketData.origin,
-        destination: ticketData.destination,
-        date: ticketData.date,
-        time: ticketData.time,
-        passengerName: ticketData.passengerName,
-        seatNumbers: ticketData.seatNumbers,
-        ticketIds: ticketData.ticketIds || [],
-      }),
-    [ticketData]
+      hasTicketIds
+        ? generateTicketCode({
+            origin: ticketData.origin,
+            destination: ticketData.destination,
+            date: ticketData.date,
+            time: ticketData.time,
+            passengerName: ticketData.passengerName,
+            seatNumbers: ticketData.seatNumbers,
+            ticketIds: ticketData.ticketIds || [],
+          })
+        : "",
+    [ticketData, hasTicketIds]
   );
 
   const handlePrint = async () => {
+    if (!hasTicketIds) {
+      toast.error("El boleto no tiene identificador; no se puede generar el QR.", { position: "top-center" });
+      return;
+    }
+
     setIsPrinting(true);
     try {
       const result = await window.electron.printer.print(ticketData);
@@ -55,7 +64,7 @@ export function TicketPreviewModal({ open, onClose, ticketData }: TicketPreviewM
         downloadPdf(result.pdfData);
         toast.info("No se detectó impresora. Se descargó el ticket como PDF.", { position: "top-center" });
       }
-    } catch (error) {
+    } catch {
       toast.error("Error al imprimir el ticket", { position: "top-center" });
     } finally {
       setIsPrinting(false);
@@ -154,10 +163,18 @@ export function TicketPreviewModal({ open, onClose, ticketData }: TicketPreviewM
 
             {/* QR Code */}
             <div className="px-5 py-4 flex flex-col items-center gap-2">
-              <QrTicket data={ticketCode} size={100} className="text-black" />
-              <p className="text-[10px] text-gray-500 text-center">
-                Presentar este código al abordar
-              </p>
+              {ticketCode ? (
+                <>
+                  <QrTicket data={ticketCode} size={100} className="text-black" />
+                  <p className="text-[10px] text-gray-500 text-center">
+                    Presentar este código al abordar
+                  </p>
+                </>
+              ) : (
+                <p className="text-[11px] text-red-600 text-center font-medium">
+                  Boleto sin identificador: no se puede generar el código QR. Reimprima el boleto desde la venta.
+                </p>
+              )}
             </div>
 
             {/* Footer */}
@@ -190,7 +207,7 @@ export function TicketPreviewModal({ open, onClose, ticketData }: TicketPreviewM
             <X className="mr-2 h-4 w-4" />
             Cerrar
           </Button>
-          <Button onClick={handlePrint} disabled={isPrinting} className="flex-1">
+          <Button onClick={handlePrint} disabled={isPrinting || !hasTicketIds} className="flex-1">
             {isPrinting ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
